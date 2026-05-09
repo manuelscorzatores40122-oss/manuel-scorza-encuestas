@@ -1,0 +1,222 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.subtitle {
+  margin-top: 0.25rem;
+  color: #475569;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.bottomGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconBox {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.warmCard {
+  background: linear-gradient(to bottom right, #fff7ed, white);
+}
+
+.brandCard {
+  background: linear-gradient(to bottom right, #eff6ff, white);
+}
+
+.greenCard {
+  background: linear-gradient(to bottom right, #ecfdf5, white);
+}
+
+.contactCard {
+  background: white;
+}
+
+.warmIcon {
+  background: #f97316;
+}
+
+.brandIcon {
+  background: #2563eb;
+}
+
+.greenIcon {
+  background: #10b981;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.privacyText {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.link {
+  font-size: 0.875rem;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.announcementList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.announcement {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid #dbeafe;
+}
+
+.announcementTitle {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.announcementContent {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #475569;
+  white-space: pre-line;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.contactName {
+  font-weight: 600;
+}
+
+.contactText {
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.emptyText {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.profileCard {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  transition: 0.2s;
+  text-decoration: none;
+}
+
+.profileCard:hover {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.profileIcon {
+  width: 2rem;
+  height: 2rem;
+  color: #ea580c;
+  margin-bottom: 0.75rem;
+}
+
+.profileTitle {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.profileText {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .bottomGrid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

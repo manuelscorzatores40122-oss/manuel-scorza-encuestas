@@ -40,7 +40,7 @@ export default async function HistorialEstudiante() {
       )}
 
       <p className="text-xs text-slate-500 text-center">
-        Tus respuestas son privadas. Solo el psicólogo del colegio puede leerlas.
+        Tus respuestas son privadas.
       </p>
     </div>
   );

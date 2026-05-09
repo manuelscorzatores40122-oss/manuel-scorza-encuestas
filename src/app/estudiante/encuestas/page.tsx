@@ -5,22 +5,41 @@ import { prisma } from '@/lib/prisma';
 
 export default async function EncuestasEstudiante() {
   const session = (await getSession())!;
+
   const student = await prisma.student.findUnique({
     where: { userId: session.userId },
     include: { section: true },
   });
+
   if (!student) return null;
 
   const surveys = await prisma.survey.findMany({
     where: {
       isActive: true,
+
+      // No mostrar encuestas que el estudiante ya respondió
+      responses: {
+        none: {
+          studentId: student.id,
+        },
+      },
+
+      // Mostrar solo encuestas de su grado o encuestas generales
       OR: [
         { targetGrades: { has: student.section.gradeId } },
         { targetGrades: { isEmpty: true } },
       ],
     },
-    orderBy: { createdAt: 'desc' },
-    include: { _count: { select: { questions: true } } },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      _count: {
+        select: {
+          questions: true,
+        },
+      },
+    },
   });
 
   return (
@@ -38,16 +57,30 @@ export default async function EncuestasEstudiante() {
               <div className="w-10 h-10 rounded-xl bg-warm-100 text-warm-600 flex items-center justify-center flex-shrink-0">
                 <ClipboardList className="w-5 h-5" />
               </div>
+
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">{s.title}</h3>
-                {s.description && <p className="text-sm text-slate-600 mt-1">{s.description}</p>}
-                <p className="text-xs text-slate-500 mt-2">{s._count.questions} preguntas</p>
+                <h3 className="font-semibold text-slate-900">
+                  {s.title}
+                </h3>
+
+                {s.description && (
+                  <p className="text-sm text-slate-600 mt-1">
+                    {s.description}
+                  </p>
+                )}
+
+                <p className="text-xs text-slate-500 mt-2">
+                  {s._count.questions} preguntas
+                </p>
               </div>
             </div>
           </Link>
         ))}
+
         {surveys.length === 0 && (
-          <p className="text-slate-500 col-span-full text-center py-12">No hay encuestas activas.</p>
+          <p className="text-slate-500 col-span-full text-center py-12">
+            No hay encuestas activas.
+          </p>
         )}
       </div>
     </div>

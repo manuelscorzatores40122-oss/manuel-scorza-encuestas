@@ -19,15 +19,29 @@ const labels = {
   apoderado: 'Apoderado / contacto de emergencia',
 };
 
-export function ProfileForm({ contacts }: { contacts: Record<string, Contact | null> }) {
+export function ProfileForm({
+  contacts,
+}: {
+  contacts: Record<string, Contact | null>;
+}) {
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   function submit(formData: FormData) {
     setMsg(null);
+    setSuccess(false);
+
     startTransition(async () => {
       const result = await updateStudentProfileAction(formData);
-      setMsg(result.ok ? 'Perfil actualizado correctamente.' : result.error);
+
+      if (result.ok) {
+        setSuccess(true);
+        setMsg('Perfil actualizado correctamente.');
+      } else {
+        setSuccess(false);
+        setMsg(result.error || 'Error al guardar.');
+      }
     });
   }
 
@@ -35,9 +49,13 @@ export function ProfileForm({ contacts }: { contacts: Record<string, Contact | n
     <form action={submit} className="space-y-4">
       {(['padre', 'madre', 'apoderado'] as const).map((key) => {
         const c = contacts[key];
+
         return (
           <section key={key} className="card">
-            <h2 className="font-semibold text-slate-900 mb-4">{labels[key]}</h2>
+            <h2 className="font-semibold text-slate-900 mb-4">
+              {labels[key]}
+            </h2>
+
             <div className="grid md:grid-cols-2 gap-3">
               <div className="md:col-span-2">
                 <label className="label">Apellidos y nombres</label>
@@ -48,22 +66,39 @@ export function ProfileForm({ contacts }: { contacts: Record<string, Contact | n
                   placeholder="Apellidos y nombres completos"
                 />
               </div>
+
               <div>
                 <label className="label">Sexo</label>
-                <select name={`${key}.sexo`} className="input" defaultValue={c?.sexo || ''}>
+                <select
+                  name={`${key}.sexo`}
+                  className="input"
+                  defaultValue={c?.sexo || ''}
+                >
                   <option value="">No especificar</option>
                   <option value="F">Mujer</option>
                   <option value="M">Hombre</option>
                 </select>
               </div>
+
               <div>
                 <label className="label">Documento</label>
-                <input name={`${key}.document`} className="input" defaultValue={c?.numeroDocumento || ''} />
+                <input
+                  name={`${key}.document`}
+                  className="input"
+                  defaultValue={c?.numeroDocumento || ''}
+                />
               </div>
+
               <div>
                 <label className="label">Correo</label>
-                <input type="email" name={`${key}.email`} className="input" defaultValue={c?.correo || ''} />
+                <input
+                  type="email"
+                  name={`${key}.email`}
+                  className="input"
+                  defaultValue={c?.correo || ''}
+                />
               </div>
+
               <div>
                 <label className="label">Celular / emergencia</label>
                 <input
@@ -79,13 +114,20 @@ export function ProfileForm({ contacts }: { contacts: Record<string, Contact | n
       })}
 
       {msg && (
-        <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-800">
+        <div
+          className={
+            success
+              ? 'rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700'
+              : 'rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700'
+          }
+        >
           {msg}
         </div>
       )}
 
       <button className="btn-warm w-full md:w-auto" disabled={pending}>
-        <Save className="w-4 h-4" /> {pending ? 'Guardando...' : 'Guardar perfil'}
+        <Save className="w-4 h-4" />
+        {pending ? 'Guardando...' : 'Guardar perfil'}
       </button>
     </form>
   );

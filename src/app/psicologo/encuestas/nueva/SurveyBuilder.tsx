@@ -83,7 +83,7 @@ export function SurveyBuilder({ grades }: { grades: Grade[] }) {
           options: ['SINGLE', 'MULTI', 'YES_NO'].includes(q.type) ? q.options : undefined,
         })),
       });
-      if (result.ok) router.push('/psicologo/encuestas');
+      if (result?.ok) router.push('/psicologo/encuestas');
       else setError(result.error || 'Error al guardar');
     });
   }
