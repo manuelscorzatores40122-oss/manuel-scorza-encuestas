@@ -1,0 +1,300 @@
+// PsicoEscolar — schema de base de datos
+// I.E. 40122 Manuel Scorza Torres
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// USUARIOS Y ROLES
+// ============================================================
+
+enum Role {
+  STUDENT
+  TUTOR
+  AUXILIAR
+  PSYCHOLOGIST
+  DIRECTOR
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique // DNI para estudiantes; email para staff
+  passwordHash String
+  role         Role
+  fullName     String
+  email        String?
+  isActive     Boolean  @default(true)
+  lastLogin    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  student      Student?
+  tutorOf      Section[] @relation("SectionTutor")
+  surveys      Survey[]  @relation("SurveyCreator")
+  alertRules   AlertRule[] @relation("RuleCreator")
+  auditLogs    AuditLog[]
+  announcements Announcement[] @relation("AnnouncementCreator")
+
+  @@index([role])
+}
+
+// ============================================================
+// ESTRUCTURA ACADÉMICA
+// ============================================================
+
+enum Nivel {
+  PRIMARIA
+  SECUNDARIA
+}
+
+model Grade {
+  id        String   @id @default(cuid())
+  name      String   // "1°", "2°", ... "6°"
+  order     Int      // 1..6 primaria, 1..5 secundaria
+  nivel     Nivel
+  sections  Section[]
+
+  @@unique([nivel, order])
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  name      String   // "A", "B"
+  gradeId   String
+  grade     Grade    @relation(fields: [gradeId], references: [id])
+  tutorId   String?
+  tutor     User?    @relation("SectionTutor", fields: [tutorId], references: [id])
+  students  Student[]
+
+  @@unique([gradeId, name])
+}
+
+// ============================================================
+// ESTUDIANTES Y APODERADOS
+// ============================================================
+
+enum EstadoMatricula {
+  DEFINITIVA
+  RETIRADO
+  EGRESADO
+  TRASLADADO
+}
+
+enum Sexo {
+  M
+  F
+}
+
+model Student {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dni               String   @unique
+  codigoEstudiante  String?  @unique
+  apellidoPaterno   String
+  apellidoMaterno   String
+  nombres           String
+  sexo              Sexo
+  fechaNacimiento   DateTime
+  edad              Int
+  sectionId         String
+  section           Section  @relation(fields: [sectionId], references: [id])
+  estadoMatricula   EstadoMatricula @default(DEFINITIVA)
+  anioAcademico     Int
+  apoderados        Apoderado[]
+  responses         Response[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([sectionId])
+  @@index([anioAcademico])
+}
+
+enum Parentesco {
+  PADRE
+  MADRE
+  APODERADO
+  OTRO
+}
+
+model Apoderado {
+  id                  String   @id @default(cuid())
+  studentId           String
+  student             Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parentesco          Parentesco
+  apellidosNombres    String
+  sexo                Sexo?
+  tipoDocumento       String?  // DNI, CE, etc.
+  numeroDocumento     String?
+  correo              String?
+  celular             String?
+  esContactoPrincipal Boolean  @default(false)
+
+  @@index([studentId])
+}
+
+// ============================================================
+// ENCUESTAS
+// ============================================================
+
+enum QuestionType {
+  SINGLE      // selección única
+  MULTI       // selección múltiple
+  SCALE       // escala 1-5
+  TEXT        // texto abierto
+  YES_NO      // sí/no
+}
+
+model Survey {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  isActive      Boolean   @default(true)
+  fechaInicio   DateTime  @default(now())
+  fechaFin      DateTime?
+  createdById   String
+  createdBy     User      @relation("SurveyCreator", fields: [createdById], references: [id])
+  targetGrades  String[]  // ids de Grade
+  targetSections String[] // ids de Section (opcional, vacío = todas)
+  questions     Question[]
+  responses     Response[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([isActive])
+}
+
+model Question {
+  id         String       @id @default(cuid())
+  surveyId   String
+  survey     Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  type       QuestionType
+  text       String
+  options    Json?        // [{label, value, riskScore}]
+  required   Boolean      @default(true)
+  order      Int
+  riskScore  Int          @default(0) // peso global de la pregunta
+  answers    Answer[]
+
+  @@index([surveyId])
+}
+
+// ============================================================
+// RESPUESTAS
+// ============================================================
+
+model Response {
+  id          String   @id @default(cuid())
+  surveyId    String
+  survey      Survey   @relation(fields: [surveyId], references: [id])
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id])
+  submittedAt DateTime @default(now())
+  riskFlag    Boolean  @default(false)
+  riskScore   Int      @default(0)
+  riskLevel   String   @default("LOW") // LOW | MID | HIGH
+  wantsToTalk Boolean  @default(false)
+  answers     Answer[]
+  alerts      Alert[]
+
+  @@index([studentId])
+  @@index([surveyId])
+  @@index([riskFlag])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  responseId String
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  value      String   // valor serializado (texto, opción seleccionada, JSON para multi)
+
+  @@index([responseId])
+}
+
+// ============================================================
+// MOTOR DE ALERTAS
+// ============================================================
+
+enum AlertRuleType {
+  KEYWORD       // palabras clave en respuestas abiertas
+  COMBINATION   // combinación de respuestas (ej. A=X y B=Y)
+  SCORE         // umbral de score acumulado
+}
+
+model AlertRule {
+  id          String        @id @default(cuid())
+  name        String
+  type        AlertRuleType
+  config      Json          // estructura depende del tipo
+  isActive    Boolean       @default(true)
+  severity    String        @default("MID") // LOW | MID | HIGH
+  createdById String
+  createdBy   User          @relation("RuleCreator", fields: [createdById], references: [id])
+  alerts      Alert[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Alert {
+  id                  String   @id @default(cuid())
+  responseId          String
+  response            Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  ruleId              String
+  rule                AlertRule @relation(fields: [ruleId], references: [id])
+  severity            String
+  detail              String?
+  triggeredAt         DateTime @default(now())
+  reviewedAt          DateTime?
+  notificarApoderado  Boolean  @default(false)
+  notificadoEn        DateTime?
+
+  @@index([responseId])
+  @@index([reviewedAt])
+}
+
+// ============================================================
+// AUDITORÍA
+// ============================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ============================================================
+// ANUNCIOS
+// ============================================================
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  targetRoles String[] @default([])
+  isPublished Boolean  @default(true)
+  createdById String
+  createdBy   User     @relation("AnnouncementCreator", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([createdAt])
+}
