@@ -33,20 +33,19 @@ export default async function ResponderEncuesta({
     redirect('/login');
   }
 
-  // Buscar encuesta
-  const survey = await prisma.survey.findUnique({
-    where: {
-      id: params.id,
-    },
-
-    include: {
-      questions: {
-        orderBy: {
-          order: 'asc',
-        },
+  const [survey, existingResponse] = await Promise.all([
+    prisma.survey.findUnique({
+      where: { id: params.id },
+      include: { questions: { orderBy: { order: 'asc' } } },
+    }),
+    prisma.response.findFirst({
+      where: {
+        surveyId: params.id,
+        studentId: student.id,
       },
-    },
-  });
+      select: { id: true },
+    }),
+  ]);
 
   // Encuesta inválida
   if (!survey || !survey.isActive) {
@@ -68,14 +67,6 @@ export default async function ResponderEncuesta({
       </div>
     );
   }
-
-  // Verificar si ya respondió
-  const existingResponse = await prisma.response.findFirst({
-    where: {
-      surveyId: survey.id,
-      studentId: student.id,
-    },
-  });
 
   // Si ya respondió → redirigir con mensaje
   if (existingResponse) {

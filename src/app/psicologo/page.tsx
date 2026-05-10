@@ -96,15 +96,18 @@ function daysAgo(n: number): Date {
 
 function bucketByDay(items: { submittedAt: Date; riskLevel: string }[], days: number) {
   const buckets: { fecha: string; total: number; riesgo: number }[] = [];
+  const byFecha = new Map<string, { fecha: string; total: number; riesgo: number }>();
   const today = new Date();
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today); d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(5, 10);
-    buckets.push({ fecha: key, total: 0, riesgo: 0 });
+    const bucket = { fecha: key, total: 0, riesgo: 0 };
+    buckets.push(bucket);
+    byFecha.set(key, bucket);
   }
   for (const item of items) {
     const key = item.submittedAt.toISOString().slice(5, 10);
-    const b = buckets.find((x) => x.fecha === key);
+    const b = byFecha.get(key);
     if (b) {
       b.total++;
       if (item.riskLevel !== 'LOW') b.riesgo++;

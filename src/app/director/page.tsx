@@ -2,6 +2,12 @@ import { Users, ClipboardList, AlertTriangle, TrendingUp } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { DirectorCharts } from './DirectorCharts';
 
+type GradeRiskRow = {
+  grado: string;
+  riskLevel: string;
+  total: bigint;
+};
+
 export default async function DirectorDashboard() {
   const [
     totalEstudiantes,
@@ -11,7 +17,7 @@ export default async function DirectorDashboard() {
     encuestasActivas,
     primaria,
     secundaria,
-    porGrado,
+    porGradoRows,
     riskDist,
   ] = await Promise.all([
     prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA' } }),
@@ -21,22 +27,30 @@ export default async function DirectorDashboard() {
     prisma.survey.count({ where: { isActive: true } }),
     prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA', section: { grade: { nivel: 'PRIMARIA' } } } }),
     prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA', section: { grade: { nivel: 'SECUNDARIA' } } } }),
-    prisma.response.findMany({
-      include: {
-        student: { include: { section: { include: { grade: true } } } },
-      },
-    }),
+    prisma.$queryRaw<GradeRiskRow[]>`
+      SELECT
+        CASE WHEN g.nivel = 'PRIMARIA' THEN 'Pri ' ELSE 'Sec ' END || g.name AS grado,
+        r."riskLevel",
+        COUNT(*) AS total
+      FROM "Response" r
+      INNER JOIN "Student" s ON s.id = r."studentId"
+      INNER JOIN "Section" sec ON sec.id = s."sectionId"
+      INNER JOIN "Grade" g ON g.id = sec."gradeId"
+      GROUP BY g.nivel, g.name, g."order", r."riskLevel"
+      ORDER BY g.nivel, g."order"
+    `,
     prisma.response.groupBy({ by: ['riskLevel'], _count: true }),
   ]);
 
   // Bucket por grado anonimizado
   const byGrade: Record<string, { total: number; alto: number; medio: number }> = {};
-  for (const r of porGrado) {
-    const key = `${r.student.section.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} ${r.student.section.grade.name}`;
+  for (const row of porGradoRows) {
+    const key = row.grado;
+    const total = Number(row.total);
     byGrade[key] = byGrade[key] || { total: 0, alto: 0, medio: 0 };
-    byGrade[key].total++;
-    if (r.riskLevel === 'HIGH') byGrade[key].alto++;
-    if (r.riskLevel === 'MID') byGrade[key].medio++;
+    byGrade[key].total += total;
+    if (row.riskLevel === 'HIGH') byGrade[key].alto += total;
+    if (row.riskLevel === 'MID') byGrade[key].medio += total;
   }
   const gradeData = Object.entries(byGrade)
     .sort()

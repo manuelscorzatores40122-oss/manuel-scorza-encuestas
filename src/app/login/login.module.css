@@ -1,0 +1,319 @@
+/* ================================================
+   PsicoEscolar – I.E. 40122 Manuel Scorza Torres
+   Login Page — Módulo CSS
+   Paleta: Verde oliva, dorado, azul andino, blanco
+   ================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap');
+
+
+/* ── Contenedor principal ── */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+
+  
+  /* Textura sutil de grano */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Patrón decorativo de fondo */
+.container::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(201,168,50,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 25%, rgba(91,141,184,0.10) 0%, transparent 35%);
+  pointer-events: none;
+}
+
+/* Patrón de rombos muy sutil */
+.container::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0 L40 20 L20 40 L0 20Z' fill='none' stroke='rgba(201,168,50,0.06)' stroke-width='0.8'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ── Tarjeta ── */
+.cardWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  background: var(--blanco);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-carta);
+  overflow: hidden;
+
+  /* Borde dorado superior */
+  border-top: 5px solid var(--dorado);
+
+  animation: slideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* ── Header / Banner ── */
+.header {
+  background: linear-gradient(145deg, var(--verde-escudo) 0%, var(--verde-hoja) 100%);
+  padding: 2.2rem 2rem 1.8rem;
+  text-align: center;
+  position: relative;
+
+  /* Franja dorada inferior */
+  border-bottom: 3px solid var(--dorado);
+}
+
+/* Destellos decorativos en el header */
+.header::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(201,168,50,0.20) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -20px; left: -20px;
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(91,141,184,0.18) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+/* ── Logo ── */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.9rem;
+}
+
+.logo img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.45));
+  animation: logoPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes logoPop {
+  from { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+  to   { opacity: 1; transform: scale(1)   rotate(0deg);  }
+}
+
+/* ── Título ── */
+.title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dorado-claro);
+  letter-spacing: 0.06em;
+  margin: 0 0 0.3rem;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* ── Subtítulo institución ── */
+.subtitle {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ── Formulario ── */
+.form {
+  padding: 2rem 2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Labels ── */
+.label {
+  display: block;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--verde-hoja);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+
+/* ── Inputs ── */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2a2a2a;
+  background: #fff;
+
+  border: 2px solid var(--gris-suave);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.input::placeholder {
+  color: #aaa;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-color: var(--verde-claro);
+  box-shadow: 0 0 0 3px rgba(107,127,46,0.18), inset 0 2px 4px rgba(0,0,0,0.04);
+  background: #fafff4;
+}
+
+/* ── Texto de ayuda ── */
+.helpText {
+  margin: 0.45rem 0 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.76rem;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* ── Error ── */
+.error {
+  background: #fff0ed;
+  border: 1.5px solid #e05030;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rojo-sol);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: shake 0.35s ease;
+}
+
+.error::before { content: '⚠'; font-size: 1rem; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+
+/* ── Botón ── */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  margin-top: 0.25rem;
+
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--verde-hoja);
+
+  background: linear-gradient(135deg, var(--dorado-claro) 0%, var(--dorado) 60%, #b8921c 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 16px rgba(201,168,50,0.40), 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo animado sobre el botón */
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s;
+}
+
+.button:hover::before { left: 135%; }
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201,168,50,0.50), 0 2px 6px rgba(0,0,0,0.15);
+  filter: brightness(1.05);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(201,168,50,0.30);
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ── Icono del botón ── */
+.buttonIcon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+}
+
+/* ── Footer / privacidad ── */
+.footer {
+  text-align: center;
+  padding-top: 0.25rem;
+}
+
+.privacyLink {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  color: var(--azul-cielo);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: color 0.15s;
+}
+
+.privacyLink:hover { color: var(--azul-oscuro); text-decoration: underline; }
+
+/* ── Franja decorativa inferior de la tarjeta ── */
+.cardWrapper::after {
+  content: '';
+  display: block;
+  height: 5px;
+  background: linear-gradient(90deg, var(--verde-hoja), var(--dorado), var(--azul-cielo), var(--dorado), var(--verde-hoja));
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .cardWrapper { border-radius: 14px; }
+  .header { padding: 1.8rem 1.4rem 1.5rem; }
+  .form   { padding: 1.6rem 1.4rem 1.4rem; }
+  .title  { font-size: 1.5rem; }
+  .logo img { width: 86px; height: 86px; }
+}

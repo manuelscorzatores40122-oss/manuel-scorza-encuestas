@@ -47,7 +47,6 @@ export async function importSiagieExcel(
   // como "SEXO" o "APELLIDOS Y NOMBRES".
   const groupRow = sheet.getRow(GROUP_ROW);
   const headerRow = sheet.getRow(HEADER_ROW);
-  const colMap: Record<string, number> = {};
   const groupedColMap: Record<string, number> = {};
 
   headerRow.eachCell((cell, colNumber) => {
@@ -56,22 +55,10 @@ export async function importSiagieExcel(
     if (!label) return;
     // En SIAGIE hay celdas combinadas que ExcelJS repite en varias columnas.
     // Nos quedamos con la primera aparición útil para cada campo.
-    if (!colMap[label]) colMap[label] = colNumber;
     if (group && !groupedColMap[`${group}.${label}`]) {
       groupedColMap[`${group}.${label}`] = colNumber;
     }
   });
-
-  const get = (row: ExcelJS.Row, ...names: string[]) => {
-    for (const n of names) {
-      const c = colMap[normalizeHeader(n)];
-      if (c) {
-        const val = row.getCell(c).value;
-        if (val !== null && val !== undefined && val !== '') return val;
-      }
-    }
-    return null;
-  };
 
   const getFrom = (row: ExcelJS.Row, group: string, ...names: string[]) => {
     const normalizedGroup = normalizeHeader(group);
@@ -177,7 +164,7 @@ export async function importSiagieExcel(
           ],
         },
       });
-      const codigoConflict = codigoEst
+      const codigoConflict = codigoEst && existing?.codigoEstudiante !== codigoEst
         ? await prisma.student.findUnique({ where: { codigoEstudiante: codigoEst } })
         : null;
       const codigoForWrite = codigoConflict && codigoConflict.id !== existing?.id ? null : codigoEst;
@@ -221,32 +208,20 @@ export async function importSiagieExcel(
         result.creados++;
       }
 
-      // Apoderados (padre, madre, apoderado oficial)
-      await upsertApoderado(studentId, Parentesco.PADRE, {
-        apellidosNombres: String(getFrom(row, 'PADRE', 'APELLIDOS Y NOMBRES') ?? '').trim(),
-        sexo: parseSexo(getFrom(row, 'PADRE', 'SEXO')),
-        tipoDocumento: String(getFrom(row, 'PADRE', 'TIPO DE DOCUMENTO', 'TIPO DE DE DOCUMENTO') ?? '').trim(),
-        numeroDocumento: String(getFrom(row, 'PADRE', 'NÚMERO DE DOCUMENTO', 'NUMERO DE DOCUMENTO', 'NÚMERO', 'NUMERO') ?? '').trim(),
-        correo: String(getFrom(row, 'PADRE', 'CORREO ELECTRÓNICO', 'CORREO ELECTRONICO', 'CORREO', 'EMAIL') ?? '').trim(),
-        celular: String(getFrom(row, 'PADRE', 'NÚMERO CELULAR', 'NUMERO CELULAR', 'CELULAR', 'TELÉFONO', 'TELEFONO') ?? '').trim(),
-      });
-      await upsertApoderado(studentId, Parentesco.MADRE, {
-        apellidosNombres: String(getFrom(row, 'MADRE', 'APELLIDOS Y NOMBRES') ?? '').trim(),
-        sexo: parseSexo(getFrom(row, 'MADRE', 'SEXO')),
-        tipoDocumento: String(getFrom(row, 'MADRE', 'TIPO DE DOCUMENTO', 'TIPO DE DE DOCUMENTO') ?? '').trim(),
-        numeroDocumento: String(getFrom(row, 'MADRE', 'NÚMERO DE DOCUMENTO', 'NUMERO DE DOCUMENTO', 'NÚMERO', 'NUMERO') ?? '').trim(),
-        correo: String(getFrom(row, 'MADRE', 'CORREO ELECTRÓNICO', 'CORREO ELECTRONICO', 'CORREO', 'EMAIL') ?? '').trim(),
-        celular: String(getFrom(row, 'MADRE', 'NÚMERO CELULAR', 'NUMERO CELULAR', 'CELULAR', 'TELÉFONO', 'TELEFONO') ?? '').trim(),
-      });
-      await upsertApoderado(studentId, Parentesco.APODERADO, {
-        apellidosNombres: String(getFrom(row, 'APODERADO', 'APELLIDOS Y NOMBRES') ?? '').trim(),
-        sexo: parseSexo(getFrom(row, 'APODERADO', 'SEXO')),
-        tipoDocumento: String(getFrom(row, 'APODERADO', 'TIPO DE DOCUMENTO', 'TIPO DE DE DOCUMENTO') ?? '').trim(),
-        numeroDocumento: String(getFrom(row, 'APODERADO', 'NÚMERO DE DOCUMENTO', 'NUMERO DE DOCUMENTO', 'NÚMERO', 'NUMERO') ?? '').trim(),
-        correo: String(getFrom(row, 'APODERADO', 'CORREO ELECTRÓNICO', 'CORREO ELECTRONICO', 'CORREO', 'EMAIL') ?? '').trim(),
-        celular: String(getFrom(row, 'APODERADO', 'NÚMERO CELULAR', 'NUMERO CELULAR', 'CELULAR', 'TELÉFONO', 'TELEFONO') ?? '').trim(),
-        principal: true,
-      });
+      await upsertApoderados(studentId, [
+        {
+          parentesco: Parentesco.PADRE,
+          data: readApoderado(row, getFrom, 'PADRE'),
+        },
+        {
+          parentesco: Parentesco.MADRE,
+          data: readApoderado(row, getFrom, 'MADRE'),
+        },
+        {
+          parentesco: Parentesco.APODERADO,
+          data: { ...readApoderado(row, getFrom, 'APODERADO'), principal: true },
+        },
+      ]);
 
       result.total++;
     } catch (err: any) {
@@ -261,38 +236,60 @@ export async function importSiagieExcel(
   return result;
 }
 
-async function upsertApoderado(
-  studentId: string,
-  parentesco: Parentesco,
-  data: {
-    apellidosNombres: string;
-    sexo?: Sexo | null;
-    tipoDocumento: string;
-    numeroDocumento: string;
-    correo: string;
-    celular: string;
-    principal?: boolean;
-  }
-) {
-  if (!data.apellidosNombres) return;
-  const existing = await prisma.apoderado.findFirst({
-    where: { studentId, parentesco },
-  });
-  const payload = {
-    apellidosNombres: data.apellidosNombres,
-    sexo: data.sexo || null,
-    numeroDocumento: data.numeroDocumento || null,
-    tipoDocumento: data.tipoDocumento || (data.numeroDocumento ? 'DNI' : null),
-    correo: data.correo || null,
-    celular: data.celular || null,
-    esContactoPrincipal: !!data.principal,
+type ApoderadoInput = {
+  apellidosNombres: string;
+  sexo?: Sexo | null;
+  tipoDocumento: string;
+  numeroDocumento: string;
+  correo: string;
+  celular: string;
+  principal?: boolean;
+};
+
+type GetFromRow = (row: ExcelJS.Row, group: string, ...names: string[]) => unknown;
+
+function readApoderado(row: ExcelJS.Row, getFrom: GetFromRow, group: string): ApoderadoInput {
+  return {
+    apellidosNombres: String(getFrom(row, group, 'APELLIDOS Y NOMBRES') ?? '').trim(),
+    sexo: parseSexo(getFrom(row, group, 'SEXO')),
+    tipoDocumento: String(getFrom(row, group, 'TIPO DE DOCUMENTO', 'TIPO DE DE DOCUMENTO') ?? '').trim(),
+    numeroDocumento: String(getFrom(row, group, 'NÚMERO DE DOCUMENTO', 'NUMERO DE DOCUMENTO', 'NÚMERO', 'NUMERO') ?? '').trim(),
+    correo: String(getFrom(row, group, 'CORREO ELECTRÓNICO', 'CORREO ELECTRONICO', 'CORREO', 'EMAIL') ?? '').trim(),
+    celular: String(getFrom(row, group, 'NÚMERO CELULAR', 'NUMERO CELULAR', 'CELULAR', 'TELÉFONO', 'TELEFONO') ?? '').trim(),
   };
-  if (existing) {
-    await prisma.apoderado.update({ where: { id: existing.id }, data: payload });
-  } else {
-    await prisma.apoderado.create({
-      data: { ...payload, parentesco, studentId },
-    });
+}
+
+async function upsertApoderados(
+  studentId: string,
+  contacts: { parentesco: Parentesco; data: ApoderadoInput }[]
+) {
+  const existingContacts = await prisma.apoderado.findMany({
+    where: {
+      studentId,
+      parentesco: { in: contacts.map((contact) => contact.parentesco) },
+    },
+  });
+  const existingByParentesco = new Map(existingContacts.map((contact) => [contact.parentesco, contact]));
+
+  for (const { parentesco, data } of contacts) {
+    if (!data.apellidosNombres) continue;
+    const payload = {
+      apellidosNombres: data.apellidosNombres,
+      sexo: data.sexo || null,
+      numeroDocumento: data.numeroDocumento || null,
+      tipoDocumento: data.tipoDocumento || (data.numeroDocumento ? 'DNI' : null),
+      correo: data.correo || null,
+      celular: data.celular || null,
+      esContactoPrincipal: !!data.principal,
+    };
+    const existing = existingByParentesco.get(parentesco);
+    if (existing) {
+      await prisma.apoderado.update({ where: { id: existing.id }, data: payload });
+    } else {
+      await prisma.apoderado.create({
+        data: { ...payload, parentesco, studentId },
+      });
+    }
   }
 }
 

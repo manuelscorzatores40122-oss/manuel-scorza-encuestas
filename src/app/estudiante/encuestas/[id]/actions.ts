@@ -20,32 +20,33 @@ export async function submitSurveyAction(input: SubmitInput) {
     return { ok: false as const, error: 'Estudiante no encontrado' };
   }
 
-  const existingResponse = await prisma.response.findFirst({
-    where: {
-      surveyId: input.surveyId,
-      studentId: student.id,
-    },
-  });
+  const [existingResponse, survey] = await Promise.all([
+    prisma.response.findFirst({
+      where: {
+        surveyId: input.surveyId,
+        studentId: student.id,
+      },
+      select: { id: true },
+    }),
+    prisma.survey.findUnique({
+      where: { id: input.surveyId },
+      include: { questions: { orderBy: { order: 'asc' } } },
+    }),
+  ]);
 
   if (existingResponse) {
-    return {
-      ok: false as const,
-      error: 'Ya respondiste esta encuesta',
-    };
+    return { ok: false as const, error: 'Ya respondiste esta encuesta' };
   }
-
-  const survey = await prisma.survey.findUnique({
-    where: { id: input.surveyId },
-    include: { questions: { orderBy: { order: 'asc' } } },
-  });
 
   if (!survey || !survey.isActive) {
     return { ok: false as const, error: 'Encuesta no disponible' };
   }
 
+  const answersByQuestion = new Map(input.answers.map((answer) => [answer.questionId, answer]));
+
   for (const q of survey.questions) {
     if (q.required) {
-      const a = input.answers.find((x) => x.questionId === q.id);
+      const a = answersByQuestion.get(q.id);
 
       if (!a || !a.value || a.value.trim() === '') {
         return {
@@ -57,7 +58,7 @@ export async function submitSurveyAction(input: SubmitInput) {
   }
 
   const evaluationInput = survey.questions.map((q) => {
-    const ans = input.answers.find((x) => x.questionId === q.id);
+    const ans = answersByQuestion.get(q.id);
     const value = ans?.value || '';
     const opts: any[] = (q.options as any) || [];
     const opt = opts.find((o: any) => o.value === value);
@@ -76,7 +77,7 @@ export async function submitSurveyAction(input: SubmitInput) {
   const wantsToTalk = survey.questions.some((q) => {
     if (!/psic[oó]logo/i.test(q.text)) return false;
 
-    const ans = input.answers.find((x) => x.questionId === q.id);
+    const ans = answersByQuestion.get(q.id);
     return ans?.value === 'si';
   });
 

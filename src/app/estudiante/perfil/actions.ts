@@ -4,6 +4,7 @@ import { Parentesco, Sexo } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 
 const CONTACTS: Array<{ key: string; parentesco: Parentesco; principal?: boolean }> = [
   { key: 'padre', parentesco: Parentesco.PADRE },
@@ -15,6 +16,14 @@ export async function updateStudentProfileAction(formData: FormData) {
   const session = await requireRole(['STUDENT']);
   const student = await prisma.student.findUnique({ where: { userId: session.userId } });
   if (!student) return { ok: false as const, error: 'No se encontró tu ficha de estudiante.' };
+
+  const existingContacts = await prisma.apoderado.findMany({
+    where: {
+      studentId: student.id,
+      parentesco: { in: CONTACTS.map((contact) => contact.parentesco) },
+    },
+  });
+  const existingByParentesco = new Map(existingContacts.map((contact) => [contact.parentesco, contact]));
 
   for (const contact of CONTACTS) {
     const name = String(formData.get(`${contact.key}.name`) || '').trim();
@@ -39,9 +48,7 @@ export async function updateStudentProfileAction(formData: FormData) {
       esContactoPrincipal: !!contact.principal,
     };
 
-    const existing = await prisma.apoderado.findFirst({
-      where: { studentId: student.id, parentesco: contact.parentesco },
-    });
+    const existing = existingByParentesco.get(contact.parentesco);
 
     if (existing) {
       await prisma.apoderado.update({ where: { id: existing.id }, data: payload });
@@ -63,7 +70,7 @@ export async function updateStudentProfileAction(formData: FormData) {
 
   revalidatePath('/estudiante');
   revalidatePath('/estudiante/perfil');
-  return { ok: true as const };
+  redirect('/estudiante');
 }
 
 function parseSexo(value: string): Sexo | null {

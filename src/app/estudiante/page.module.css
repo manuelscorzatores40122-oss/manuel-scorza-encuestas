@@ -1,97 +1,141 @@
+/* ── Layout ───────────────────────────────────────── */
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  animation: fadeIn 0.3s ease;
+  gap: 1.75rem;
+  max-width: 860px;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ── Header ───────────────────────────────────────── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 1.875rem;
   font-weight: 700;
   color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .subtitle {
-  margin-top: 0.25rem;
-  color: #475569;
+  font-size: 0.9375rem;
+  color: #64748b;
+  font-weight: 400;
 }
 
+/* ── Stats row ────────────────────────────────────── */
 .statsGrid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
 }
 
-.bottomGrid {
-  display: grid;
-  gap: 1rem;
+/* ── Stat card (link) ─────────────────────────────── */
+.cardButton {
+  display: block;
+  padding: 1.25rem 1.375rem;
+  border-radius: 1.125rem;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.card {
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background: white;
-  border: 1px solid #e2e8f0;
+.cardButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -8px rgba(0,0,0,0.12);
+}
+
+.cardButton:active {
+  transform: translateY(0);
+}
+
+.warmCard {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef9f5 60%, #ffffff 100%);
+  border-color: #fed7aa;
+}
+
+.warmCard:hover {
+  border-color: #fb923c;
+}
+
+.brandCard {
+  background: linear-gradient(135deg, #eff6ff 0%, #f4f9ff 60%, #ffffff 100%);
+  border-color: #bfdbfe;
+}
+
+.brandCard:hover {
+  border-color: #3b82f6;
 }
 
 .cardRow {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
 }
 
 .iconBox {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.875rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
 }
 
-.warmCard {
-  background: linear-gradient(to bottom right, #fff7ed, white);
-}
+.warmIcon  { background: linear-gradient(135deg, #fb923c, #f97316); }
+.brandIcon { background: linear-gradient(135deg, #60a5fa, #2563eb); }
 
-.brandCard {
-  background: linear-gradient(to bottom right, #eff6ff, white);
-}
-
-.greenCard {
-  background: linear-gradient(to bottom right, #ecfdf5, white);
-}
-
-.contactCard {
-  background: white;
-}
-
-.warmIcon {
-  background: #f97316;
-}
-
-.brandIcon {
-  background: #2563eb;
-}
-
-.greenIcon {
-  background: #10b981;
+.cardContent {
+  flex: 1;
+  min-width: 0;
 }
 
 .statNumber {
-  font-size: 1.5rem;
+  font-size: 1.625rem;
   font-weight: 700;
   color: #0f172a;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .statLabel {
-  font-size: 0.875rem;
-  color: #475569;
+  margin-top: 0.2rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.3;
 }
 
-.privacyText {
-  font-size: 0.875rem;
-  font-weight: 600;
+.arrow {
+  font-size: 1.125rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.cardButton:hover .arrow {
+  transform: translateX(3px);
+  color: #64748b;
+}
+
+/* ── Generic card ─────────────────────────────────── */
+.card {
+  padding: 1.375rem 1.5rem;
+  border-radius: 1.125rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+}
+
+/* ── Announcements card ───────────────────────────── */
+.announcementsCard {
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 60%, #ffffff 100%);
+  border-color: #bfdbfe;
 }
 
 .sectionHeader {
@@ -105,35 +149,36 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
+  color: #0f172a;
 }
 
 .link {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: #2563eb;
   text-decoration: none;
+  font-weight: 500;
 }
 
-.link:hover {
-  text-decoration: underline;
-}
+.link:hover { text-decoration: underline; }
 
 .announcementList {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.625rem;
 }
 
 .announcement {
-  padding: 1rem;
+  padding: 0.875rem 1rem;
   border-radius: 0.75rem;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.85);
   border: 1px solid #dbeafe;
 }
 
 .announcementTitle {
   font-weight: 600;
+  font-size: 0.9375rem;
   color: #0f172a;
 }
 
@@ -142,81 +187,307 @@
   font-size: 0.875rem;
   color: #475569;
   white-space: pre-line;
+  line-height: 1.55;
+}
+
+/* ── Bottom grid ──────────────────────────────────── */
+.bottomGrid {
+  display: grid;
+  gap: 0.875rem;
+}
+
+/* ── Contact card ─────────────────────────────────── */
+
+.contactCard {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  box-shadow:
+    0 4px 10px rgba(15, 23, 42, 0.04),
+    0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.contactCard:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08),
+    0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.contactHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .contactInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.contactAvatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
 }
 
 .contactName {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.contactBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
   font-weight: 600;
+  color: #0369a1;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  width: fit-content;
+  letter-spacing: 0.02em;
 }
 
 .contactText {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  word-break: break-word;
+}
+
+.contactText strong {
+  color: #1e293b;
+  font-weight: 600;
 }
 
 .emptyText {
-  color: #64748b;
+  margin-top: 0.85rem;
+  color: #94a3b8;
   font-size: 0.875rem;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  background: #f8fafc;
 }
 
-.profileCard {
-  padding: 1.5rem;
+/* ── Contact card ─────────────────────────────────── */
+
+.contactCard {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid #e2e8f0;
   border-radius: 1rem;
+  padding: 1.25rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  box-shadow:
+    0 4px 10px rgba(15, 23, 42, 0.04),
+    0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.contactCard:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08),
+    0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.contactHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.contactAvatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.contactName {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.contactBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #0369a1;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  width: fit-content;
+  letter-spacing: 0.02em;
+}
+
+.contactText {
+  font-size: 0.9rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  word-break: break-word;
+}
+
+.contactText strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.emptyText {
+  margin-top: 0.85rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+
+/* ── Responsive ─────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .contactCard {
+    padding: 1rem;
+  }
+
+  .contactHeader {
+    align-items: flex-start;
+  }
+
+  .contactAvatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 0.85rem;
+  }
+
+  .contactName {
+    font-size: 0.95rem;
+  }
+
+  .contactText {
+    font-size: 0.85rem;
+  }
+}
+/* ── Profile card ─────────────────────────────────── */
+.profileCard {
+  padding: 1.375rem 1.5rem;
+  border-radius: 1.125rem;
   background: white;
   border: 1px solid #e2e8f0;
-  transition: 0.2s;
   text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .profileCard:hover {
   background: #fff7ed;
   border-color: #fdba74;
+  transform: translateY(-2px);
+}
+
+.profileIconWrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: #fff7ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.875rem;
+  border: 1px solid #fed7aa;
 }
 
 .profileIcon {
-  width: 2rem;
-  height: 2rem;
+  width: 1.25rem;
+  height: 1.25rem;
   color: #ea580c;
-  margin-bottom: 0.75rem;
 }
 
 .profileTitle {
   font-weight: 600;
-  color: #0f172a;
+  color: #000104;
+  font-size: 0.9375rem;
 }
 
 .profileText {
   margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: #475569;
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.5;
 }
 
-@media (min-width: 768px) {
-  .statsGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
+/* ── Responsive ───────────────────────────────────── */
+@media (min-width: 640px) {
   .bottomGrid {
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 1.625rem;
+  }
+}
+
+/* ── Animation ────────────────────────────────────── */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
