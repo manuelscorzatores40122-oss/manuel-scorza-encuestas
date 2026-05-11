@@ -14,6 +14,8 @@ import {
   CartesianGrid,
 } from 'recharts';
 
+import styles from './DashboardCharts.module.css';
+
 type RiskDist = {
   LOW: number;
   MID: number;
@@ -43,36 +45,20 @@ export function DashboardCharts({
   const totalRisk = riskDist.LOW + riskDist.MID + riskDist.HIGH;
 
   const pieData = [
-    {
-      name: 'Sin riesgo',
-      value: riskDist.LOW,
-      color: COLORS.LOW,
-    },
-    {
-      name: 'Riesgo medio',
-      value: riskDist.MID,
-      color: COLORS.MID,
-    },
-    {
-      name: 'Riesgo alto',
-      value: riskDist.HIGH,
-      color: COLORS.HIGH,
-    },
+    { name: 'Sin riesgo', value: riskDist.LOW, color: COLORS.LOW },
+    { name: 'Riesgo medio', value: riskDist.MID, color: COLORS.MID },
+    { name: 'Riesgo alto', value: riskDist.HIGH, color: COLORS.HIGH },
   ].filter((item) => item.value > 0);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4">
-          <h3 className="text-base font-semibold text-slate-900">
-            Distribución de riesgo
-          </h3>
-          <p className="text-sm text-slate-500">
-            Clasificación general de respuestas psicológicas.
-          </p>
-        </div>
+    <div className={styles.grid}>
+      <section className={styles.card}>
+        <ChartHeader
+          title="Distribución de riesgo"
+          description="Clasificación general de respuestas psicológicas."
+        />
 
-        <div className="h-72">
+        <div className={styles.chartBox}>
           {totalRisk === 0 ? (
             <EmptyChart text="Aún no hay datos de riesgo para mostrar." />
           ) : (
@@ -116,22 +102,21 @@ export function DashboardCharts({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4">
-          <h3 className="text-base font-semibold text-slate-900">
-            Respuestas últimos 30 días
-          </h3>
-          <p className="text-sm text-slate-500">
-            Comparación entre respuestas totales y respuestas con riesgo.
-          </p>
-        </div>
+      <section className={styles.card}>
+        <ChartHeader
+          title="Respuestas últimos 30 días"
+          description="Comparación entre respuestas totales y respuestas con riesgo."
+        />
 
-        <div className="h-72">
+        <div className={styles.chartBox}>
           {trend.length === 0 ? (
             <EmptyChart text="Aún no hay respuestas registradas." />
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trend} margin={{ top: 8, right: 16, left: -20, bottom: 0 }}>
+              <LineChart
+                data={trend}
+                margin={{ top: 8, right: 16, left: -20, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
 
                 <XAxis
@@ -149,7 +134,6 @@ export function DashboardCharts({
                 />
 
                 <Tooltip />
-
                 <Legend />
 
                 <Line
@@ -180,10 +164,21 @@ export function DashboardCharts({
   );
 }
 
-function EmptyChart({ text }: { text: string }) {
+function ChartHeader({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
-    <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center text-sm text-slate-500">
-      {text}
+    <div className={styles.header}>
+      <h3 className={styles.title}>{title}</h3>
+      <p className={styles.description}>{description}</p>
     </div>
   );
+}
+
+function EmptyChart({ text }: { text: string }) {
+  return <div className={styles.emptyChart}>{text}</div>;
 }
