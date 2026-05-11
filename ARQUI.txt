@@ -1,0 +1,135 @@
+hugo@archlinux ~/FINAL_PRO/psicoescolar $ tree app src prisma components lib -I "node_modules|.next" -L 5
+app  [error opening dir]
+src
+├── app
+│   ├── admin
+│   │   ├── anuncios
+│   │   │   ├── actions.ts
+│   │   │   ├── AnnouncementsManager.tsx
+│   │   │   └── page.tsx
+│   │   ├── auditoria
+│   │   │   └── page.tsx
+│   │   ├── importar
+│   │   │   ├── actions.ts
+│   │   │   ├── ImportSiagie.tsx
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── reglas
+│   │   │   ├── actions.ts
+│   │   │   ├── page.tsx
+│   │   │   └── RulesEditor.tsx
+│   │   └── usuarios
+│   │       ├── actions.ts
+│   │       ├── page.tsx
+│   │       └── UsersTable.tsx
+│   ├── api
+│   │   └── export
+│   │       └── responses
+│   │           └── route.ts
+│   ├── auxiliar
+│   │   ├── estudiantes
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── respuestas
+│   │       └── page.tsx
+│   ├── director
+│   │   ├── comparativas
+│   │   │   ├── ComparativasCharts.tsx
+│   │   │   └── page.tsx
+│   │   ├── DirectorCharts.tsx
+│   │   ├── estudiantes
+│   │   │   ├── [id]
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── reportes
+│   │       └── page.tsx
+│   ├── estudiante
+│   │   ├── anuncios
+│   │   │   └── page.tsx
+│   │   ├── encuestas
+│   │   │   ├── [id]
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── SurveyForm.tsx
+│   │   │   └── page.tsx
+│   │   ├── error.tsx
+│   │   ├── historial
+│   │   │   └── page.tsx
+│   │   ├── layout.module.css
+│   │   ├── layout.tsx
+│   │   ├── page.module.css
+│   │   ├── page.tsx
+│   │   └── perfil
+│   │       ├── actions.ts
+│   │       ├── layout.module.css
+│   │       ├── page.tsx
+│   │       ├── perfil.css
+│   │       └── ProfileForm.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── login
+│   │   ├── actions.ts
+│   │   ├── login.module.css
+│   │   └── page.tsx
+│   ├── page.tsx
+│   ├── privacidad
+│   │   └── page.tsx
+│   ├── psicologo
+│   │   ├── alertas
+│   │   │   ├── actions.ts
+│   │   │   └── page.tsx
+│   │   ├── anuncios
+│   │   │   └── page.tsx
+│   │   ├── DashboardCharts.tsx
+│   │   ├── encuestas
+│   │   │   ├── actions.ts
+│   │   │   ├── nueva
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── SurveyBuilder.tsx
+│   │   │   └── page.tsx
+│   │   ├── estudiantes
+│   │   │   ├── [id]
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── StudentTimeline.tsx
+│   │   │   ├── page.module.css
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── respuestas
+│   │       ├── [id]
+│   │       │   └── page.tsx
+│   │       └── page.tsx
+│   └── tutor
+│       ├── estudiantes
+│       │   └── page.tsx
+│       ├── layout.tsx
+│       ├── page.tsx
+│       └── respuestas
+│           └── page.tsx
+├── components
+│   ├── AppShell.tsx
+│   ├── DatabaseUnavailable.tsx
+│   ├── RiskBadge.tsx
+│   └── StudentMobileBottomNav.tsx
+├── lib
+│   ├── alert-engine.ts
+│   ├── announcements.ts
+│   ├── auth.ts
+│   ├── constants.ts
+│   ├── excel-exporter.ts
+│   ├── prisma.ts
+│   ├── siagie-importer.ts
+│   └── utils.ts
+└── middleware.ts
+prisma
+├── schema.prisma
+└── seed.ts
+components  [error opening dir]
+lib  [error opening dir]
+
+42 directories, 86 files
+hugo@archlinux ~/FINAL_PRO/psicoescolar $ 
