@@ -1,18 +1,20 @@
 import Link from 'next/link';
-import { FileBarChart } from 'lucide-react';
+import { Download, FileBarChart } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
 import { RiskBadge } from '@/components/RiskBadge';
+import { ImportResponsesExcel } from './ImportResponsesExcel';
 
 export default async function RespuestasPsicologo({
   searchParams,
-}: { searchParams: { riesgo?: string; gradoId?: string; surveyId?: string } }) {
+}: { searchParams: { riesgo?: string; gradoId?: string; sectionId?: string; surveyId?: string } }) {
   const where: any = {};
   if (searchParams.riesgo) where.riskLevel = searchParams.riesgo;
   if (searchParams.surveyId) where.surveyId = searchParams.surveyId;
-  if (searchParams.gradoId) where.student = { section: { gradeId: searchParams.gradoId } };
+  if (searchParams.sectionId) where.student = { sectionId: searchParams.sectionId };
+  else if (searchParams.gradoId) where.student = { section: { gradeId: searchParams.gradoId } };
 
-  const [responses, surveys, grades] = await Promise.all([
+  const [responses, surveys, grades, sections] = await Promise.all([
     prisma.response.findMany({
       where,
       include: {
@@ -24,7 +26,14 @@ export default async function RespuestasPsicologo({
     }),
     prisma.survey.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.grade.findMany({ orderBy: [{ nivel: 'asc' }, { order: 'asc' }] }),
+    prisma.section.findMany({
+      include: { grade: true },
+      orderBy: [{ grade: { nivel: 'asc' } }, { grade: { order: 'asc' } }, { name: 'asc' }],
+    }),
   ]);
+  const visibleSections = searchParams.gradoId
+    ? sections.filter((section) => section.gradeId === searchParams.gradoId)
+    : sections;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -32,7 +41,6 @@ export default async function RespuestasPsicologo({
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <FileBarChart className="w-6 h-6 text-brand-600" /> Respuestas
         </h1>
-        <p className="text-xs text-slate-500">Los documentos de identidad solo son visibles para administración.</p>
       </div>
 
       <form className="card flex flex-wrap gap-3 items-end">
@@ -51,6 +59,17 @@ export default async function RespuestasPsicologo({
           </select>
         </div>
         <div>
+          <label className="label text-xs">Sección</label>
+          <select name="sectionId" defaultValue={searchParams.sectionId || ''} className="input">
+            <option value="">Todas</option>
+            {visibleSections.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {s.grade.name} {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="label text-xs">Nivel de riesgo</label>
           <select name="riesgo" defaultValue={searchParams.riesgo || ''} className="input">
             <option value="">Todos</option>
@@ -61,6 +80,63 @@ export default async function RespuestasPsicologo({
         </div>
         <button className="btn-primary" type="submit">Filtrar</button>
       </form>
+
+      <form action="/api/export/responses" method="GET" className="card space-y-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-slate-900">Exportar respuestas</h2>
+            <p className="text-sm text-slate-500">
+              Selecciona la encuesta, el grado y la sección antes de generar el archivo.
+            </p>
+          </div>
+          <Download className="h-5 w-5 text-brand-600" />
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5 xl:items-end">
+          <div>
+            <label className="label text-xs">Encuesta</label>
+            <select name="surveyId" defaultValue={searchParams.surveyId || ''} className="input">
+              <option value="">Todas</option>
+              {surveys.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="label text-xs">Grado</label>
+            <select name="gradoId" defaultValue={searchParams.gradoId || ''} className="input">
+              <option value="">Todos</option>
+              {grades.map((g) => <option key={g.id} value={g.id}>{g.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {g.name}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="label text-xs">Sección</label>
+            <select name="sectionId" defaultValue={searchParams.sectionId || ''} className="input">
+              <option value="">Todas</option>
+              {visibleSections.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {s.grade.name} {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="label text-xs">Formato</label>
+            <select name="format" defaultValue="xlsx" className="input">
+              <option value="xlsx">Excel</option>
+              <option value="csv">CSV</option>
+            </select>
+          </div>
+
+          <button className="btn-primary" type="submit">
+            <Download className="w-4 h-4" />
+            Exportar respuestas
+          </button>
+        </div>
+      </form>
+
+      <ImportResponsesExcel surveys={surveys.map((survey) => ({ id: survey.id, title: survey.title }))} />
 
       <div className="card !p-0 overflow-x-auto">
         <table className="w-full text-sm">

@@ -1,0 +1,286 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.titleIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #2563eb;
+}
+
+.newButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.newButton:hover {
+  background: #1d4ed8;
+}
+
+.buttonIcon,
+.smallIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.desktopTable {
+  display: block;
+}
+
+.mobileList {
+  display: none;
+}
+
+.tableCard {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.thead {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.thead th {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  font-weight: 700;
+}
+
+.row {
+  border-top: 1px solid #f1f5f9;
+}
+
+.row:hover {
+  background: #f8fafc;
+}
+
+.row td {
+  padding: 1rem;
+}
+
+.surveyTitle {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.date {
+  color: #64748b;
+}
+
+.activeBadge,
+.inactiveBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.activeBadge {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.inactiveBadge {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.toggleButton,
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggleButton {
+  color: #475569;
+}
+
+.toggleButton:hover {
+  color: #2563eb;
+}
+
+.deleteButton {
+  color: #dc2626;
+}
+
+.deleteButton:hover {
+  color: #991b1b;
+}
+
+.empty,
+.emptyMobile {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #64748b;
+}
+
+/* Móvil tipo combo box */
+
+.mobileSurvey {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.mobileSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mobileSummary::-webkit-details-marker {
+  display: none;
+}
+
+.mobileTitle {
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.chevronIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.mobileSurvey[open] .chevronIcon {
+  transform: rotate(180deg);
+}
+
+.mobileContent {
+  border-top: 1px solid #f1f5f9;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.mobileInfo {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.mobileInfo strong {
+  color: #0f172a;
+}
+
+.mobileActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.mobileToggleButton,
+.mobileDeleteButton {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mobileToggleButton {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.mobileDeleteButton {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .desktopTable {
+    display: none;
+  }
+
+  .mobileList {
+    display: grid;
+    gap: 0.75rem;
+  }
+}

@@ -1,61 +1,170 @@
 'use server';
 
-import { Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { z } from 'zod';
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function toggleSurveyAction(id: string) {
-  await requireRole(['PSYCHOLOGIST', 'ADMIN']);
-  const s = await prisma.survey.findUnique({ where: { id } });
-  if (!s) return;
-  await prisma.survey.update({
-    where: { id },
-    data: { isActive: !s.isActive },
-  });
-  revalidatePath('/psicologo/encuestas');
-}
+const optionSchema = z.object({
+  label: z.string().trim().min(1, 'Cada opción necesita una etiqueta'),
+  value: z.string().trim().min(1, 'Cada opción necesita un valor'),
+  riskScore: z.coerce.number().int().min(0).max(100),
+});
 
-type CreateSurveyInput = {
-  title: string;
-  description?: string;
-  targetGrades: string[];
-  questions: {
-    type: 'SINGLE' | 'MULTI' | 'SCALE' | 'TEXT' | 'YES_NO';
-    text: string;
-    required: boolean;
-    options?: { label: string; value: string; riskScore: number }[];
-    riskScore?: number;
-  }[];
-};
+const questionSchema = z.object({
+  type: z.enum(['SINGLE', 'MULTI', 'SCALE', 'TEXT', 'YES_NO']),
+  text: z.string().trim().min(1, 'Cada pregunta necesita texto'),
+  required: z.boolean(),
+  riskScore: z.coerce.number().int().min(0).max(100),
+  options: z.array(optionSchema).optional(),
+});
 
-export async function createSurveyAction(input: CreateSurveyInput) {
+const createSurveySchema = z.object({
+  title: z.string().trim().min(1, 'Falta el título'),
+  description: z.string().trim().optional(),
+  targetGrades: z.array(z.string().trim().min(1)).default([]),
+  questions: z.array(questionSchema).min(1, 'Agrega al menos una pregunta'),
+});
+
+type CreateSurveyInput = z.input<typeof createSurveySchema>;
+type SurveyActionResult =
+  | { ok: true; surveyId: string }
+  | { ok: false; error: string };
+
+export async function createSurveyAction(input: CreateSurveyInput): Promise<SurveyActionResult> {
   const session = await requireRole(['PSYCHOLOGIST']);
-  if (!input.title.trim()) return { ok: false as const, error: 'El título es obligatorio' };
-  if (input.questions.length === 0) return { ok: false as const, error: 'Debes agregar al menos una pregunta' };
+  const parsed = createSurveySchema.safeParse(input);
+
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues[0]?.message || 'Datos inválidos',
+    };
+  }
+
+  const { title, description, targetGrades, questions } = parsed.data;
+
+  for (const question of questions) {
+    const needsOptions = question.type === 'SINGLE' || question.type === 'MULTI' || question.type === 'YES_NO';
+
+    if (needsOptions && (!question.options || question.options.length === 0)) {
+      return {
+        ok: false,
+        error: `La pregunta "${question.text}" necesita opciones`,
+      };
+    }
+
+    if (!needsOptions && question.options?.length) {
+      return {
+        ok: false,
+        error: `La pregunta "${question.text}" no debe enviar opciones`,
+      };
+    }
+  }
+
+  const validGrades = targetGrades.length
+    ? await prisma.grade.count({
+        where: {
+          id: {
+            in: targetGrades,
+          },
+        },
+      })
+    : 0;
+
+  if (targetGrades.length > 0 && validGrades !== targetGrades.length) {
+    return {
+      ok: false,
+      error: 'Uno o más grados seleccionados no existen',
+    };
+  }
 
   const survey = await prisma.survey.create({
     data: {
-      title: input.title.trim(),
-      description: input.description?.trim() || null,
-      isActive: true,
+      title,
+      description: description || null,
       createdById: session.userId,
-      targetGrades: input.targetGrades,
+      targetGrades,
       targetSections: [],
       questions: {
-        create: input.questions.map((q, i) => ({
-          type: q.type,
-          text: q.text.trim(),
-          required: q.required,
-          order: i + 1,
-          riskScore: q.riskScore || 0,
-          options: q.options ?? Prisma.JsonNull,
+        create: questions.map((question, index) => ({
+          type: question.type,
+          text: question.text,
+          required: question.required,
+          riskScore: question.riskScore,
+          order: index + 1,
+          options: question.options || undefined,
         })),
       },
     },
   });
 
+  await prisma.auditLog.create({
+    data: {
+      userId: session.userId,
+      action: 'CREATE_SURVEY',
+      entity: 'Survey',
+      entityId: survey.id,
+    },
+  });
+
   revalidatePath('/psicologo/encuestas');
-  return { ok: true as const, surveyId: survey.id };
+
+  return {
+    ok: true,
+    surveyId: survey.id,
+  };
+}
+
+export async function toggleSurveyAction(id: string) {
+  await requireRole(['PSYCHOLOGIST', 'ADMIN']);
+
+  const survey = await prisma.survey.findUnique({
+    where: { id },
+    select: { isActive: true },
+  });
+
+  if (!survey) return { ok: false as const, error: 'Encuesta no encontrada' };
+
+  await prisma.survey.update({
+    where: { id },
+    data: {
+      isActive: !survey.isActive,
+    },
+  });
+
+  revalidatePath('/psicologo/encuestas');
+
+  return { ok: true as const };
+}
+
+export async function deleteSurveyAction(id: string) {
+  await requireRole(['PSYCHOLOGIST', 'ADMIN']);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.response.deleteMany({
+      where: {
+        surveyId: id,
+      },
+    });
+
+    await tx.question.deleteMany({
+      where: {
+        surveyId: id,
+      },
+    });
+
+    await tx.survey.delete({
+      where: {
+        id,
+      },
+    });
+  });
+
+  revalidatePath('/psicologo/encuestas');
+  revalidatePath('/psicologo/respuestas');
+  revalidatePath('/psicologo/alertas');
+  revalidatePath('/psicologo/estadisticas');
+
+  return { ok: true as const, mode: 'deleted' as const };
 }

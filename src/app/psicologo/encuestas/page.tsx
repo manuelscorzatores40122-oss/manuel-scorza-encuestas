@@ -1,64 +1,165 @@
 import Link from 'next/link';
-import { Plus, ClipboardList, Power } from 'lucide-react';
+
+import {
+  Plus,
+  ClipboardList,
+  ChevronDown,
+} from 'lucide-react';
+
 import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
-import { toggleSurveyAction } from './actions';
+
+import styles from './page.module.css';
+import { SurveyActions } from './SurveyActions';
 
 export default async function EncuestasPsicologo() {
   const surveys = await prisma.survey.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { _count: { select: { responses: true, questions: true } } },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    include: {
+      _count: {
+        select: {
+          responses: true,
+          questions: true,
+        },
+      },
+    },
   });
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <ClipboardList className="w-6 h-6 text-brand-600" /> Encuestas
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>
+          <ClipboardList className={styles.titleIcon} />
+          Encuestas
         </h1>
-        <Link href="/psicologo/encuestas/nueva" className="btn-primary">
-          <Plus className="w-4 h-4" /> Nueva encuesta
+
+        <Link href="/psicologo/encuestas/nueva" className={styles.newButton}>
+          <Plus className={styles.buttonIcon} />
+          Nueva encuesta
         </Link>
       </div>
 
-      <div className="card !p-0 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-600">
-            <tr>
-              <th className="text-left px-4 py-3">Título</th>
-              <th className="text-center px-4 py-3">Preguntas</th>
-              <th className="text-center px-4 py-3">Respuestas</th>
-              <th className="text-center px-4 py-3">Estado</th>
-              <th className="text-left px-4 py-3">Creada</th>
-              <th className="text-right px-4 py-3">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {surveys.map((s) => (
-              <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-900">{s.title}</td>
-                <td className="px-4 py-3 text-center">{s._count.questions}</td>
-                <td className="px-4 py-3 text-center">{s._count.responses}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className={`badge ${s.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                    {s.isActive ? 'Activa' : 'Inactiva'}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-slate-500">{formatDate(s.createdAt)}</td>
-                <td className="px-4 py-3 text-right">
-                  <form action={toggleSurveyAction.bind(null, s.id)}>
-                    <button className="text-slate-600 hover:text-brand-600 inline-flex items-center gap-1 text-xs">
-                      <Power className="w-3 h-3" /> {s.isActive ? 'Desactivar' : 'Activar'}
-                    </button>
-                  </form>
-                </td>
+      {/* Vista escritorio */}
+      <div className={styles.desktopTable}>
+        <div className={styles.tableCard}>
+          <table className={styles.table}>
+            <thead className={styles.thead}>
+              <tr>
+                <th>Título</th>
+                <th className={styles.center}>Preguntas</th>
+                <th className={styles.center}>Respuestas</th>
+                <th className={styles.center}>Estado</th>
+                <th>Creada</th>
+                <th className={styles.right}>Acciones</th>
               </tr>
-            ))}
-            {surveys.length === 0 && (
-              <tr><td colSpan={6} className="text-center text-slate-500 py-12">No hay encuestas creadas todavía.</td></tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {surveys.map((survey) => (
+                <tr key={survey.id} className={styles.row}>
+                  <td className={styles.surveyTitle}>{survey.title}</td>
+                  <td className={styles.center}>{survey._count.questions}</td>
+                  <td className={styles.center}>{survey._count.responses}</td>
+
+                  <td className={styles.center}>
+                    <span
+                      className={
+                        survey.isActive
+                          ? styles.activeBadge
+                          : styles.inactiveBadge
+                      }
+                    >
+                      {survey.isActive ? 'Activa' : 'Inactiva'}
+                    </span>
+                  </td>
+
+                  <td className={styles.date}>
+                    {formatDate(survey.createdAt)}
+                  </td>
+
+                  <td className={styles.right}>
+                    <div className={styles.actions}>
+                      <SurveyActions
+                        id={survey.id}
+                        title={survey.title}
+                        isActive={survey.isActive}
+                        responsesCount={survey._count.responses}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {surveys.length === 0 && (
+                <tr>
+                  <td colSpan={6} className={styles.empty}>
+                    No hay encuestas creadas todavía.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Vista móvil tipo combo box */}
+      <div className={styles.mobileList}>
+        {surveys.map((survey) => (
+          <details key={survey.id} className={styles.mobileSurvey}>
+            <summary className={styles.mobileSummary}>
+              <div>
+                <p className={styles.mobileTitle}>{survey.title}</p>
+
+                <span
+                  className={
+                    survey.isActive
+                      ? styles.activeBadge
+                      : styles.inactiveBadge
+                  }
+                >
+                  {survey.isActive ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
+
+              <ChevronDown className={styles.chevronIcon} />
+            </summary>
+
+            <div className={styles.mobileContent}>
+              <div className={styles.mobileInfo}>
+                <span>Preguntas</span>
+                <strong>{survey._count.questions}</strong>
+              </div>
+
+              <div className={styles.mobileInfo}>
+                <span>Respuestas</span>
+                <strong>{survey._count.responses}</strong>
+              </div>
+
+              <div className={styles.mobileInfo}>
+                <span>Creada</span>
+                <strong>{formatDate(survey.createdAt)}</strong>
+              </div>
+
+              <div className={styles.mobileActions}>
+                <SurveyActions
+                  id={survey.id}
+                  title={survey.title}
+                  isActive={survey.isActive}
+                  responsesCount={survey._count.responses}
+                  variant="mobile"
+                />
+              </div>
+            </div>
+          </details>
+        ))}
+
+        {surveys.length === 0 && (
+          <div className={styles.emptyMobile}>
+            No hay encuestas creadas todavía.
+          </div>
+        )}
       </div>
     </div>
   );

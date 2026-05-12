@@ -1,5 +1,4 @@
 
-// src/app/psicologo/layout.tsx
 
 import { redirect } from 'next/navigation';
 

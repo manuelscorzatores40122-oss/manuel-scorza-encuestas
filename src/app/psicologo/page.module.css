@@ -1,0 +1,80 @@
+.desktopTable {
+  display: block;
+}
+
+.mobileList {
+  display: none;
+}
+
+.studentButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.studentButton:active {
+  transform: scale(0.98);
+}
+
+.studentButtonName {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.studentButtonMeta {
+  margin-top: 0.25rem;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.studentButtonEmergency {
+  margin-top: 0.5rem;
+  color: #2563eb;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.studentButtonArrow {
+  color: #94a3b8;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.emptyMobile {
+  padding: 1rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 1rem;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .desktopTable {
+    display: none;
+  }
+
+  .mobileList {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
