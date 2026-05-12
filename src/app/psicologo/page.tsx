@@ -8,6 +8,7 @@ import {
   Users,
   TrendingUp,
   MessageSquare,
+  Megaphone,
 } from 'lucide-react';
 
 import { prisma } from '@/lib/prisma';
@@ -15,15 +16,8 @@ import { DashboardCharts } from './DashboardCharts';
 
 /**
  * Panel principal del psicólogo.
- *
- * Esta página es un Server Component porque consulta directamente
- * la base de datos con Prisma.
  */
 export default async function PsicologoDashboard() {
-  /**
-   * Ejecutamos todas las consultas en paralelo para mejorar rendimiento.
-   * Promise.all evita esperar una consulta después de otra.
-   */
   const [
     totalEstudiantes,
     encuestasActivas,
@@ -33,37 +27,31 @@ export default async function PsicologoDashboard() {
     respuestasUltimos30,
     quierenHablar,
   ] = await Promise.all([
-    // Total de estudiantes matriculados y activos.
     prisma.student.count({
       where: {
         estadoMatricula: 'DEFINITIVA',
       },
     }),
 
-    // Encuestas activas disponibles.
     prisma.survey.count({
       where: {
         isActive: true,
       },
     }),
 
-    // Total histórico de respuestas registradas.
     prisma.response.count(),
 
-    // Alertas que todavía no han sido revisadas por el psicólogo.
     prisma.alert.count({
       where: {
         reviewedAt: null,
       },
     }),
 
-    // Agrupación de respuestas por nivel de riesgo: LOW, MID, HIGH.
     prisma.response.groupBy({
       by: ['riskLevel'],
       _count: true,
     }),
 
-    // Respuestas enviadas durante los últimos 30 días.
     prisma.response.findMany({
       where: {
         submittedAt: {
@@ -76,7 +64,6 @@ export default async function PsicologoDashboard() {
       },
     }),
 
-    // Estudiantes que indicaron que desean hablar con alguien.
     prisma.response.count({
       where: {
         wantsToTalk: true,
@@ -85,32 +72,33 @@ export default async function PsicologoDashboard() {
   ]);
 
   /**
-   * Convertimos el resultado del groupBy en un objeto simple
-   * para usarlo en los gráficos.
+   * Distribución de riesgo
    */
   const riskDist = {
     LOW:
-      respuestasPorRiesgo.find((item) => item.riskLevel === 'LOW')?._count ||
-      0,
+      respuestasPorRiesgo.find(
+        (item) => item.riskLevel === 'LOW'
+      )?._count || 0,
 
     MID:
-      respuestasPorRiesgo.find((item) => item.riskLevel === 'MID')?._count ||
-      0,
+      respuestasPorRiesgo.find(
+        (item) => item.riskLevel === 'MID'
+      )?._count || 0,
 
     HIGH:
-      respuestasPorRiesgo.find((item) => item.riskLevel === 'HIGH')?._count ||
-      0,
+      respuestasPorRiesgo.find(
+        (item) => item.riskLevel === 'HIGH'
+      )?._count || 0,
   };
 
   /**
-   * Agrupa las respuestas por día para graficar la tendencia
-   * de los últimos 30 días.
+   * Tendencia últimos 30 días
    */
   const trend = bucketByDay(respuestasUltimos30, 30);
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Encabezado principal */}
+      {/* Header */}
       <header>
         <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
           Panel del Psicólogo
@@ -121,9 +109,8 @@ export default async function PsicologoDashboard() {
         </p>
       </header>
 
-      {/* Tarjetas resumen */}
-      
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      {/* Estadísticas */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
         <StatButton
           href="/psicologo/estudiantes"
           icon={<Users className="h-5 w-5" />}
@@ -143,7 +130,7 @@ export default async function PsicologoDashboard() {
         <StatButton
           href="/psicologo/respuestas"
           icon={<TrendingUp className="h-5 w-5" />}
-          label="Respuestas totales"
+          label="Respuestas"
           value={totalRespuestas}
           color="purple"
         />
@@ -151,19 +138,34 @@ export default async function PsicologoDashboard() {
         <StatButton
           href="/psicologo/alertas"
           icon={<AlertTriangle className="h-5 w-5" />}
-          label="Alertas pendientes"
+          label="Alertas"
           value={alertasPendientes}
-    color="red"
-  />
+          color="red"
+        />
 
-  <StatButton
-    href="/psicologo/respuestas"
-    icon={<MessageSquare className="h-5 w-5" />}
-    label="Quieren hablar"
-    value={quierenHablar}
-    color="warm"
-  />
-</div>     
+        <StatButton
+          href="/psicologo/respuestas"
+          icon={<MessageSquare className="h-5 w-5" />}
+          label="Quieren hablar"
+          value={quierenHablar}
+          color="warm"
+        />
+
+        <StatButton
+          href="/psicologo/anuncios"
+          icon={<Megaphone className="h-5 w-5" />}
+          label="Anuncios"
+          value={0}
+          color="amber"
+        />
+      </div>
+
+      {/* Charts */}
+      <DashboardCharts
+        riskDist={riskDist}
+        trend={trend}
+      />
+
       {/* Acciones rápidas */}
       <section className="card">
         <div className="mb-4 flex items-center justify-between">
@@ -172,7 +174,7 @@ export default async function PsicologoDashboard() {
           </h2>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-4">
           <Link
             href="/psicologo/alertas"
             className="btn-secondary justify-start"
@@ -196,6 +198,14 @@ export default async function PsicologoDashboard() {
             <TrendingUp className="h-4 w-4 text-purple-500" />
             Ver respuestas
           </Link>
+
+          <Link
+            href="/psicologo/anuncios"
+            className="btn-secondary justify-start"
+          >
+            <Megaphone className="h-4 w-4 text-amber-500" />
+            Ver anuncios
+          </Link>
         </div>
       </section>
     </div>
@@ -203,7 +213,7 @@ export default async function PsicologoDashboard() {
 }
 
 /**
- * Tarjeta pequeña para mostrar una métrica del dashboard.
+ * Tarjeta estadística reutilizable
  */
 function StatButton({
   href,
@@ -223,29 +233,50 @@ function StatButton({
     emerald: 'bg-emerald-100 text-emerald-700',
     purple: 'bg-purple-100 text-purple-700',
     red: 'bg-red-100 text-red-700',
-    warm: 'bg-warm-100 text-warm-700',
+    warm: 'bg-orange-100 text-orange-700',
+    amber: 'bg-amber-100 text-amber-700',
   };
 
   return (
     <Link
       href={href}
-      className="card !p-4 transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+      className="
+        card
+        !p-4
+        transition-all
+        hover:-translate-y-0.5
+        hover:shadow-md
+        active:scale-[0.98]
+      "
     >
       <div
-        className={`mb-3 flex h-9 w-9 items-center justify-center rounded-lg ${colorMap[color]}`}
+        className={`
+          mb-3
+          flex
+          h-10
+          w-10
+          items-center
+          justify-center
+          rounded-xl
+          ${colorMap[color]}
+        `}
       >
         {icon}
       </div>
 
-      <p className="text-xs text-slate-500">{label}</p>
+      <p className="text-xs text-slate-500">
+        {label}
+      </p>
 
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
+      <p className="text-2xl font-bold text-slate-900">
+        {value}
+      </p>
     </Link>
   );
 }
 
 /**
- * Retorna una fecha ubicada N días atrás.
+ * Retorna fecha de hace N días
  */
 function daysAgo(days: number): Date {
   const date = new Date();
@@ -256,10 +287,7 @@ function daysAgo(days: number): Date {
 }
 
 /**
- * Agrupa respuestas por día para generar una serie temporal.
- *
- * total: cantidad de respuestas del día.
- * riesgo: respuestas que no son LOW.
+ * Agrupa respuestas por día
  */
 function bucketByDay(
   items: {
@@ -286,8 +314,7 @@ function bucketByDay(
   const today = new Date();
 
   /**
-   * Primero creamos todos los días vacíos.
-   * Así el gráfico muestra también días sin respuestas.
+   * Crear días vacíos
    */
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today);
@@ -303,14 +330,18 @@ function bucketByDay(
     };
 
     buckets.push(bucket);
+
     byFecha.set(key, bucket);
   }
 
   /**
-   * Luego llenamos cada día con las respuestas reales.
+   * Llenar datos reales
    */
   for (const item of items) {
-    const key = item.submittedAt.toISOString().slice(5, 10);
+    const key = item.submittedAt
+      .toISOString()
+      .slice(5, 10);
+
     const bucket = byFecha.get(key);
 
     if (!bucket) continue;

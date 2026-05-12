@@ -4,12 +4,22 @@ import { prisma } from '@/lib/prisma';
 
 import styles from './page.module.css';
 
+const PAGE_SIZE = 10;
+
 export default async function EstudiantesPsicologo({
   searchParams,
 }: {
-  searchParams: { q?: string; gradoId?: string };
+  searchParams: {
+    q?: string;
+    gradoId?: string;
+    page?: string;
+  };
 }) {
-  const where: any = { estadoMatricula: 'DEFINITIVA' };
+  const page = Number(searchParams.page || '1');
+
+  const where: any = {
+    estadoMatricula: 'DEFINITIVA',
+  };
 
   if (searchParams.q) {
     where.OR = [
@@ -20,24 +30,47 @@ export default async function EstudiantesPsicologo({
   }
 
   if (searchParams.gradoId) {
-    where.section = { gradeId: searchParams.gradoId };
+    where.section = {
+      gradeId: searchParams.gradoId,
+    };
   }
 
-  const [students, grades] = await Promise.all([
+  const [students, grades, total] = await Promise.all([
     prisma.student.findMany({
       where,
       include: {
-        section: { include: { grade: true } },
+        section: {
+          include: {
+            grade: true,
+          },
+        },
         apoderados: true,
-        _count: { select: { responses: true } },
+        _count: {
+          select: {
+            responses: true,
+          },
+        },
       },
-      orderBy: [{ apellidoPaterno: 'asc' }],
-      take: 200,
+      orderBy: [
+        {
+          apellidoPaterno: 'asc',
+        },
+      ],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
     }),
+
     prisma.grade.findMany({
-      orderBy: [{ nivel: 'asc' }, { order: 'asc' }],
+      orderBy: [
+        { nivel: 'asc' },
+        { order: 'asc' },
+      ],
     }),
+
+    prisma.student.count({ where }),
   ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className={styles.container}>
@@ -49,11 +82,12 @@ export default async function EstudiantesPsicologo({
       <form className={styles.filters}>
         <div className={styles.searchGroup}>
           <label className={styles.label}>
-            Buscar por nombre o apellido
+            Buscar estudiante
           </label>
 
           <div className={styles.searchBox}>
             <Search className={styles.searchIcon} />
+
             <input
               name="q"
               defaultValue={searchParams.q || ''}
@@ -63,8 +97,10 @@ export default async function EstudiantesPsicologo({
           </div>
         </div>
 
-        <div>
-          <label className={styles.label}>Grado</label>
+        <div className={styles.selectGroup}>
+          <label className={styles.label}>
+            Grado
+          </label>
 
           <select
             name="gradoId"
@@ -72,6 +108,7 @@ export default async function EstudiantesPsicologo({
             className={styles.input}
           >
             <option value="">Todos</option>
+
             {grades.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {g.name}
@@ -80,84 +117,107 @@ export default async function EstudiantesPsicologo({
           </select>
         </div>
 
-        <button className={styles.button} type="submit">
+        <button className={styles.button}>
           Filtrar
         </button>
       </form>
 
-      <div className={styles.tableCard}>
-        <table className={styles.table}>
-          <thead className={styles.thead}>
-            <tr>
-              <th>Apellidos y nombres</th>
-              <th>Grado</th>
-              <th>Emergencia</th>
-              <th className={styles.center}>Edad</th>
-              <th className={styles.center}>Respuestas</th>
-              <th></th>
-            </tr>
-          </thead>
+      <div className={styles.studentsGrid}>
+        {students.map((s) => {
+          const emergency =
+            s.apoderados.find((a) => a.esContactoPrincipal) ||
+            s.apoderados.find((a) => a.parentesco === 'APODERADO') ||
+            s.apoderados[0];
 
-          <tbody>
-            {students.map((s) => {
-              const emergency =
-                s.apoderados.find((a) => a.esContactoPrincipal) ||
-                s.apoderados.find((a) => a.parentesco === 'APODERADO') ||
-                s.apoderados[0];
+          return (
+            <div key={s.id} className={styles.studentCard}>
+              <div className={styles.cardHeader}>
+                <h3 className={styles.studentName}>
+                  {s.apellidoPaterno} {s.apellidoMaterno},{' '}
+                  {s.nombres}
+                </h3>
 
-              return (
-                <tr key={s.id} className={styles.row}>
-                  <td className={styles.studentName}>
-                    {s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}
-                  </td>
+                <span className={styles.badge}>
+                  {s.section.grade.nivel === 'PRIMARIA'
+                    ? 'Primaria'
+                    : 'Secundaria'}
+                </span>
+              </div>
 
-                  <td className={styles.smallText}>
-                    {s.section.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'}{' '}
-                    {s.section.grade.name} {s.section.name}
-                  </td>
+              <div className={styles.cardInfo}>
+                <p>
+                  <strong>Grado:</strong>{' '}
+                  {s.section.grade.name} {s.section.name}
+                </p>
 
-                  <td className={styles.smallText}>
-                    {emergency ? (
-                      <>
-                        <p className={styles.emergencyName}>
-                          {emergency.apellidosNombres}
-                        </p>
-                        <p className={styles.muted}>
-                          {emergency.celular || 'Sin celular'}
-                        </p>
-                      </>
-                    ) : (
-                      <span className={styles.noContact}>
-                        Sin contacto
-                      </span>
-                    )}
-                  </td>
+                <p>
+                  <strong>Edad:</strong> {s.edad}
+                </p>
 
-                  <td className={styles.center}>{s.edad}</td>
-                  <td className={styles.center}>{s._count.responses}</td>
+                <p>
+                  <strong>Respuestas:</strong>{' '}
+                  {s._count.responses}
+                </p>
+              </div>
 
-                  <td className={styles.right}>
-                    <Link
-                      href={`/psicologo/estudiantes/${s.id}`}
-                      className={styles.historyLink}
-                    >
-                      Histórico →
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
+              <div className={styles.contactBox}>
+                {emergency ? (
+                  <>
+                    <p className={styles.emergencyName}>
+                      {emergency.apellidosNombres}
+                    </p>
 
-            {students.length === 0 && (
-              <tr>
-                <td colSpan={6} className={styles.empty}>
-                  No hay estudiantes que coincidan.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                    <p className={styles.muted}>
+                      {emergency.celular || 'Sin celular'}
+                    </p>
+                  </>
+                ) : (
+                  <span className={styles.noContact}>
+                    Sin contacto
+                  </span>
+                )}
+              </div>
+
+              <Link
+                href={`/psicologo/estudiantes/${s.id}`}
+                className={styles.historyLink}
+              >
+                Ver histórico
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+
+      {students.length === 0 && (
+        <div className={styles.empty}>
+          No se encontraron estudiantes.
+        </div>
+      )}
+
+      <div className={styles.pagination}>
+        {page > 1 && (
+          <Link
+            href={`?q=${searchParams.q || ''}&gradoId=${searchParams.gradoId || ''}&page=${page - 1}`}
+            className={styles.pageButton}
+          >
+            ← Anterior
+          </Link>
+        )}
+
+        <span className={styles.pageInfo}>
+          Página {page} de {totalPages || 1}
+        </span>
+
+        {page < totalPages && (
+          <Link
+            href={`?q=${searchParams.q || ''}&gradoId=${searchParams.gradoId || ''}&page=${page + 1}`}
+            className={styles.pageButton}
+          >
+            Siguiente →
+          </Link>
+        )}
       </div>
     </div>
   );
-} 
+}
