@@ -1,8 +1,10 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
 import { prisma } from './prisma';
+import { verifyPassword as comparePassword } from './password';
+
+export { hashPassword, verifyPassword } from './password';
 
 const COOKIE_NAME = 'pse_session';
 const SECRET = new TextEncoder().encode(
@@ -16,12 +18,28 @@ export type SessionPayload = {
   fullName: string;
 };
 
-export async function hashPassword(password: string) {
-  return bcrypt.hash(password, 10);
-}
+export async function authenticate(username: string, password: string) {
+  const user = await prisma.user.findUnique({
+    where: { username }
+  });
 
-export async function verifyPassword(password: string, hash: string) {
-  return bcrypt.compare(password, hash);
+  if (!user || !user.isActive) return null;
+
+  const ok = await comparePassword(
+    password,
+    user.passwordHash
+  );
+
+  if (!ok) return null;
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      lastLogin: new Date(),
+    },
+  });
+
+  return user;
 }
 
 export async function createSession(payload: SessionPayload) {
@@ -65,18 +83,6 @@ export async function requireRole(allowed: Role[]): Promise<SessionPayload> {
   const session = await requireSession();
   if (!allowed.includes(session.role)) throw new Error('FORBIDDEN');
   return session;
-}
-
-export async function authenticate(username: string, password: string) {
-  const user = await prisma.user.findUnique({ where: { username } });
-  if (!user || !user.isActive) return null;
-  const ok = await verifyPassword(password, user.passwordHash);
-  if (!ok) return null;
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { lastLogin: new Date() },
-  });
-  return user;
 }
 
 export const ROLE_LABELS: Record<Role, string> = {

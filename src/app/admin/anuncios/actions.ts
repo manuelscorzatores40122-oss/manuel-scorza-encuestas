@@ -33,6 +33,7 @@ export async function createAnnouncementAction(formData: FormData) {
   });
 
   revalidatePath('/admin/anuncios');
+  revalidatePath('/psicologo');
   revalidatePath('/psicologo/anuncios');
   revalidatePath('/estudiante');
   revalidatePath('/estudiante/anuncios');
@@ -43,6 +44,7 @@ export async function toggleAnnouncementAction(id: string) {
   await requireRole(['ADMIN', 'PSYCHOLOGIST']);
   await toggleAnnouncement(id);
   revalidatePath('/admin/anuncios');
+  revalidatePath('/psicologo');
   revalidatePath('/psicologo/anuncios');
   revalidatePath('/estudiante');
   revalidatePath('/estudiante/anuncios');
@@ -52,6 +54,7 @@ export async function deleteAnnouncementAction(id: string) {
   await requireRole(['ADMIN', 'PSYCHOLOGIST']);
   await deleteAnnouncement(id);
   revalidatePath('/admin/anuncios');
+  revalidatePath('/psicologo');
   revalidatePath('/psicologo/anuncios');
   revalidatePath('/estudiante');
   revalidatePath('/estudiante/anuncios');

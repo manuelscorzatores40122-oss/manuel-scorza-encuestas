@@ -26,6 +26,7 @@ export default async function PsicologoDashboard() {
     respuestasPorRiesgo,
     respuestasUltimos30,
     quierenHablar,
+    anunciosPublicados,
   ] = await Promise.all([
     prisma.student.count({
       where: {
@@ -67,6 +68,12 @@ export default async function PsicologoDashboard() {
     prisma.response.count({
       where: {
         wantsToTalk: true,
+      },
+    }),
+
+    prisma.announcement.count({
+      where: {
+        isPublished: true,
       },
     }),
   ]);
@@ -155,7 +162,7 @@ export default async function PsicologoDashboard() {
           href="/psicologo/anuncios"
           icon={<Megaphone className="h-5 w-5" />}
           label="Anuncios"
-          value={0}
+          value={anunciosPublicados}
           color="amber"
         />
       </div>

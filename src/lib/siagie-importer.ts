@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { Sexo, Nivel, EstadoMatricula, Role, Parentesco } from '@prisma/client';
 import { prisma } from './prisma';
-import { hashPassword } from './auth';
+import { hashPassword } from './password';
 import { calcEdad } from './utils';
 
 export type ImportResult = {

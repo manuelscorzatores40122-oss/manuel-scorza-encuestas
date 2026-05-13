@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { Role } from '@prisma/client';
-import { requireRole, hashPassword } from '@/lib/auth';
+import { requireRole } from '@/lib/auth';
+import { hashPassword } from '@/lib/password';
 import { prisma } from '@/lib/prisma';
 
 function generateTempPassword(): string {
