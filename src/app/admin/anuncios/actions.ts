@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { createAnnouncement, deleteAnnouncement, toggleAnnouncement } from '@/lib/announcements';
+import { sendAnnouncementPush } from '@/lib/push';
+import type { Role } from '@prisma/client';
 
 export async function createAnnouncementAction(formData: FormData) {
   const session = await requireRole(['ADMIN', 'PSYCHOLOGIST']);
@@ -15,11 +17,14 @@ export async function createAnnouncementAction(formData: FormData) {
     return { ok: false as const, error: 'Completa el título y el mensaje.' };
   }
 
+  const announcementId = crypto.randomUUID();
+  const roles = (targetRoles.length > 0 ? targetRoles : ['STUDENT']) as Role[];
+
   await createAnnouncement({
-    id: crypto.randomUUID(),
+    id: announcementId,
     title,
     content,
-    targetRoles: targetRoles.length > 0 ? targetRoles : ['STUDENT'],
+    targetRoles: roles,
     createdById: session.userId,
   });
 
@@ -28,8 +33,15 @@ export async function createAnnouncementAction(formData: FormData) {
       userId: session.userId,
       action: 'CREATE_ANNOUNCEMENT',
       entity: 'Announcement',
-      metadata: { title, targetRoles } as any,
+      entityId: announcementId,
+      metadata: { title, targetRoles: roles } as any,
     },
+  });
+
+  await sendAnnouncementPush({
+    title,
+    content,
+    targetRoles: roles,
   });
 
   revalidatePath('/admin/anuncios');

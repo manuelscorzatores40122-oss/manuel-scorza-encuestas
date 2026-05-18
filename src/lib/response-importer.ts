@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { evaluateResponse } from './alert-engine';
+import { sendRiskAlertPush } from './push';
 import { prisma } from './prisma';
 
 type ImportError = {
@@ -100,6 +101,12 @@ export async function importSurveyResponsesExcel(
         continue;
       }
 
+      if (survey.targetSections.length > 0 && !survey.targetSections.includes(student.sectionId)) {
+        result.omitidos++;
+        result.errores.push({ fila: rowNumber, razon: 'El estudiante no pertenece a las secciones objetivo' });
+        continue;
+      }
+
       const existing = await prisma.response.findFirst({
         where: {
           surveyId: survey.id,
@@ -164,6 +171,13 @@ export async function importSurveyResponsesExcel(
           },
         },
       });
+
+      if (evaluation.riskFlag) {
+        await sendRiskAlertPush({
+          riskLevel: evaluation.riskLevel,
+          riskScore: evaluation.totalScore,
+        });
+      }
 
       result.importados++;
     } catch (error: any) {

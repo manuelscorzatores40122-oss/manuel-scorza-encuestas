@@ -105,7 +105,7 @@ export function AnnouncementsManager({ announcements }: { announcements: Announc
                     {a.isPublished ? 'Publicado' : 'Oculto'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 mt-1" suppressHydrationWarning>
                   {new Date(a.createdAt).toLocaleString('es-PE')} · {a.createdBy.fullName}
                 </p>
               </div>

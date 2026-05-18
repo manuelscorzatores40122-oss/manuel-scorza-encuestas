@@ -55,6 +55,9 @@ Supabase ofrece PostgreSQL administrado con plan gratuito (500 MB, suficiente pa
    | `DATABASE_URL`       | La URL de Supabase del Paso 1                                          |
    | `JWT_SECRET`         | Genera con `openssl rand -base64 32` o usa cualquier string >32 chars |
    | `NEXT_PUBLIC_APP_URL`| `https://psicoescolar.vercel.app` (lo ajustas después si usas dominio) |
+   | `VAPID_SUBJECT`      | `mailto:bienestar@scorzatorres.edu.pe` o correo técnico del sistema   |
+   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Clave pública generada con `npx web-push generate-vapid-keys` |
+   | `VAPID_PRIVATE_KEY`  | Clave privada generada con `npx web-push generate-vapid-keys`          |
 
 6. Click en **Deploy**. El primer build tarda 2–4 minutos.
 

@@ -52,17 +52,31 @@ export default async function ResponderEncuesta({
     notFound();
   }
 
-  // Validar grado
-  const targets = survey.targetGrades || [];
+  // Validar destinatarios
+  const targetGrades = survey.targetGrades || [];
+  const targetSections = survey.targetSections || [];
 
   if (
-    targets.length > 0 &&
-    !targets.includes(student.section.gradeId)
+    targetGrades.length > 0 &&
+    !targetGrades.includes(student.section.gradeId)
   ) {
     return (
       <div className="card max-w-md mx-auto text-center">
         <p className="text-slate-700">
           Esta encuesta no está disponible para tu grado.
+        </p>
+      </div>
+    );
+  }
+
+  if (
+    targetSections.length > 0 &&
+    !targetSections.includes(student.sectionId)
+  ) {
+    return (
+      <div className="card max-w-md mx-auto text-center">
+        <p className="text-slate-700">
+          Esta encuesta no está disponible para tu sección.
         </p>
       </div>
     );

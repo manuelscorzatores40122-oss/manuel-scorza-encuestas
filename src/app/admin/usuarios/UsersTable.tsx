@@ -96,7 +96,7 @@ export function UsersTable({ users }: { users: U[] }) {
                 <td className="px-4 py-3 font-medium">{u.fullName}</td>
                 <td className="px-4 py-3 text-slate-600 font-mono text-xs">{u.username}</td>
                 <td className="px-4 py-3"><span className="badge bg-slate-100 text-slate-700">{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS]}</span></td>
-                <td className="px-4 py-3 text-xs text-slate-500">
+                <td className="px-4 py-3 text-xs text-slate-500" suppressHydrationWarning>
                   {u.lastLogin ? new Date(u.lastLogin).toLocaleString('es-PE') : 'Nunca'}
                 </td>
                 <td className="px-4 py-3 text-right">

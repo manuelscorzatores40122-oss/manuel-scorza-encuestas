@@ -31,6 +31,14 @@ export default async function EncuestasEstudiante() {
           { targetGrades: { has: student.section.gradeId } },
           { targetGrades: { isEmpty: true } },
         ],
+        AND: [
+          {
+            OR: [
+              { targetSections: { has: student.sectionId } },
+              { targetSections: { isEmpty: true } },
+            ],
+          },
+        ],
       },
       orderBy: {
         createdAt: 'desc',

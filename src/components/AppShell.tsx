@@ -7,6 +7,7 @@ import { LogOut, Menu, X, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logoutAction } from '@/app/login/actions';
 import { useRouter } from 'next/navigation';
+import { PushSubscriptionButton } from './PushSubscriptionButton';
 
 type NavItem = { href: string; label: string; icon: React.ReactNode };
 
@@ -71,6 +72,7 @@ export function AppShell({
 
         <div className="px-4 py-4 border-t border-white/10">
           <p className="text-xs opacity-75 mb-2 truncate">{user.fullName}</p>
+          <PushSubscriptionButton className="mb-3 w-full justify-center" />
           <button onClick={logout} className="flex items-center gap-2 text-sm text-white/90 hover:text-white">
             <LogOut className="w-4 h-4" /> Cerrar sesión
           </button>
@@ -112,6 +114,7 @@ export function AppShell({
             <button onClick={logout} className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg">
               <LogOut className="w-4 h-4" /> Cerrar sesión
             </button>
+            <PushSubscriptionButton className="w-full justify-center bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 disabled:text-slate-500" />
           </nav>
         )}
       </div>

@@ -39,6 +39,14 @@ export default async function EstudianteHome() {
           { targetGrades: { has: student.section.gradeId } },
           { targetGrades: { isEmpty: true } },
         ],
+        AND: [
+          {
+            OR: [
+              { targetSections: { has: student.sectionId } },
+              { targetSections: { isEmpty: true } },
+            ],
+          },
+        ],
       },
       orderBy: { createdAt: 'desc' },
       select: { id: true, title: true, description: true },

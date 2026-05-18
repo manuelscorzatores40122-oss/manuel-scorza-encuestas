@@ -5,6 +5,20 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
+
+  /* PsicoEscolar palette */
+  --verde-oscuro:  #2d5016;
+  --verde-escudo:  #3a6b1a;
+  --verde-hoja:    #4e7c22;
+  --verde-claro:   #6b7f2e;
+  --dorado:        #c9a832;
+  --dorado-claro:  #e8c84a;
+  --dorado-suave:  #f5e099;
+  --azul-andino:   #2a5fa8;
+  --azul-cielo:    #5b8db8;
+  --blanco:        #ffffff;
+  --gris-suave:    #dde3ea;
+  --rojo-sol:      #c0392b;
 }
 
 html, body { height: 100%; }

@@ -23,6 +23,7 @@ const createSurveySchema = z.object({
   title: z.string().trim().min(1, 'Falta el título'),
   description: z.string().trim().optional(),
   targetGrades: z.array(z.string().trim().min(1)).default([]),
+  targetSections: z.array(z.string().trim().min(1)).default([]),
   questions: z.array(questionSchema).min(1, 'Agrega al menos una pregunta'),
 });
 
@@ -42,7 +43,7 @@ export async function createSurveyAction(input: CreateSurveyInput): Promise<Surv
     };
   }
 
-  const { title, description, targetGrades, questions } = parsed.data;
+  const { title, description, targetGrades, targetSections, questions } = parsed.data;
 
   for (const question of questions) {
     const needsOptions = question.type === 'SINGLE' || question.type === 'MULTI' || question.type === 'YES_NO';
@@ -79,13 +80,44 @@ export async function createSurveyAction(input: CreateSurveyInput): Promise<Surv
     };
   }
 
+  const validSections = targetSections.length
+    ? await prisma.section.findMany({
+        where: {
+          id: {
+            in: targetSections,
+          },
+        },
+        select: {
+          id: true,
+          gradeId: true,
+        },
+      })
+    : [];
+
+  if (targetSections.length > 0 && validSections.length !== targetSections.length) {
+    return {
+      ok: false,
+      error: 'Una o más secciones seleccionadas no existen',
+    };
+  }
+
+  if (
+    targetSections.length > 0 &&
+    validSections.some((section) => !targetGrades.includes(section.gradeId))
+  ) {
+    return {
+      ok: false,
+      error: 'Todas las secciones deben pertenecer a los grados seleccionados',
+    };
+  }
+
   const survey = await prisma.survey.create({
     data: {
       title,
       description: description || null,
       createdById: session.userId,
       targetGrades,
-      targetSections: [],
+      targetSections,
       questions: {
         create: questions.map((question, index) => ({
           type: question.type,

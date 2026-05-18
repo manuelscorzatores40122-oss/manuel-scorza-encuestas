@@ -3,6 +3,7 @@
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { evaluateResponse } from '@/lib/alert-engine';
+import { sendRiskAlertPush } from '@/lib/push';
 
 type SubmitInput = {
   surveyId: string;
@@ -14,6 +15,7 @@ export async function submitSurveyAction(input: SubmitInput) {
 
   const student = await prisma.student.findUnique({
     where: { userId: session.userId },
+    include: { section: true },
   });
 
   if (!student) {
@@ -40,6 +42,20 @@ export async function submitSurveyAction(input: SubmitInput) {
 
   if (!survey || !survey.isActive) {
     return { ok: false as const, error: 'Encuesta no disponible' };
+  }
+
+  if (
+    survey.targetGrades.length > 0 &&
+    !survey.targetGrades.includes(student.section.gradeId)
+  ) {
+    return { ok: false as const, error: 'Encuesta no disponible para tu grado' };
+  }
+
+  if (
+    survey.targetSections.length > 0 &&
+    !survey.targetSections.includes(student.sectionId)
+  ) {
+    return { ok: false as const, error: 'Encuesta no disponible para tu sección' };
   }
 
   const answersByQuestion = new Map(input.answers.map((answer) => [answer.questionId, answer]));
@@ -113,6 +129,13 @@ export async function submitSurveyAction(input: SubmitInput) {
       entityId: response.id,
     },
   });
+
+  if (evaluation.riskFlag) {
+    await sendRiskAlertPush({
+      riskLevel: evaluation.riskLevel,
+      riskScore: evaluation.totalScore,
+    });
+  }
 
   return { ok: true as const, responseId: response.id };
 }
