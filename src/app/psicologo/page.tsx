@@ -1,7 +1,6 @@
 // src/app/psicologo/page.tsx
 
 import Link from 'next/link';
-
 import {
   AlertTriangle,
   ClipboardList,
@@ -9,10 +8,12 @@ import {
   TrendingUp,
   MessageSquare,
   Megaphone,
+  Brain,
 } from 'lucide-react';
 
 import { prisma } from '@/lib/prisma';
 import { DashboardCharts } from './DashboardCharts';
+import styles from './dashboard.module.css';
 
 /**
  * Panel principal del psicólogo.
@@ -104,63 +105,59 @@ export default async function PsicologoDashboard() {
   const trend = bucketByDay(respuestasUltimos30, 30);
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
-          Panel del Psicólogo
-        </h1>
+    <div className={styles.page}>
 
-        <p className="mt-1 text-slate-600">
-          Resumen general del bienestar estudiantil
-        </p>
-      </header>
+      {/* Banner */}
+      <div className={styles.banner}>
+        <div className={styles.bannerIcon}>
+          <Brain className={styles.bannerIconSvg} />
+        </div>
+        <div className={styles.bannerText}>
+          <h1 className={styles.bannerTitle}>Panel del Psicólogo</h1>
+          <p className={styles.bannerSub}>Resumen general del bienestar estudiantil</p>
+        </div>
+      </div>
 
-      {/* Estadísticas */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-        <StatButton
+      {/* Stats grid */}
+      <div className={styles.statsGrid}>
+        <StatCard
           href="/psicologo/estudiantes"
-          icon={<Users className="h-5 w-5" />}
+          icon={<Users />}
           label="Estudiantes"
           value={totalEstudiantes}
-          color="brand"
+          color="blue"
         />
-
-        <StatButton
+        <StatCard
           href="/psicologo/encuestas"
-          icon={<ClipboardList className="h-5 w-5" />}
+          icon={<ClipboardList />}
           label="Encuestas activas"
           value={encuestasActivas}
           color="emerald"
         />
-
-        <StatButton
+        <StatCard
           href="/psicologo/respuestas"
-          icon={<TrendingUp className="h-5 w-5" />}
+          icon={<TrendingUp />}
           label="Respuestas"
           value={totalRespuestas}
           color="purple"
         />
-
-        <StatButton
+        <StatCard
           href="/psicologo/alertas"
-          icon={<AlertTriangle className="h-5 w-5" />}
-          label="Alertas"
+          icon={<AlertTriangle />}
+          label="Alertas pendientes"
           value={alertasPendientes}
           color="red"
         />
-
-        <StatButton
+        <StatCard
           href="/psicologo/respuestas"
-          icon={<MessageSquare className="h-5 w-5" />}
+          icon={<MessageSquare />}
           label="Quieren hablar"
           value={quierenHablar}
-          color="warm"
+          color="orange"
         />
-
-        <StatButton
+        <StatCard
           href="/psicologo/anuncios"
-          icon={<Megaphone className="h-5 w-5" />}
+          icon={<Megaphone />}
           label="Anuncios"
           value={anunciosPublicados}
           color="amber"
@@ -168,53 +165,57 @@ export default async function PsicologoDashboard() {
       </div>
 
       {/* Charts */}
-      <DashboardCharts
-        riskDist={riskDist}
-        trend={trend}
-      />
-
-      {/* Acciones rápidas */}
-      <section className="card">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            Acciones rápidas
-          </h2>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-4">
-          <Link
-            href="/psicologo/alertas"
-            className="btn-secondary justify-start"
-          >
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-            Revisar alertas
-          </Link>
-
-          <Link
-            href="/psicologo/encuestas/nueva"
-            className="btn-secondary justify-start"
-          >
-            <ClipboardList className="h-4 w-4 text-brand-500" />
-            Crear encuesta
-          </Link>
-
-          <Link
-            href="/psicologo/respuestas"
-            className="btn-secondary justify-start"
-          >
-            <TrendingUp className="h-4 w-4 text-purple-500" />
-            Ver respuestas
-          </Link>
-
-          <Link
-            href="/psicologo/anuncios"
-            className="btn-secondary justify-start"
-          >
-            <Megaphone className="h-4 w-4 text-amber-500" />
-            Ver anuncios
+      <div className={styles.section}>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>Analítica</h2>
+          <Link href="/psicologo/estadisticas" className={styles.sectionLink}>
+            Ver estadísticas →
           </Link>
         </div>
-      </section>
+        <div className={styles.sectionBody}>
+          <DashboardCharts riskDist={riskDist} trend={trend} />
+        </div>
+      </div>
+
+      {/* Quick actions */}
+      <div className={styles.section}>
+        <div className={styles.sectionHead}>
+          <h2 className={styles.sectionTitle}>Acciones rápidas</h2>
+        </div>
+        <div className={styles.sectionBody}>
+          <div className={styles.actionsGrid}>
+            <Link
+              href="/psicologo/alertas"
+              className={`${styles.actionBtn} ${styles.actionBtnRed}`}
+            >
+              <AlertTriangle className={styles.actionBtnIcon} />
+              Revisar alertas
+            </Link>
+            <Link
+              href="/psicologo/encuestas/nueva"
+              className={`${styles.actionBtn} ${styles.actionBtnEmerald}`}
+            >
+              <ClipboardList className={styles.actionBtnIcon} />
+              Crear encuesta
+            </Link>
+            <Link
+              href="/psicologo/respuestas"
+              className={`${styles.actionBtn} ${styles.actionBtnPurple}`}
+            >
+              <TrendingUp className={styles.actionBtnIcon} />
+              Ver respuestas
+            </Link>
+            <Link
+              href="/psicologo/anuncios"
+              className={`${styles.actionBtn} ${styles.actionBtnAmber}`}
+            >
+              <Megaphone className={styles.actionBtnIcon} />
+              Ver anuncios
+            </Link>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
@@ -222,7 +223,7 @@ export default async function PsicologoDashboard() {
 /**
  * Tarjeta estadística reutilizable
  */
-function StatButton({
+function StatCard({
   href,
   icon,
   label,
@@ -235,49 +236,12 @@ function StatButton({
   value: number;
   color: string;
 }) {
-  const colorMap: Record<string, string> = {
-    brand: 'bg-brand-100 text-brand-700',
-    emerald: 'bg-emerald-100 text-emerald-700',
-    purple: 'bg-purple-100 text-purple-700',
-    red: 'bg-red-100 text-red-700',
-    warm: 'bg-orange-100 text-orange-700',
-    amber: 'bg-amber-100 text-amber-700',
-  };
-
+  const colorClass = styles[`stat${color.charAt(0).toUpperCase() + color.slice(1)}` as keyof typeof styles];
   return (
-    <Link
-      href={href}
-      className="
-        card
-        !p-4
-        transition-all
-        hover:-translate-y-0.5
-        hover:shadow-md
-        active:scale-[0.98]
-      "
-    >
-      <div
-        className={`
-          mb-3
-          flex
-          h-10
-          w-10
-          items-center
-          justify-center
-          rounded-xl
-          ${colorMap[color]}
-        `}
-      >
-        {icon}
-      </div>
-
-      <p className="text-xs text-slate-500">
-        {label}
-      </p>
-
-      <p className="text-2xl font-bold text-slate-900">
-        {value}
-      </p>
+    <Link href={href} className={styles.statCard}>
+      <div className={`${styles.statIconWrap} ${colorClass}`}>{icon}</div>
+      <p className={styles.statLabel}>{label}</p>
+      <p className={styles.statValue}>{value}</p>
     </Link>
   );
 }
