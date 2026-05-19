@@ -3,7 +3,7 @@ import { AlertTriangle, Search, Users } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/prisma';
-import { RiskBadge } from '@/components/RiskBadge';
+import { RiskBadge } from '@/components/EtiquetaRiesgo';
 
 export default async function DirectorEstudiantes({
   searchParams,

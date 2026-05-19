@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Download, FileBarChart } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
-import { RiskBadge } from '@/components/RiskBadge';
+import { RiskBadge } from '@/components/EtiquetaRiesgo';
 import { ImportResponsesExcel } from './ImportResponsesExcel';
 
 export default async function RespuestasPsicologo({

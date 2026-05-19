@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { Users, Search } from 'lucide-react';
 
@@ -57,16 +58,22 @@ export default async function AuxiliarEstudiantes({
               <th className="text-left px-4 py-3">Grado</th>
               <th className="text-center px-4 py-3">Edad</th>
               <th className="text-center px-4 py-3">Sexo</th>
+              <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
             {students.map((s) => (
-              <tr key={s.id} className="border-t border-slate-100">
+              <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50">
                 <td className="px-4 py-3 font-mono text-xs">{s.dni}</td>
                 <td className="px-4 py-3">{s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}</td>
                 <td className="px-4 py-3 text-xs">{s.section.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {s.section.grade.name} {s.section.name}</td>
                 <td className="px-4 py-3 text-center">{s.edad}</td>
                 <td className="px-4 py-3 text-center">{s.sexo}</td>
+                <td className="px-4 py-3 text-right">
+                  <Link href={`/auxiliar/estudiantes/${s.id}`} className="text-brand-600 text-xs hover:underline">
+                    Ver ficha →
+                  </Link>
+                </td>
               </tr>
             ))}
             {students.length === 0 && <tr><td colSpan={5} className="text-center text-slate-500 py-8">Sin resultados.</td></tr>}

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Phone } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
-import { RiskBadge } from '@/components/RiskBadge';
+import { RiskBadge } from '@/components/EtiquetaRiesgo';
 import { StudentTimeline } from './StudentTimeline';
 
 export default async function HistorialEstudiante({ params }: { params: { id: string } }) {

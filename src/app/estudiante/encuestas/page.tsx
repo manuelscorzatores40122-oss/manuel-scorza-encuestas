@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, HelpCircle, ChevronRight } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { DatabaseUnavailable } from '@/components/DatabaseUnavailable';
+import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
+import styles from './encuestas.module.css';
 
 export default async function EncuestasEstudiante() {
   const session = (await getSession())!;
@@ -18,79 +19,81 @@ export default async function EncuestasEstudiante() {
     const surveys = await prisma.survey.findMany({
       where: {
         isActive: true,
-
-        // No mostrar encuestas que el estudiante ya respondió
-        responses: {
-          none: {
-            studentId: student.id,
-          },
-        },
-
-        // Mostrar solo encuestas de su grado o encuestas generales
+        responses: { none: { studentId: student.id } },
         OR: [
           { targetGrades: { has: student.section.gradeId } },
           { targetGrades: { isEmpty: true } },
         ],
-        AND: [
-          {
-            OR: [
-              { targetSections: { has: student.sectionId } },
-              { targetSections: { isEmpty: true } },
-            ],
-          },
-        ],
+        AND: [{
+          OR: [
+            { targetSections: { has: student.sectionId } },
+            { targetSections: { isEmpty: true } },
+          ],
+        }],
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        _count: {
-          select: {
-            questions: true,
-          },
-        },
-      },
+      orderBy: { createdAt: 'desc' },
+      include: { _count: { select: { questions: true } } },
     });
 
     return (
-      <div className="space-y-6 animate-fade-in">
-        <h1 className="text-2xl font-bold">Encuestas disponibles</h1>
+      <div className={styles.page}>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Banner superior */}
+        <div className={styles.banner}>
+          <div className={styles.bannerIcon}>
+            <ClipboardList className={styles.bannerIconSvg} />
+          </div>
+          <div className={styles.bannerText}>
+            <h1 className={styles.bannerTitle}>Encuestas disponibles</h1>
+            <p className={styles.bannerSub}>
+              {surveys.length > 0
+                ? `${surveys.length} pendiente${surveys.length > 1 ? 's' : ''} por responder`
+                : 'No tienes encuestas pendientes'}
+            </p>
+          </div>
+          {surveys.length > 0 && (
+            <span className={styles.bannerBadge}>{surveys.length}</span>
+          )}
+        </div>
+
+        {/* Grilla de tarjetas */}
+        <div className={styles.grid}>
           {surveys.map((s) => (
-            <Link
-              key={s.id}
-              href={`/estudiante/encuestas/${s.id}`}
-              className="card hover:shadow-md hover:-translate-y-0.5 transition-all border-2 border-transparent hover:border-warm-300"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-warm-100 text-warm-600 flex items-center justify-center flex-shrink-0">
-                  <ClipboardList className="w-5 h-5" />
-                </div>
+            <Link key={s.id} href={`/estudiante/encuestas/${s.id}`} className={styles.card}>
 
-                <div className="flex-1">
-                  <h3 className="font-semibold text-slate-900">
-                    {s.title}
-                  </h3>
-
-                  {s.description && (
-                    <p className="text-sm text-slate-600 mt-1">
-                      {s.description}
-                    </p>
-                  )}
-
-                  <p className="text-xs text-slate-500 mt-2">
-                    {s._count.questions} preguntas
-                  </p>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardIconWrap}>
+                  <ClipboardList className={styles.cardIcon} />
                 </div>
               </div>
+
+              <div className={styles.cardBody}>
+                <h3 className={styles.cardTitle}>{s.title}</h3>
+                {s.description && (
+                  <p className={styles.cardDesc}>{s.description}</p>
+                )}
+              </div>
+
+              <div className={styles.cardFooter}>
+                <span className={styles.cardQuestions}>
+                  <HelpCircle className={styles.cardQIcon} />
+                  {s._count.questions} pregunta{s._count.questions !== 1 ? 's' : ''}
+                </span>
+                <span className={styles.cardCta}>
+                  Responder
+                  <ChevronRight className={styles.cardCtaIcon} />
+                </span>
+              </div>
+
             </Link>
           ))}
 
           {surveys.length === 0 && (
-            <p className="text-slate-500 col-span-full text-center py-12">
-              No hay encuestas activas.
-            </p>
+            <div className={styles.empty}>
+              <span className={styles.emptyIcon}>📋</span>
+              <p className={styles.emptyTitle}>¡Todo al día!</p>
+              <p className={styles.emptyDesc}>No tienes encuestas pendientes por responder.</p>
+            </div>
           )}
         </div>
       </div>

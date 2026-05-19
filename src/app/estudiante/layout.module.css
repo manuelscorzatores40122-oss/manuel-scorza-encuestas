@@ -1,68 +1,217 @@
-.icon {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
+/* ══════════════════════════════════════════
+   Layout del Estudiante
+   ══════════════════════════════════════════ */
+
+/* ── SHELL PRINCIPAL ─────────────────────
+   En móvil: flex-col (solo main visible)
+   En desktop: sidebar fijo + main a la derecha
+*/
+.shell {
+  display: flex;
+  min-height: 100dvh;
+  background: #f8fafc;
 }
 
-/* espacio inferior para móvil */
-.mobileSafeArea {
+/* ── MAIN (área de contenido) ──────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  /* móvil: espacio para bottom nav */
   padding-bottom: 5rem;
 }
 
-/* navbar móvil */
+@media (min-width: 768px) {
+  .main {
+    margin-left: 240px;
+    padding-bottom: 0;
+  }
+}
+
+/* wrapper interno con padding */
+.pageWrapper {
+  padding: 1rem 1rem;
+}
+
+@media (min-width: 640px)  { .pageWrapper { padding: 1.5rem; } }
+@media (min-width: 1024px) { .pageWrapper { padding: 2rem 2.5rem; } }
+
+/* ══════════════════════════════════════════
+   SIDEBAR DESKTOP  (oculto en móvil)
+   ══════════════════════════════════════════ */
+.sidebar {
+  display: none; /* oculto en móvil */
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    background: #fff;
+    border-right: 1.5px solid #e2e8f0;
+    box-shadow: 2px 0 16px rgba(15,23,42,0.05);
+    z-index: 40;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+/* ── CABECERA DEL SIDEBAR ─────────────── */
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.375rem 1.25rem 1.125rem;
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border-bottom: 1.5px solid #fed7aa;
+  flex-shrink: 0;
+}
+
+.sidebarLogo {
+  width: 2.625rem;
+  height: 2.625rem;
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 5px 14px rgba(249,115,22,0.35);
+}
+
+.sidebarLogoIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #fff;
+}
+
+.sidebarAppName {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: #1c1917;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.sidebarRole {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #f97316;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── NAVEGACIÓN ───────────────────────── */
+.sidebarNav {
+  padding: 1rem 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.875rem;
+  border-radius: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.sidebarItem:hover {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.sidebarItemActive {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  color: #ea580c !important;
+  box-shadow: inset 0 0 0 1.5px #fed7aa;
+}
+
+.sidebarItemIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+/* ── PIE DEL SIDEBAR ──────────────────── */
+.sidebarFooter {
+  padding: 0.75rem;
+  border-top: 1.5px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.sidebarLogout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.875rem;
+  border: 1.5px solid #fecdd3;
+  border-radius: 0.875rem;
+  background: #fff1f2;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #e11d48;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+}
+
+.sidebarLogout:hover {
+  background: #ffe4e6;
+  box-shadow: 0 3px 10px rgba(225,29,72,0.18);
+}
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV MÓVIL  (oculto en desktop)
+   ══════════════════════════════════════════ */
 .mobileBottomNav {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-
   z-index: 50;
-
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-
   gap: 0.25rem;
-
   padding: 0.5rem;
-  padding-bottom:
-    calc(
-      0.5rem +
-      env(safe-area-inset-bottom)
-    );
-
-  background:
-    rgba(255, 255, 255, 0.96);
-
-  border-top:
-    1px solid #e2e8f0;
-
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid #e2e8f0;
   backdrop-filter: blur(12px);
 }
 
-/* botón móvil */
+@media (min-width: 768px) {
+  .mobileBottomNav { display: none; }
+}
+
+/* botón del nav móvil */
 .mobileNavButton {
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
-
   gap: 0.25rem;
-
   min-height: 3.5rem;
-
   border-radius: 0.875rem;
-
   color: #475569;
-
   font-size: 0.7rem;
   font-weight: 600;
-
   text-decoration: none;
-
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .mobileNavButton:hover {
@@ -70,67 +219,48 @@
   color: #ea580c;
 }
 
-/* icono navbar */
 .mobileIcon {
   width: 1.25rem;
   height: 1.25rem;
 }
 
-/* menú desplegable */
-.mobileMenu {
-  position: relative;
-}
+/* menú "Más" */
+.mobileMenu { position: relative; }
 
-/* ocultar flecha default */
 .mobileMenu summary {
   list-style: none;
   cursor: pointer;
 }
 
-.mobileMenu summary::-webkit-details-marker {
-  display: none;
-}
+.mobileMenu summary::-webkit-details-marker { display: none; }
 
-/* contenido menú */
 .mobileMenuContent {
   position: absolute;
-
   right: 0;
   bottom: 4rem;
-
   min-width: 12rem;
-
   padding: 0.5rem;
-
   background: white;
-
-  border:
-    1px solid #e2e8f0;
-
+  border: 1px solid #e2e8f0;
   border-radius: 1rem;
-
-  box-shadow:
-    0 12px 30px
-    rgba(15, 23, 42, 0.15);
+  box-shadow: 0 12px 30px rgba(15,23,42,0.15);
 }
 
-/* item menú */
 .mobileMenuItem {
   display: flex;
   align-items: center;
-
   gap: 0.5rem;
-
   padding: 0.75rem;
-
   border-radius: 0.75rem;
-
   color: #334155;
-
   font-size: 0.875rem;
   font-weight: 600;
-
   text-decoration: none;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 
 .mobileMenuItem:hover {
@@ -138,14 +268,8 @@
   color: #ea580c;
 }
 
-/* ocultar navbar móvil en desktop */
-@media (min-width: 768px) {
-
-  .mobileBottomNav {
-    display: none;
-  }
-
-  .mobileSafeArea {
-    padding-bottom: 0;
-  }
+.icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }

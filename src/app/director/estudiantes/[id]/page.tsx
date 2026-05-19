@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Bell, CalendarDays, FileText, Phone, ShieldAlert, UserRound } from 'lucide-react';
 
-import { RiskBadge } from '@/components/RiskBadge';
+import { RiskBadge } from '@/components/EtiquetaRiesgo';
 import { prisma } from '@/lib/prisma';
 import { formatDate, formatDateTime } from '@/lib/utils';
 

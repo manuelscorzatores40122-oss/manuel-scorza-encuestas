@@ -54,30 +54,6 @@ export default function LoginPage() {
 
           <div className={styles.heroDivider} />
 
-          {/* Tarjetas de roles */}
-          <div className={styles.heroRoles}>
-            <div className={styles.roleCard}>
-              <span className={styles.roleEmoji}>🎓</span>
-              <div className={styles.roleInfo}>
-                <span className={styles.roleTitle}>Estudiantes</span>
-                <span className={styles.roleDesc}>Accede con tu DNI</span>
-              </div>
-            </div>
-            <div className={styles.roleCard}>
-              <span className={styles.roleEmoji}>🧠</span>
-              <div className={styles.roleInfo}>
-                <span className={styles.roleTitle}>Psicólogos</span>
-                <span className={styles.roleDesc}>Gestión y encuestas</span>
-              </div>
-            </div>
-            <div className={styles.roleCard}>
-              <span className={styles.roleEmoji}>👨‍💼</span>
-              <div className={styles.roleInfo}>
-                <span className={styles.roleTitle}>Personal</span>
-                <span className={styles.roleDesc}>Correo institucional</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className={styles.heroBadge}>

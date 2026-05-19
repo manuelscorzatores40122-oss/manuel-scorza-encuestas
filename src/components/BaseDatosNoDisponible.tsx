@@ -2,7 +2,7 @@ import { AlertTriangle } from 'lucide-react';
 
 export function DatabaseUnavailable({
   title = 'Base de datos no disponible',
-  message = 'No se pudo conectar con Neon en este momento. Espera unos segundos y vuelve a intentar.',
+  message = 'Espera unos segundos y vuelve a intentar.',
 }: {
   title?: string;
   message?: string;

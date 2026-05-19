@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { Users } from 'lucide-react';
@@ -36,16 +37,22 @@ export default async function TutorEstudiantes() {
                   <th className="text-center py-2">Edad</th>
                   <th className="text-center py-2">Sexo</th>
                   <th className="text-center py-2">Respuestas</th>
+                  <th className="py-2"></th>
                 </tr>
               </thead>
               <tbody>
                 {sec.students.map((st) => (
-                  <tr key={st.id} className="border-t border-slate-100">
+                  <tr key={st.id} className="border-t border-slate-100 hover:bg-slate-50">
                     <td className="py-2 font-mono text-xs">{st.dni}</td>
                     <td className="py-2">{st.apellidoPaterno} {st.apellidoMaterno}, {st.nombres}</td>
                     <td className="py-2 text-center">{st.edad}</td>
                     <td className="py-2 text-center">{st.sexo}</td>
                     <td className="py-2 text-center">{st._count.responses}</td>
+                    <td className="py-2 text-right">
+                      <Link href={`/tutor/estudiantes/${st.id}`} className="text-brand-600 text-xs hover:underline">
+                        Ver ficha →
+                      </Link>
+                    </td>
                   </tr>
                 ))}
                 {sec.students.length === 0 && <tr><td colSpan={5} className="text-center py-4 text-slate-500">Sin estudiantes.</td></tr>}
