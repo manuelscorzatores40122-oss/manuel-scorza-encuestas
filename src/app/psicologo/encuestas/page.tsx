@@ -4,6 +4,7 @@ import {
   Plus,
   ClipboardList,
   ChevronDown,
+  Users,
 } from 'lucide-react';
 
 import { prisma } from '@/lib/prisma';
@@ -81,6 +82,14 @@ export default async function EncuestasPsicologo() {
 
                   <td className={styles.right}>
                     <div className={styles.actions}>
+                      <Link
+                        href={`/psicologo/encuestas/${survey.id}`}
+                        className={styles.toggleButton}
+                        title="Ver respondientes"
+                      >
+                        <Users className={styles.smallIcon} />
+                        Ver
+                      </Link>
                       <SurveyActions
                         id={survey.id}
                         title={survey.title}
@@ -143,6 +152,13 @@ export default async function EncuestasPsicologo() {
               </div>
 
               <div className={styles.mobileActions}>
+                <Link
+                  href={`/psicologo/encuestas/${survey.id}`}
+                  className={styles.mobileToggleButton}
+                >
+                  <Users className={styles.smallIcon} />
+                  Ver respondientes
+                </Link>
                 <SurveyActions
                   id={survey.id}
                   title={survey.title}

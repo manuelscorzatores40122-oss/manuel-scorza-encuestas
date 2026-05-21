@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Users,
-  ClipboardList,
-  AlertTriangle,
-  FileBarChart,
-  BarChart3,
-  Megaphone,
+  LayoutGrid,
+  GraduationCap,
+  ClipboardCheck,
+  Bell,
+  BarChart2,
+  TrendingUp,
+  Newspaper,
   LogOut,
   Brain,
 } from 'lucide-react';
@@ -17,13 +17,13 @@ import { logoutAction } from '@/app/login/actions';
 import styles from './psicologo-layout.module.css';
 
 const NAV_ITEMS = [
-  { href: '/psicologo',             label: 'Inicio',       icon: LayoutDashboard },
-  { href: '/psicologo/estudiantes', label: 'Estudiantes',  icon: Users           },
-  { href: '/psicologo/encuestas',   label: 'Encuestas',    icon: ClipboardList   },
-  { href: '/psicologo/alertas',     label: 'Alertas',      icon: AlertTriangle   },
-  { href: '/psicologo/respuestas',  label: 'Respuestas',   icon: FileBarChart    },
-  { href: '/psicologo/estadisticas',label: 'Estadísticas', icon: BarChart3       },
-  { href: '/psicologo/anuncios',    label: 'Anuncios',     icon: Megaphone       },
+  { href: '/psicologo',              label: 'Inicio',       icon: LayoutGrid     },
+  { href: '/psicologo/estudiantes',  label: 'Estudiantes',  icon: GraduationCap  },
+  { href: '/psicologo/encuestas',    label: 'Encuestas',    icon: ClipboardCheck },
+  { href: '/psicologo/alertas',      label: 'Alertas',      icon: Bell           },
+  { href: '/psicologo/respuestas',   label: 'Respuestas',   icon: BarChart2      },
+  { href: '/psicologo/estadisticas', label: 'Estadísticas', icon: TrendingUp     },
+  { href: '/psicologo/anuncios',     label: 'Anuncios',     icon: Newspaper      },
 ];
 
 export function SidebarPsicologo() {
@@ -49,7 +49,7 @@ export function SidebarPsicologo() {
         <div className={styles.sidebarLogo}>
           <Brain className={styles.sidebarLogoIcon} />
         </div>
-        <div>
+        <div className={styles.sidebarMeta}>
           <p className={styles.sidebarAppName}>PsicoEscolar</p>
           <p className={styles.sidebarRole}>Psicólogo</p>
         </div>
@@ -57,6 +57,7 @@ export function SidebarPsicologo() {
 
       {/* Navegación */}
       <nav className={styles.sidebarNav}>
+        <p className={styles.sidebarNavLabel}>Menú</p>
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}

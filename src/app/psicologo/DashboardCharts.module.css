@@ -1,52 +1,66 @@
 .grid {
   display: grid;
-  gap: 1rem;
-}
-
-.card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-}
-
-.header {
-  margin-bottom: 1rem;
-}
-
-.title {
-  color: #0f172a;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.description {
-  margin-top: 0.25rem;
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.chartBox {
-  height: 18rem;
-}
-
-.emptyChart {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-  border: 1px dashed #cbd5e1;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  color: #64748b;
-  font-size: 0.875rem;
-  text-align: center;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 @media (min-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .grid         { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cardWide     { grid-column: 1 / -1; }
 }
+
+.card {
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.25rem;
+}
+
+.header { margin-bottom: 16px; }
+
+.title {
+  margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.description {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.chartBox      { height: 18rem; }
+.cardWide .chartBox { height: 14rem; }
+
+/* Estado vacío */
+.emptyChart {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+}
+
+.emptyIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.emptyIcon svg { width: 20px; height: 20px; color: var(--text-tertiary); }
+
+.emptyTitle { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-primary); }
+.emptyText  { margin: 0; font-size: 13px; color: var(--text-secondary); max-width: 240px; }

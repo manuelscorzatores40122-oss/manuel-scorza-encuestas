@@ -1,0 +1,253 @@
+/* ═══════════════════════════════════════════
+   Detalle de Estudiante
+   ═══════════════════════════════════════════ */
+
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: fadeIn 0.25s ease both;
+}
+
+/* ── Back link ──────────────────────────── */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--brand);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.backLink:hover { opacity: 0.75; }
+.backIcon       { width: 1rem; height: 1rem; }
+
+/* ── Cards ──────────────────────────────── */
+.card {
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.25rem 1.5rem;
+}
+
+/* ── Student info card ──────────────────── */
+.studentName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.studentMeta {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.infoItem {}
+
+.infoLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  margin: 0 0 2px;
+}
+
+.infoValue {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ── Card count badge ────────────────────── */
+.cardCount {
+  margin-left: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--brand);
+}
+
+/* ── Card section header ─────────────────── */
+.cardTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cardTitleIcon { width: 1rem; height: 1rem; color: var(--brand); flex-shrink: 0; }
+
+/* ── Apoderados list ─────────────────────── */
+.apoderadoList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.apoderadoCard {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+/* Cabecera: nombre + badge principal */
+.apoderadoHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.apoderadoName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.apoderadoParentesco {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.badgePrincipal {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(15, 118, 110, 0.10);
+  color: var(--brand);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.starIcon { width: 0.65rem; height: 0.65rem; }
+
+/* Datos de contacto */
+.apoderadoContacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.apoderadoContactItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.contactItemIcon {
+  width: 0.8rem;
+  height: 0.8rem;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.contactItemValue {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.contactItemEmpty {
+  font-size: 0.825rem;
+  color: var(--text-tertiary);
+}
+
+.docLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  background: var(--bg-muted);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.noContact {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+}
+
+/* ── Response list ──────────────────────── */
+.responseList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.responseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.875rem;
+  border-radius: var(--r-md);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.responseRow:hover {
+  background: var(--bg-muted);
+  border-color: var(--border);
+}
+
+.responseInfo {}
+
+.responseSurvey {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 2px;
+}
+
+.responseMeta {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.emptyResponses {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}
+
+/* ── Animation ──────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}

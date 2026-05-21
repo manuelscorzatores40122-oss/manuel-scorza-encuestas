@@ -63,7 +63,7 @@ async function main() {
     const csvPath = path.resolve(`credenciales-${nivelStr.toLowerCase()}-${anio}.csv`);
     const csv = ['DNI,Nombre,Clave', ...result.credenciales.map((c) => `${c.dni},"${c.nombre}",${c.clave}`)].join('\n');
     fs.writeFileSync(csvPath, '\uFEFF' + csv, 'utf8');
-    console.log(`\n📄 Credenciales nuevas guardadas en: ${csvPath}`);
+    console.log(`\n  Credenciales nuevas guardadas en: ${csvPath}`);
   }
 }
 

@@ -1,0 +1,203 @@
+/* ═══════════════════════════════════════════
+   Detalle de Encuesta
+   ═══════════════════════════════════════════ */
+
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.25s ease both;
+}
+
+/* ── Back ────────────────────────────────── */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--brand);
+  text-decoration: none;
+}
+.backLink:hover { opacity: 0.75; }
+.backIcon { width: 1rem; height: 1rem; }
+
+/* ── Header ──────────────────────────────── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pageTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+
+.pageDesc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.badgeActive   { display:inline-block; padding:3px 10px; border-radius:4px; font-size:0.75rem; font-weight:600; background:#dcfce7; color:#166534; white-space:nowrap; }
+.badgeInactive { display:inline-block; padding:3px 10px; border-radius:4px; font-size:0.75rem; font-weight:600; background:var(--bg-muted); color:var(--text-secondary); white-space:nowrap; }
+
+/* ── Stats ───────────────────────────────── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.875rem;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1rem 1.125rem;
+}
+
+.statIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--brand);
+  flex-shrink: 0;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 3px 0 0;
+}
+
+/* ── Section ─────────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sectionIcon      { width:1rem; height:1rem; color: var(--brand); flex-shrink:0; }
+.sectionIconMuted { width:1rem; height:1rem; color: var(--text-tertiary); flex-shrink:0; }
+
+.sectionCount {
+  margin-left: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: rgba(15,118,110,0.12);
+  color: var(--brand);
+}
+
+.sectionCountMuted {
+  margin-left: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+}
+
+/* ── Table ───────────────────────────────── */
+.tableCard {
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+
+.th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  background: var(--bg-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.thCenter { text-align: center; }
+
+.row { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+.row:last-child { border-bottom: none; }
+.row:hover { background: var(--bg-muted); }
+
+.td, .tdName {
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.tdCenter { text-align: center; }
+
+.tdName {
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 200px;
+}
+
+.viewLink {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brand);
+  text-decoration: none;
+  padding: 3px 8px;
+  border-radius: var(--r-md);
+  white-space: nowrap;
+  transition: background 0.1s;
+}
+.viewLink:hover { background: rgba(15,118,110,0.08); }
+
+.emptyMsg {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ── Animation ───────────────────────────── */
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}

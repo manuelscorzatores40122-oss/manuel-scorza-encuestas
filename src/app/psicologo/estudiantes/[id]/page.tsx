@@ -1,12 +1,17 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Phone } from 'lucide-react';
+import { ArrowLeft, Phone, User, Mail, Star } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
 import { RiskBadge } from '@/components/EtiquetaRiesgo';
 import { StudentTimeline } from './StudentTimeline';
+import styles from './page.module.css';
 
-export default async function HistorialEstudiante({ params }: { params: { id: string } }) {
+export default async function HistorialEstudiante({
+  params,
+}: {
+  params: { id: string };
+}) {
   const student = await prisma.student.findUnique({
     where: { id: params.id },
     include: {
@@ -20,75 +25,161 @@ export default async function HistorialEstudiante({ params }: { params: { id: st
   });
   if (!student) notFound();
 
-  const trend = student.responses.slice().reverse().map((r) => ({
-    fecha: r.submittedAt.toISOString().slice(5, 10),
-    score: r.riskScore,
-  }));
-  const emergencyContact =
-    student.apoderados.find((a) => a.esContactoPrincipal) ||
-    student.apoderados.find((a) => a.parentesco === 'APODERADO') ||
-    student.apoderados[0];
+  const trend = student.responses
+    .slice()
+    .reverse()
+    .map((r) => ({
+      fecha: r.submittedAt.toISOString().slice(5, 10),
+      score: r.riskScore,
+    }));
+
+  const parentescoLabel: Record<string, string> = {
+    PADRE:     'Padre',
+    MADRE:     'Madre',
+    APODERADO: 'Apoderado',
+    OTRO:      'Otro',
+  };
+
+  const nivel =
+    student.section.grade.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria';
+  const sexo = student.sexo === 'F' ? 'Mujer' : 'Hombre';
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-5xl">
-      <Link href="/psicologo/estudiantes" className="inline-flex items-center gap-2 text-brand-600 hover:underline text-sm">
-        <ArrowLeft className="w-4 h-4" /> Volver
+    <div className={styles.page}>
+
+      {/* Back */}
+      <Link href="/psicologo/estudiantes" className={styles.backLink}>
+        <ArrowLeft className={styles.backIcon} />
+        Volver a estudiantes
       </Link>
 
-      <div className="card">
-        <h1 className="text-2xl font-bold">{student.apellidoPaterno} {student.apellidoMaterno}, {student.nombres}</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {student.section.grade.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria'} {student.section.grade.name} {student.section.name} · {student.edad} años · {student.sexo === 'F' ? 'Mujer' : 'Hombre'}
+      {/* Student info */}
+      <div className={styles.card}>
+        <h1 className={styles.studentName}>
+          {student.apellidoPaterno} {student.apellidoMaterno},{' '}
+          {student.nombres}
+        </h1>
+        <p className={styles.studentMeta}>
+          {nivel} · {student.section.grade.name} {student.section.name}
         </p>
+
+        <div className={styles.infoGrid}>
+          <div className={styles.infoItem}>
+            <p className={styles.infoLabel}>Edad</p>
+            <p className={styles.infoValue}>{student.edad} años</p>
+          </div>
+          <div className={styles.infoItem}>
+            <p className={styles.infoLabel}>Sexo</p>
+            <p className={styles.infoValue}>{sexo}</p>
+          </div>
+          <div className={styles.infoItem}>
+            <p className={styles.infoLabel}>Encuestas</p>
+            <p className={styles.infoValue}>{student.responses.length}</p>
+          </div>
+          <div className={styles.infoItem}>
+            <p className={styles.infoLabel}>Nivel</p>
+            <p className={styles.infoValue}>{nivel}</p>
+          </div>
+        </div>
       </div>
 
+      {/* Timeline */}
       {trend.length > 0 && <StudentTimeline data={trend} />}
 
-      <div className="card bg-emerald-50 border-emerald-200">
-        <h2 className="font-semibold mb-3 flex items-center gap-2 text-emerald-900">
-          <Phone className="w-4 h-4" /> Contacto de emergencia
+      {/* Apoderados */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>
+          <Phone className={styles.cardTitleIcon} />
+          Apoderados y contactos
+          {student.apoderados.length > 0 && (
+            <span className={styles.cardCount}>{student.apoderados.length}</span>
+          )}
         </h2>
-        {emergencyContact ? (
-          <div className="grid sm:grid-cols-2 gap-3 text-sm">
-            <div>
-              <p className="text-xs text-slate-500">Nombre</p>
-              <p className="font-medium text-slate-900">{emergencyContact.apellidosNombres}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500">Parentesco</p>
-              <p className="font-medium text-slate-900">{emergencyContact.parentesco}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500">Celular</p>
-              <p className="font-medium text-slate-900">{emergencyContact.celular || 'No registrado'}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500">Correo</p>
-              <p className="font-medium text-slate-900">{emergencyContact.correo || 'No registrado'}</p>
-            </div>
+
+        {student.apoderados.length > 0 ? (
+          <div className={styles.apoderadoList}>
+            {student.apoderados.map((a) => (
+              <div key={a.id} className={styles.apoderadoCard}>
+
+                {/* Cabecera del apoderado */}
+                <div className={styles.apoderadoHeader}>
+                  <div>
+                    <p className={styles.apoderadoName}>{a.apellidosNombres}</p>
+                    <p className={styles.apoderadoParentesco}>
+                      {parentescoLabel[a.parentesco] ?? a.parentesco}
+                    </p>
+                  </div>
+                  {a.esContactoPrincipal && (
+                    <span className={styles.badgePrincipal}>
+                      <Star className={styles.starIcon} />
+                      Principal
+                    </span>
+                  )}
+                </div>
+
+                {/* Datos de contacto */}
+                <div className={styles.apoderadoContacts}>
+                  <div className={styles.apoderadoContactItem}>
+                    <Phone className={styles.contactItemIcon} />
+                    <span className={a.celular ? styles.contactItemValue : styles.contactItemEmpty}>
+                      {a.celular || 'Sin celular'}
+                    </span>
+                  </div>
+                  <div className={styles.apoderadoContactItem}>
+                    <Mail className={styles.contactItemIcon} />
+                    <span className={a.correo ? styles.contactItemValue : styles.contactItemEmpty}>
+                      {a.correo || 'Sin correo'}
+                    </span>
+                  </div>
+                  {a.numeroDocumento && (
+                    <div className={styles.apoderadoContactItem}>
+                      <span className={styles.docLabel}>
+                        {a.tipoDocumento || 'DOC'}
+                      </span>
+                      <span className={styles.contactItemValue}>{a.numeroDocumento}</span>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            ))}
           </div>
         ) : (
-          <p className="text-sm text-slate-600">No hay contacto registrado.</p>
+          <p className={styles.noContact}>No hay apoderados registrados.</p>
         )}
       </div>
 
-      <div className="card">
-        <h2 className="font-semibold mb-4">Respuestas ({student.responses.length})</h2>
-        <div className="space-y-2">
+      {/* Historial de respuestas */}
+      <div className={styles.card}>
+        <h2 className={styles.cardTitle}>
+          <User className={styles.cardTitleIcon} />
+          Respuestas ({student.responses.length})
+        </h2>
+        <div className={styles.responseList}>
           {student.responses.map((r) => (
-            <Link key={r.id} href={`/psicologo/respuestas/${r.id}`} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border border-slate-100">
-              <div>
-                <p className="font-medium text-sm">{r.survey.title}</p>
-                <p className="text-xs text-slate-500">{formatDateTime(r.submittedAt)} · Score {r.riskScore} · {r.alerts.length} alerta(s)</p>
+            <Link
+              key={r.id}
+              href={`/psicologo/respuestas/${r.id}`}
+              className={styles.responseRow}
+            >
+              <div className={styles.responseInfo}>
+                <p className={styles.responseSurvey}>{r.survey.title}</p>
+                <p className={styles.responseMeta}>
+                  {formatDateTime(r.submittedAt)} · Score {r.riskScore} ·{' '}
+                  {r.alerts.length} alerta{r.alerts.length !== 1 ? 's' : ''}
+                </p>
               </div>
               <RiskBadge level={r.riskLevel} />
             </Link>
           ))}
           {student.responses.length === 0 && (
-            <p className="text-center text-slate-500 py-8">El estudiante aún no ha respondido encuestas.</p>
+            <p className={styles.emptyResponses}>
+              El estudiante aún no ha respondido encuestas.
+            </p>
           )}
         </div>
       </div>
+
     </div>
   );
 }

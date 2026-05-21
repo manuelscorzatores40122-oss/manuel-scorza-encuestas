@@ -6,19 +6,28 @@ import {
   ClipboardList,
   Users,
   TrendingUp,
-  MessageSquare,
   Megaphone,
-  Brain,
+  Plus,
 } from 'lucide-react';
 
 import { prisma } from '@/lib/prisma';
 import { DashboardCharts } from './DashboardCharts';
+import { DashboardStudentSearch } from './DashboardStudentSearch';
+import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
 import styles from './dashboard.module.css';
 
 /**
  * Panel principal del psicólogo.
  */
 export default async function PsicologoDashboard() {
+  try {
+    return await renderDashboard();
+  } catch {
+    return <DatabaseUnavailable />;
+  }
+}
+
+async function renderDashboard() {
   const [
     totalEstudiantes,
     encuestasActivas,
@@ -26,229 +35,235 @@ export default async function PsicologoDashboard() {
     alertasPendientes,
     respuestasPorRiesgo,
     respuestasUltimos30,
-    quierenHablar,
     anunciosPublicados,
+    ultimasAlertas,
+    respuestasTodas,
   ] = await Promise.all([
-    prisma.student.count({
-      where: {
-        estadoMatricula: 'DEFINITIVA',
-      },
-    }),
-
-    prisma.survey.count({
-      where: {
-        isActive: true,
-      },
-    }),
-
+    prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA' } }),
+    prisma.survey.count({ where: { isActive: true } }),
     prisma.response.count(),
-
-    prisma.alert.count({
-      where: {
-        reviewedAt: null,
-      },
-    }),
-
-    prisma.response.groupBy({
-      by: ['riskLevel'],
-      _count: true,
-    }),
-
+    prisma.alert.count({ where: { reviewedAt: null } }),
+    prisma.response.groupBy({ by: ['riskLevel'], _count: true }),
     prisma.response.findMany({
-      where: {
-        submittedAt: {
-          gte: daysAgo(30),
+      where: { submittedAt: { gte: daysAgo(30) } },
+      select: { submittedAt: true, riskLevel: true },
+    }),
+    prisma.announcement.count({ where: { isPublished: true } }),
+    prisma.alert.findMany({
+      where: { reviewedAt: null },
+      orderBy: { triggeredAt: 'desc' },
+      take: 6,
+      select: {
+        id: true,
+        severity: true,
+        triggeredAt: true,
+        response: {
+          select: {
+            riskLevel: true,
+            survey: { select: { title: true } },
+            student: { select: { nombres: true, apellidoPaterno: true } },
+          },
         },
       },
+    }),
+    prisma.response.findMany({
       select: {
-        submittedAt: true,
         riskLevel: true,
-      },
-    }),
-
-    prisma.response.count({
-      where: {
-        wantsToTalk: true,
-      },
-    }),
-
-    prisma.announcement.count({
-      where: {
-        isPublished: true,
+        student: {
+          select: {
+            section: {
+              select: {
+                grade: { select: { name: true, order: true } },
+              },
+            },
+          },
+        },
       },
     }),
   ]);
 
-  /**
-   * Distribución de riesgo
-   */
   const riskDist = {
-    LOW:
-      respuestasPorRiesgo.find(
-        (item) => item.riskLevel === 'LOW'
-      )?._count || 0,
-
-    MID:
-      respuestasPorRiesgo.find(
-        (item) => item.riskLevel === 'MID'
-      )?._count || 0,
-
-    HIGH:
-      respuestasPorRiesgo.find(
-        (item) => item.riskLevel === 'HIGH'
-      )?._count || 0,
+    LOW:  respuestasPorRiesgo.find((r) => r.riskLevel === 'LOW')?._count  || 0,
+    MID:  respuestasPorRiesgo.find((r) => r.riskLevel === 'MID')?._count  || 0,
+    HIGH: respuestasPorRiesgo.find((r) => r.riskLevel === 'HIGH')?._count || 0,
   };
 
-  /**
-   * Tendencia últimos 30 días
-   */
-  const trend = bucketByDay(respuestasUltimos30, 30);
+  const trend       = bucketByDay(respuestasUltimos30, 30);
+  const riskByGrade = buildRiskByGrade(respuestasTodas);
+
+  const tasaRespuesta = totalEstudiantes > 0
+    ? `${Math.round((totalRespuestas / totalEstudiantes) * 100)}%`
+    : '—';
 
   return (
     <div className={styles.page}>
 
-      {/* Banner */}
-      <div className={styles.banner}>
-        <div className={styles.bannerIcon}>
-          <Brain className={styles.bannerIconSvg} />
+      {/* Encabezado */}
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle}>Panel del psicólogo</h1>
+          <p className={styles.pageSubtitle}>Resumen del bienestar estudiantil · I.E. 40122</p>
         </div>
-        <div className={styles.bannerText}>
-          <h1 className={styles.bannerTitle}>Panel del Psicólogo</h1>
-          <p className={styles.bannerSub}>Resumen general del bienestar estudiantil</p>
-        </div>
-      </div>
+        <Link href="/psicologo/encuestas/nueva" className={styles.btnPrimary}>
+          <Plus className={styles.btnPrimaryIcon} />
+          Nueva encuesta
+        </Link>
+      </header>
 
-      {/* Stats grid */}
-      <div className={styles.statsGrid}>
+      {/* Buscador de alumnos */}
+      <DashboardStudentSearch />
+
+      {/* Grupo 1: Requiere atención */}
+      <p className={styles.sectionLabel}>Requiere tu atención</p>
+      <section className={`${styles.grid} ${styles.gridAttention}`}>
         <StatCard
-          href="/psicologo/estudiantes"
-          icon={<Users />}
-          label="Estudiantes"
-          value={totalEstudiantes}
-          color="blue"
-        />
-        <StatCard
-          href="/psicologo/encuestas"
-          icon={<ClipboardList />}
-          label="Encuestas activas"
-          value={encuestasActivas}
-          color="emerald"
-        />
-        <StatCard
-          href="/psicologo/respuestas"
-          icon={<TrendingUp />}
-          label="Respuestas"
-          value={totalRespuestas}
-          color="purple"
-        />
-        <StatCard
-          href="/psicologo/alertas"
           icon={<AlertTriangle />}
+          iconVariant="danger"
           label="Alertas pendientes"
           value={alertasPendientes}
-          color="red"
+          hint={alertasPendientes === 0 ? { text: 'Todo en orden', success: true } : undefined}
+          link={alertasPendientes > 0 ? { href: '/psicologo/alertas', text: 'Revisar ahora →' } : undefined}
         />
         <StatCard
-          href="/psicologo/respuestas"
-          icon={<MessageSquare />}
-          label="Quieren hablar"
-          value={quierenHablar}
-          color="orange"
+          icon={<ClipboardList />}
+          iconVariant="info"
+          label="Encuestas activas"
+          value={encuestasActivas}
+          link={{ href: '/psicologo/encuestas/nueva', text: 'Lanzar una →' }}
         />
         <StatCard
-          href="/psicologo/anuncios"
-          icon={<Megaphone />}
-          label="Anuncios"
-          value={anunciosPublicados}
-          color="amber"
+          icon={<TrendingUp />}
+          iconVariant="neutral"
+          label="Respuestas recibidas"
+          value={totalRespuestas}
+          hint={encuestasActivas === 0 ? { text: 'Sin encuestas activas' } : undefined}
+          link={encuestasActivas > 0 ? { href: '/psicologo/respuestas', text: 'Ver respuestas →' } : undefined}
         />
-      </div>
+      </section>
 
-      {/* Charts */}
-      <div className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Analítica</h2>
-          <Link href="/psicologo/estadisticas" className={styles.sectionLink}>
-            Ver estadísticas →
-          </Link>
-        </div>
-        <div className={styles.sectionBody}>
-          <DashboardCharts riskDist={riskDist} trend={trend} />
-        </div>
-      </div>
+      {/* Grupo 2: Contexto general */}
+      <p className={styles.sectionLabel}>Contexto general</p>
+      <section className={`${styles.grid} ${styles.gridContext}`}>
+        <MiniStat icon={<Users />}       label="Estudiantes"        value={totalEstudiantes}    />
+        <MiniStat icon={<Megaphone />}   label="Anuncios"           value={anunciosPublicados}  />
+        <MiniStat icon={<TrendingUp />}  label="Tasa de respuesta"  value={tasaRespuesta} empty={totalRespuestas === 0} />
+      </section>
 
-      {/* Quick actions */}
-      <div className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Acciones rápidas</h2>
-        </div>
-        <div className={styles.sectionBody}>
-          <div className={styles.actionsGrid}>
-            <Link
-              href="/psicologo/alertas"
-              className={`${styles.actionBtn} ${styles.actionBtnRed}`}
-            >
-              <AlertTriangle className={styles.actionBtnIcon} />
-              Revisar alertas
-            </Link>
-            <Link
-              href="/psicologo/encuestas/nueva"
-              className={`${styles.actionBtn} ${styles.actionBtnEmerald}`}
-            >
-              <ClipboardList className={styles.actionBtnIcon} />
-              Crear encuesta
-            </Link>
-            <Link
-              href="/psicologo/respuestas"
-              className={`${styles.actionBtn} ${styles.actionBtnPurple}`}
-            >
-              <TrendingUp className={styles.actionBtnIcon} />
-              Ver respuestas
-            </Link>
-            <Link
-              href="/psicologo/anuncios"
-              className={`${styles.actionBtn} ${styles.actionBtnAmber}`}
-            >
-              <Megaphone className={styles.actionBtnIcon} />
-              Ver anuncios
-            </Link>
-          </div>
-        </div>
+      {/* Analítica */}
+      <div className={styles.analyticsHead}>
+        <h2 className={styles.analyticsTitle}>Analítica</h2>
+        <Link href="/psicologo/estadisticas" className={styles.linkArrow}>
+          Ver estadísticas →
+        </Link>
       </div>
+      <DashboardCharts riskDist={riskDist} trend={trend} riskByGrade={riskByGrade} />
+
+      {/* Alertas recientes */}
+      <div className={styles.alertsHead}>
+        <h2 className={styles.alertsTitle}>Alertas recientes</h2>
+        <Link href="/psicologo/alertas" className={styles.linkArrow}>Ver todas →</Link>
+      </div>
+      {ultimasAlertas.length === 0 ? (
+        <p className={styles.alertEmpty}>No hay alertas pendientes ✓</p>
+      ) : (
+        <div className={styles.alertList}>
+          {ultimasAlertas.map((a) => {
+            const level      = a.response.riskLevel as 'LOW' | 'MID' | 'HIGH';
+            const dotClass   = level === 'HIGH' ? styles.alertDotHigh   : level === 'MID' ? styles.alertDotMid   : styles.alertDotLow;
+            const badgeClass = level === 'HIGH' ? styles.alertBadgeHigh : level === 'MID' ? styles.alertBadgeMid : styles.alertBadgeLow;
+            const badgeText  = level === 'HIGH' ? 'ALTO' : level === 'MID' ? 'MEDIO' : 'BAJO';
+            return (
+              <Link key={a.id} href="/psicologo/alertas" className={styles.alertRow}>
+                <span className={`${styles.alertDot} ${dotClass}`} />
+                <span className={styles.alertName}>
+                  {a.response.student.apellidoPaterno}, {a.response.student.nombres}
+                </span>
+                <span className={styles.alertSurvey}>{a.response.survey.title}</span>
+                <span className={`${styles.alertBadge} ${badgeClass}`}>{badgeText}</span>
+                <span className={styles.alertTime}>{timeAgo(a.triggeredAt)}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
 
     </div>
   );
 }
 
-/**
- * Tarjeta estadística reutilizable
- */
 function StatCard({
-  href,
   icon,
+  iconVariant,
   label,
   value,
-  color,
+  hint,
+  link,
 }: {
-  href: string;
   icon: React.ReactNode;
+  iconVariant: 'danger' | 'info' | 'neutral';
   label: string;
   value: number;
-  color: string;
+  hint?: { text: string; success?: boolean };
+  link?: { href: string; text: string };
 }) {
-  const colorClass = styles[`stat${color.charAt(0).toUpperCase() + color.slice(1)}` as keyof typeof styles];
+  const iconClass =
+    iconVariant === 'danger' ? styles.statIconDanger :
+    iconVariant === 'info'   ? styles.statIconInfo   :
+                               styles.statIconNeutral;
   return (
-    <Link href={href} className={styles.statCard}>
-      <div className={`${styles.statIconWrap} ${colorClass}`}>{icon}</div>
-      <p className={styles.statLabel}>{label}</p>
-      <p className={styles.statValue}>{value}</p>
-    </Link>
+    <article className={styles.card}>
+      <div className={styles.statHead}>
+        <span className={`${styles.statIcon} ${iconClass}`}>{icon}</span>
+        <span className={styles.statLabel}>{label}</span>
+      </div>
+      <div className={styles.statValueRow}>
+        <span className={styles.statValue}>{value}</span>
+        {hint && (
+          <span className={`${styles.statHint} ${hint.success ? styles.statHintSuccess : ''}`}>
+            {hint.text}
+          </span>
+        )}
+        {link && <Link href={link.href} className={styles.statLink}>{link.text}</Link>}
+      </div>
+    </article>
   );
 }
 
-/**
- * Retorna fecha de hace N días
- */
+function MiniStat({
+  icon,
+  label,
+  value,
+  empty,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  empty?: boolean;
+}) {
+  return (
+    <article className={styles.ministat}>
+      <div className={styles.ministatHead}>
+        {icon}
+        <span>{label}</span>
+      </div>
+      <span className={`${styles.ministatValue} ${empty ? styles.ministatValueEmpty : ''}`}>
+        {value}
+      </span>
+    </article>
+  );
+}
+
+function timeAgo(date: Date): string {
+  const diff  = Date.now() - date.getTime();
+  const mins  = Math.floor(diff / 60_000);
+  const hours = Math.floor(diff / 3_600_000);
+  const days  = Math.floor(diff / 86_400_000);
+  if (days  > 0) return `hace ${days}d`;
+  if (hours > 0) return `hace ${hours}h`;
+  if (mins  > 1) return `hace ${mins}m`;
+  return 'ahora';
+}
+
 function daysAgo(days: number): Date {
   const date = new Date();
 
@@ -258,71 +273,61 @@ function daysAgo(days: number): Date {
 }
 
 /**
- * Agrupa respuestas por día
+ * Agrupa respuestas por día con desglose LOW/MID/HIGH
  */
 function bucketByDay(
-  items: {
-    submittedAt: Date;
-    riskLevel: string;
-  }[],
+  items: { submittedAt: Date; riskLevel: string }[],
   days: number
 ) {
-  const buckets: {
-    fecha: string;
-    total: number;
-    riesgo: number;
-  }[] = [];
-
-  const byFecha = new Map<
-    string,
-    {
-      fecha: string;
-      total: number;
-      riesgo: number;
-    }
-  >();
-
+  type Bucket = { fecha: string; total: number; low: number; mid: number; high: number };
+  const buckets: Bucket[] = [];
+  const byFecha = new Map<string, Bucket>();
   const today = new Date();
 
-  /**
-   * Crear días vacíos
-   */
   for (let i = days - 1; i >= 0; i--) {
     const date = new Date(today);
-
     date.setDate(date.getDate() - i);
-
     const key = date.toISOString().slice(5, 10);
-
-    const bucket = {
-      fecha: key,
-      total: 0,
-      riesgo: 0,
-    };
-
+    const bucket: Bucket = { fecha: key, total: 0, low: 0, mid: 0, high: 0 };
     buckets.push(bucket);
-
     byFecha.set(key, bucket);
   }
 
-  /**
-   * Llenar datos reales
-   */
   for (const item of items) {
-    const key = item.submittedAt
-      .toISOString()
-      .slice(5, 10);
-
+    const key = item.submittedAt.toISOString().slice(5, 10);
     const bucket = byFecha.get(key);
-
     if (!bucket) continue;
-
-    bucket.total += 1;
-
-    if (item.riskLevel !== 'LOW') {
-      bucket.riesgo += 1;
-    }
+    bucket.total++;
+    if (item.riskLevel === 'LOW')       bucket.low++;
+    else if (item.riskLevel === 'MID')  bucket.mid++;
+    else if (item.riskLevel === 'HIGH') bucket.high++;
   }
 
   return buckets;
+}
+
+/**
+ * Agrupa respuestas por grado con desglose LOW/MID/HIGH
+ */
+function buildRiskByGrade(
+  items: {
+    riskLevel: string;
+    student: { section: { grade: { name: string; order: number } } };
+  }[]
+) {
+  type GradeBucket = { grade: string; order: number; LOW: number; MID: number; HIGH: number };
+  const map = new Map<string, GradeBucket>();
+
+  for (const item of items) {
+    const { name, order } = item.student.section.grade;
+    if (!map.has(name)) {
+      map.set(name, { grade: name, order, LOW: 0, MID: 0, HIGH: 0 });
+    }
+    const b = map.get(name)!;
+    if (item.riskLevel === 'LOW')       b.LOW++;
+    else if (item.riskLevel === 'MID')  b.MID++;
+    else if (item.riskLevel === 'HIGH') b.HIGH++;
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.order - b.order);
 }

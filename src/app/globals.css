@@ -6,6 +6,23 @@
   --background: #ffffff;
   --foreground: #0f172a;
 
+  /* ── Design tokens (panel psicólogo) ── */
+  --brand:          #0f766e;
+  --brand-strong:   #0b5a54;
+  --bg-page:        #f5f6f7;
+  --bg-surface:     #ffffff;
+  --bg-muted:       #f1f3f4;
+  --text-primary:   #1a1d1f;
+  --text-secondary: #6b7280;
+  --text-tertiary:  #9aa0a6;
+  --border:         rgba(0, 0, 0, 0.10);
+  --border-strong:  rgba(0, 0, 0, 0.18);
+  --danger-bg:      #fceaea;  --danger-text:  #a32d2d;
+  --info-bg:        #e6f1fb;  --info-text:    #185fa5;
+  --success-text:   #0f6e56;
+  --r-md:           8px;
+  --r-lg:           12px;
+
   /* PsicoEscolar palette */
   --verde-oscuro:  #2d5016;
   --verde-escudo:  #3a6b1a;
@@ -24,7 +41,8 @@
 html, body { height: 100%; }
 
 body {
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  background: #fff;
+  color-scheme: light;
   color: var(--foreground);
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
