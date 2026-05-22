@@ -3,8 +3,8 @@
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  User, Lock, LogIn, Shield, CheckCircle2, Clock3,
-  ClipboardCheck, Activity, Users, BookOpen, ShieldCheck,
+  User, Lock, LogIn, Shield,
+  ClipboardCheck, Activity, Users, Clock3, BookOpen, ShieldCheck,
 } from 'lucide-react';
 import { loginAction } from './actions';
 import styles from './login.module.css';
@@ -48,62 +48,56 @@ export default function LoginPage() {
 
       {/* ══ HEADER ══════════════════════════════════════ */}
       <header className={styles.header}>
-        <div className={styles.wrap}>
-          <div className={styles.nav}>
-            <a href="#" className={styles.brand}>
-              <div className={styles.brandMark}>
-                <svg className={styles.brandMarkIcon} viewBox="0 0 24 24" fill="none">
-                  <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z" fill="#fff"/>
-                </svg>
-              </div>
-              <div>
-                <span className={styles.brandName}>
-                  Psico<span className={styles.brandNameAccent}>Escolar</span>
-                </span>
-                <span className={styles.brandSub}>I.E. 40122 Manuel Scorza</span>
-              </div>
-            </a>
+        <div className={`${styles.wrap} ${styles.nav}`}>
 
-            <nav className={styles.navLinks}>
-              <a href="#programa"    className={styles.navLink}>El programa</a>
-              <a href="#como"        className={styles.navLink}>Cómo funciona</a>
-              <a href="#privacidad"  className={styles.navLink}>Privacidad</a>
-              <a href="#acceder" className={`${styles.btn} ${styles.btnPrimary}`}>
-                Iniciar sesión
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </a>
-            </nav>
-          </div>
+          <a href="#" className={styles.brand}>
+            <span className={styles.brandName}>Bienestar Escolar</span>
+            <span className={styles.brandSub}>I.E. 40122 Manuel Scorza Torres</span>
+          </a>
+
+          <nav className={styles.navLinks}>
+            <a href="#programa"   className={styles.navLink}>El programa</a>
+            <a href="#como"       className={styles.navLink}>Cómo funciona</a>
+            <a href="#privacidad" className={styles.navLink}>Privacidad</a>
+          </nav>
+
+          <a href="#acceder" className={styles.navCta}>
+            Iniciar sesión
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+
         </div>
       </header>
 
-      {/* ══ HERO ════════════════════════════════════════ */}
-      <section className={styles.hero}>
-        <div className={`${styles.wrap} ${styles.heroGrid}`}>
+      {/* ══ HERO + STATS ════════════════════════════════ */}
+      <div className={styles.wrap}>
 
-          {/* Left — copy */}
-          <div className={`${styles.heroCopy} ${styles.reveal}`}>
-            <span className={styles.eyebrow}>
-              <span className={styles.eyebrowDot} />
-              Bienestar emocional estudiantil
-            </span>
+        <section className={`${styles.hero} ${styles.reveal}`} id="acceder">
+
+          {/* Izquierda — copy */}
+          <div className={styles.heroLeft}>
+            <div className={styles.heroEyebrow}>Bienestar emocional estudiantil</div>
 
             <h1 className={styles.heroTitle}>
               Tu espacio para <em>cuidar</em> cómo te sientes
             </h1>
 
             <p className={styles.heroLead}>
-              PsicoEscolar es la plataforma de acompañamiento psicológico de la I.E. 40122 Manuel Scorza Torres.
-              Realiza tus evaluaciones, registra cómo te sientes y conecta con el área de psicología,
-              de forma segura y confidencial.
+              PsicoEscolar es la plataforma de acompañamiento psicológico de la I.E. 40122
+              Manuel Scorza Torres. Realiza tus evaluaciones, registra cómo te sientes y
+              conecta con el área de psicología, de forma segura y confidencial.
             </p>
 
             <div className={styles.heroActions}>
-              <a href="#acceder" className={`${styles.btn} ${styles.btnPrimary}`}>
+              <a href="#acceder" className={styles.btnSolid}>
                 Ingresar con mi DNI
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
               </a>
-              <a href="#como" className={`${styles.btn} ${styles.btnGhost}`}>Conocer más</a>
+              <a href="#como" className={styles.btnText}>Conocer el programa</a>
             </div>
 
             <div className={styles.heroNote}>
@@ -112,118 +106,86 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Right — login form */}
-          <div className={`${styles.heroVisual} ${styles.reveal}`} id="acceder">
+          {/* Derecha — formulario */}
+          <div className={styles.heroRight}>
+            <div className={styles.loginBox}>
 
-            {/* floating badge top-right */}
-            <div className={`${styles.floatBadge} ${styles.fb1}`}>
-              <div className={`${styles.floatIco} ${styles.floatIco1}`}>
-                <CheckCircle2 className={styles.floatIcoIcon} />
+              <div className={styles.loginTop}>
+                <div className={styles.loginKick}>Acceso</div>
+                <h2 className={styles.loginTitle}>Iniciar sesión</h2>
+                <p className={styles.loginSub}>Ingresa tus credenciales para continuar.</p>
               </div>
-              <div>
-                <div className={styles.floatT}>Evaluación</div>
-                <div className={styles.floatN}>Lista</div>
-              </div>
-            </div>
 
-            {/* form card */}
-            <div className={styles.formCard}>
-              <div className={styles.formStripe} />
-              <div className={styles.formBody}>
-
-                <div className={styles.formHead}>
-                  <p className={styles.formPreTitle}>Bienvenido</p>
-                  <h2 className={styles.formMainTitle}>Iniciar sesión</h2>
-                  <p className={styles.formSubTitle}>Ingresa tus credenciales para continuar</p>
+              <form onSubmit={submit} className={styles.loginForm}>
+                <div className={styles.loginField}>
+                  <label className={styles.loginLabel} htmlFor="username">Usuario</label>
+                  <div className={styles.inputRow}>
+                    <User className={styles.inputRowIcon} />
+                    <input
+                      id="username"
+                      className={styles.input}
+                      type="text"
+                      placeholder="DNI o correo institucional"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      autoComplete="username"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  <p className={styles.hint}>Estudiantes: tu DNI · Personal: correo institucional.</p>
                 </div>
 
-                <form onSubmit={submit} className={styles.formFields}>
-                  <div>
-                    <label className={styles.label} htmlFor="username">Usuario</label>
-                    <div className={styles.inputWrap}>
-                      <User className={styles.inputIcon} />
-                      <input
-                        id="username"
-                        className={styles.input}
-                        type="text"
-                        placeholder="DNI o correo institucional"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        autoComplete="username"
-                        required
-                        autoFocus
-                      />
-                    </div>
-                    <p className={styles.helpText}>
-                      Estudiantes: DNI · Personal: correo institucional
-                    </p>
+                <div className={styles.loginField}>
+                  <label className={styles.loginLabel} htmlFor="password">Contraseña</label>
+                  <div className={styles.inputRow}>
+                    <Lock className={styles.inputRowIcon} />
+                    <input
+                      id="password"
+                      className={styles.input}
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="current-password"
+                      required
+                    />
                   </div>
-
-                  <div>
-                    <label className={styles.label} htmlFor="password">Contraseña</label>
-                    <div className={styles.inputWrap}>
-                      <Lock className={styles.inputIcon} />
-                      <input
-                        id="password"
-                        className={styles.input}
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {error && <div className={styles.error}>{error}</div>}
-
-                  <button type="submit" className={styles.submitBtn} disabled={pending}>
-                    <LogIn className={styles.submitBtnIcon} />
-                    {pending ? 'Ingresando...' : 'Ingresar'}
-                  </button>
-                </form>
-
-                <div className={styles.formFooterNote}>
-                  <a href="/privacidad" className={styles.privacyLink}>Aviso de privacidad</a>
-                  <span className={styles.version}>PsicoEscolar v1.0 · 2026</span>
                 </div>
 
+                {error && <div className={styles.error}>{error}</div>}
+
+                <button type="submit" className={styles.submitBtn} disabled={pending}>
+                  {pending ? 'Ingresando…' : 'Ingresar'}
+                  <LogIn className={styles.submitBtnIcon} />
+                </button>
+              </form>
+
+              <div className={styles.loginFoot}>
+                <a href="/privacidad" className={styles.privacyLink}>Aviso de privacidad</a>
+                <span className={styles.version}>PsicoEscolar v1.0</span>
               </div>
+
             </div>
+          </div>
 
-            {/* floating badge bottom-left */}
-            <div className={`${styles.floatBadge} ${styles.fb2}`}>
-              <div className={`${styles.floatIco} ${styles.floatIco2}`}>
-                <svg className={styles.floatIcoIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              </div>
-              <div>
-                <div className={styles.floatT}>Psicología</div>
-                <div className={styles.floatN}>Disponible</div>
-              </div>
+        </section>
+
+        {/* Stats */}
+        <div className={styles.stats}>
+          {[
+            { num: '100%', cap: 'Confidencial' },
+            { num: '2',    cap: 'Niveles educativos' },
+            { num: '24/7', cap: 'Acceso a la plataforma' },
+            { num: '',    cap: 'Equipo de psicología que te acompaña' },
+          ].map((s) => (
+            <div key={s.cap} className={`${styles.stat} ${styles.reveal}`}>
+              <div className={styles.statNum}>{s.num}</div>
+              <div className={styles.statCap}>{s.cap}</div>
             </div>
-
-          </div>
+          ))}
         </div>
-      </section>
 
-      {/* ══ TRUST STRIP ═════════════════════════════════ */}
-      <div className={styles.strip}>
-        <div className={styles.wrap}>
-          <div className={styles.stripInner}>
-            {[
-              { num: '100%', cap: 'Confidencial' },
-              { num: '3',    cap: 'Niveles educativos' },
-              { num: '24/7', cap: 'Acceso a la plataforma' },
-              { num: '1',    cap: 'Equipo de psicología que te acompaña' },
-            ].map((s) => (
-              <div key={s.cap} className={`${styles.stat} ${styles.reveal}`}>
-                <div className={styles.statNum}>{s.num}</div>
-                <div className={styles.statCap}>{s.cap}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* ══ FEATURES ════════════════════════════════════ */}
@@ -262,74 +224,79 @@ export default function LoginPage() {
       </section>
 
       {/* ══ STEPS ═══════════════════════════════════════ */}
-      <section className={styles.block} id="como" style={{ paddingTop: 0 }}>
+      <section className={styles.stepsSection} id="como">
         <div className={styles.wrap}>
-          <div className={`${styles.stepsWrap} ${styles.reveal}`}>
-            <div className={styles.stepsHead}>
-              <h2 className={styles.stepsTitle}>Empezar es muy fácil</h2>
-              <p className={styles.stepsSubtitle}>En tres pasos ya estarás dentro de tu espacio.</p>
+
+          <div className={styles.stepsHead}>
+            <div>
+              <div className={styles.stepsLabel}>Cómo funciona</div>
+              <h2 className={styles.stepsTitle}>Tres pasos<br/>para empezar</h2>
             </div>
-            <div className={styles.stepsGrid}>
-              {[
-                { n: '01', title: 'Ingresa con tu DNI',        desc: 'Usa tu número de DNI como usuario. El personal del colegio usa su correo institucional.' },
-                { n: '02', title: 'Completa tus actividades',  desc: 'Responde las encuestas y evaluaciones que te asignen, con calma y honestidad.' },
-                { n: '03', title: 'Recibe acompañamiento',     desc: 'El equipo de psicología revisa tus respuestas y te orienta cuando lo necesites.' },
-              ].map(({ n, title, desc }) => (
-                <div key={n} className={styles.step}>
-                  <span className={styles.stepNum}>{n}</span>
-                  <h4 className={styles.stepTitle}>{title}</h4>
-                  <p  className={styles.stepDesc}>{desc}</p>
-                </div>
-              ))}
-            </div>
+            <p className={styles.stepsAside}>
+              Un recorrido simple, pensado para que entres a tu espacio sin complicaciones.
+            </p>
           </div>
+
+          {[
+            {
+              n: '01', title: 'Ingresa con tu DNI',
+              desc: <> Usa tu número de <b>DNI</b> como usuario para acceder. El personal del colegio ingresa con su correo institucional.</>,
+            },
+            {
+              n: '02', title: 'Completa tus actividades',
+              desc: <> Responde las <b>encuestas y evaluaciones</b> que el área de psicología te asigne, con calma y honestidad. No hay respuestas correctas ni incorrectas.</>,
+            },
+            {
+              n: '03', title: 'Recibe acompañamiento',
+              desc: <> El <b>equipo de psicología</b> revisa tus respuestas y te orienta cuando lo necesites, de forma confidencial y cercana.</>,
+            },
+          ].map(({ n, title, desc }) => (
+            <div key={n} className={styles.stepRow}>
+              <div className={styles.stepIdx}>{n}</div>
+              <div className={styles.stepTtl}>{title}</div>
+              <p   className={styles.stepDesc}>{desc}</p>
+            </div>
+          ))}
+
         </div>
       </section>
 
       {/* ══ PRIVACY ═════════════════════════════════════ */}
-      <section className={styles.block} id="privacidad">
+      <section className={styles.privacySection} id="privacidad">
         <div className={styles.wrap}>
-          <div className={styles.privacyGrid}>
 
-            <div className={`${styles.privacyVisual} ${styles.reveal}`}>
-              <div className={styles.privacyLock}>
-                <svg className={styles.privacyLockIcon} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-              </div>
-              <h3 className={styles.privacyVisualTitle}>Tu confianza es lo primero</h3>
-              <p  className={styles.privacyVisualDesc}>
-                Lo que compartes aquí se mantiene privado. Nadie de tus compañeros puede ver tus respuestas.
-              </p>
-            </div>
-
-            <div className={styles.reveal}>
-              <span className={styles.eyebrow}>
-                <span className={styles.eyebrowDot} />
-                Privacidad y confianza
-              </span>
-              <h2 className={styles.privacySubtitle}>Un espacio seguro para expresarte</h2>
-              <ul className={styles.privacyList}>
-                {[
-                  { title: 'Acceso restringido', desc: 'Solo el área de psicología autorizada del colegio puede ver tu información.' },
-                  { title: 'Sin juicios',        desc: 'No hay respuestas buenas ni malas. Este es tu espacio para ser honesto contigo.' },
-                  { title: 'Datos protegidos',   desc: 'Tu información se guarda de forma segura y se usa únicamente para acompañarte.' },
-                ].map(({ title, desc }) => (
-                  <li key={title} className={styles.privacyItem}>
-                    <span className={styles.privacyCheck}>
-                      <CheckCircle2 className={styles.privacyCheckIcon} />
-                    </span>
-                    <div>
-                      <h4 className={styles.privacyItemTitle}>{title}</h4>
-                      <p  className={styles.privacyItemDesc}>{desc}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
+          <div className={`${styles.privacyHead} ${styles.reveal}`}>
+            <div className={styles.privacyLabel}>Privacidad y confianza</div>
+            <h2 className={styles.privacyTitle}>
+              Un espacio seguro para <em>expresarte</em>
+            </h2>
           </div>
+
+          <div className={styles.privacyBody}>
+            <div className={`${styles.privacyLede} ${styles.reveal}`}>
+              Lo que compartes aquí se mantiene privado.{' '}
+              <span className={styles.privacyQuiet}>
+                Ninguno de tus compañeros puede ver tus respuestas, solo el equipo que te acompaña.
+              </span>
+            </div>
+
+            <div className={`${styles.privacyGuarantees} ${styles.reveal}`}>
+              {[
+                { n: '01', title: 'Acceso restringido', desc: 'Solo el área de psicología autorizada del colegio puede ver tu información.' },
+                { n: '02', title: 'Sin juicios',        desc: 'No hay respuestas buenas ni malas. Este es tu espacio para ser honesto contigo.' },
+                { n: '03', title: 'Datos protegidos',   desc: 'Tu información se guarda de forma segura y se usa únicamente para acompañarte.' },
+              ].map(({ n, title, desc }) => (
+                <div key={n} className={styles.gItem}>
+                  <div className={styles.gNum}>{n}</div>
+                  <div>
+                    <h4 className={styles.gItemTitle}>{title}</h4>
+                    <p  className={styles.gItemDesc}>{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -339,24 +306,13 @@ export default function LoginPage() {
           <div className={styles.footGrid}>
 
             <div>
-              <div className={styles.brand} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className={styles.brandMark}>
-                  <svg className={styles.brandMarkIcon} viewBox="0 0 24 24" fill="none">
-                    <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z" fill="#fff"/>
-                  </svg>
-                </div>
-                <div>
-                  <span className={styles.footBrandName}>
-                    Psico<span className={styles.footBrandAccent}>Escolar</span>
-                  </span>
-                  <span className={styles.footBrandSub} style={{ display: 'block' }}>
-                    I.E. 40122 Manuel Scorza Torres
-                  </span>
-                </div>
+              <div className={styles.footBrand}>
+                Escolar<span className={styles.footBrandAccent}>Escolar</span>
               </div>
+              <div className={styles.footBrandSub}>I.E. 40122 Manuel Scorza Torres</div>
               <p className={styles.footAbout}>
                 Plataforma de acompañamiento psicológico y bienestar emocional para la comunidad
-                estudiantil de la Institución Educativa 40122 Manuel Scorza Torres.
+                estudiantil.
               </p>
             </div>
 
@@ -379,7 +335,7 @@ export default function LoginPage() {
 
           <div className={styles.footBottom}>
             <span>© 2026 I.E. 40122 Manuel Scorza Torres. Todos los derechos reservados.</span>
-            <span>PsicoEscolar v1.0 · 2026</span>
+            <span>Bienestar Escolar 2026</span>
           </div>
         </div>
       </footer>

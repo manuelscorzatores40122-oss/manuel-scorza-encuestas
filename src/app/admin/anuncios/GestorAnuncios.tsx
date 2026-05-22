@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Megaphone, Send, EyeOff, Eye, Trash2 } from 'lucide-react';
+import { Megaphone, Send, EyeOff, Eye, Trash2, ChevronDown } from 'lucide-react';
 import {
   createAnnouncementAction,
   deleteAnnouncementAction,
@@ -22,6 +22,16 @@ type Announcement = {
 export function GestorAnuncios({ announcements }: { announcements: Announcement[] }) {
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+
+  function toggleExpanded(id: string) {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   function create(formData: FormData) {
     setMsg(null);
@@ -101,46 +111,65 @@ export function GestorAnuncios({ announcements }: { announcements: Announcement[
 
       {/* ── Lista ── */}
       <section className={styles.list}>
-        {announcements.map((a) => (
-          <article key={a.id} className={styles.card}>
-            <div className={styles.cardTop}>
-              <div className={styles.cardMeta}>
-                <div className={styles.cardTitleRow}>
-                  <h3 className={styles.cardTitle}>{a.title}</h3>
-                  <span className={a.isPublished ? styles.badgePublished : styles.badgeHidden}>
-                    {a.isPublished ? 'Publicado' : 'Oculto'}
-                  </span>
+        {announcements.map((a) => {
+          const open = expanded.has(a.id);
+          return (
+            <article key={a.id} className={styles.card} data-open={open ? 'true' : 'false'}>
+              <div className={styles.cardTop}>
+                {/* título + badge + fecha — clicable en móvil para desplegar */}
+                <button
+                  type="button"
+                  className={styles.cardSummary}
+                  onClick={() => toggleExpanded(a.id)}
+                  aria-expanded={open}
+                >
+                  <div className={styles.cardMeta}>
+                    <div className={styles.cardTitleRow}>
+                      <h3 className={styles.cardTitle}>{a.title}</h3>
+                      <span className={a.isPublished ? styles.badgePublished : styles.badgeHidden}>
+                        {a.isPublished ? 'Publicado' : 'Oculto'}
+                      </span>
+                    </div>
+                    <p className={styles.cardDate} suppressHydrationWarning>
+                      {new Date(a.createdAt).toLocaleString('es-PE')} · {a.createdBy.fullName}
+                    </p>
+                  </div>
+
+                  <ChevronDown
+                    className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
+                  />
+                </button>
+
+                {/* acciones siempre visibles */}
+                <div className={styles.cardActions}>
+                  {/* Muestra el estado ACTUAL; al hacer clic lo cambia al opuesto */}
+                  <button
+                    onClick={() => toggle(a.id)}
+                    className={a.isPublished ? styles.btnVisible : styles.btnHidden}
+                    disabled={pending}
+                    title={a.isPublished ? 'Clic para ocultar' : 'Clic para publicar'}
+                  >
+                    {a.isPublished
+                      ? <><Eye className={styles.actionIcon} /><span>Visible</span></>
+                      : <><EyeOff className={styles.actionIcon} /><span>Oculto</span></>}
+                  </button>
+                  <button
+                    onClick={() => remove(a.id)}
+                    className={styles.btnActionDanger}
+                    disabled={pending}
+                    title="Eliminar"
+                  >
+                    <Trash2 className={styles.actionIcon} />
+                  </button>
                 </div>
-                <p className={styles.cardDate} suppressHydrationWarning>
-                  {new Date(a.createdAt).toLocaleString('es-PE')} · {a.createdBy.fullName}
-                </p>
               </div>
 
-              <div className={styles.cardActions}>
-                <button
-                  onClick={() => toggle(a.id)}
-                  className={styles.btnAction}
-                  disabled={pending}
-                  title={a.isPublished ? 'Ocultar' : 'Publicar'}
-                >
-                  {a.isPublished
-                    ? <EyeOff className={styles.actionIcon} />
-                    : <Eye className={styles.actionIcon} />}
-                </button>
-                <button
-                  onClick={() => remove(a.id)}
-                  className={styles.btnActionDanger}
-                  disabled={pending}
-                  title="Eliminar"
-                >
-                  <Trash2 className={styles.actionIcon} />
-                </button>
+              <div className={styles.cardContent}>
+                <p className={styles.cardText}>{a.content}</p>
               </div>
-            </div>
-
-            <p className={styles.cardContent}>{a.content}</p>
-          </article>
-        ))}
+            </article>
+          );
+        })}
 
         {announcements.length === 0 && (
           <div className={styles.empty}>

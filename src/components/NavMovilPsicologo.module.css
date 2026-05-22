@@ -32,9 +32,9 @@
   border-radius: 1rem;
   min-height: 3.75rem;
   color: #a3b09a;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   text-decoration: none;
   transition: color 0.18s, background 0.18s;
   border: none;
@@ -116,7 +116,7 @@
   padding: 0.75rem 0.875rem;
   border-radius: 0.875rem;
   color: #1c241a;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   text-decoration: none;
   width: 100%;
@@ -140,7 +140,7 @@
   padding: 0.75rem 0.875rem;
   border-radius: 0.875rem;
   color: #dc2626;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   width: 100%;
   border: none;

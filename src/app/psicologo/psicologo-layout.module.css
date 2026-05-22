@@ -7,6 +7,8 @@
   min-height: 100dvh;
   background: var(--bg-page, #f4f6f0);
   color-scheme: light;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
 }
 
 /* ── MAIN ───────────────────────────────── */
@@ -82,8 +84,8 @@
 .sidebarMeta { min-width: 0; }
 
 .sidebarAppName {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 700;
   color: #f9fafb;
   margin: 0;
   letter-spacing: -0.01em;
@@ -93,7 +95,7 @@
 }
 
 .sidebarRole {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
   margin: 1px 0 0;
@@ -111,8 +113,8 @@
 }
 
 .sidebarNavLabel {
-  font-size: 0.6rem;
-  font-weight: 600;
+  font-size: 0.675rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.22);
@@ -124,9 +126,9 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.7rem 0.875rem;
+  padding: 0.75rem 0.875rem;
   border-radius: 7px;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
@@ -168,13 +170,13 @@
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.7rem 0.875rem;
+  padding: 0.75rem 0.875rem;
   border: none;
   border-radius: 7px;
   background: transparent;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  font-family: inherit;
+  font-family: 'Outfit', system-ui, sans-serif;
   color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: background 0.1s ease, color 0.1s ease;
