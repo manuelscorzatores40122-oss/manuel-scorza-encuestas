@@ -20,7 +20,7 @@ const SECTIONS = [
   { key: 'apoderado' as const, label: 'Apoderado / contacto principal', color: 'amber' },
 ];
 
-export function ProfileForm({ contacts }: { contacts: Record<string, Contact | null> }) {
+export function FormularioPerfil({ contacts }: { contacts: Record<string, Contact | null> }) {
   const [pending, startTransition] = useTransition();
   const [msg, setMsg]         = useState<string | null>(null);
   const [success, setSuccess] = useState(false);

@@ -1,4 +1,4 @@
-import { ImportSiagie } from './ImportSiagie';
+import { ImportarSiagie } from './ImportarSiagie';
 
 export default function ImportarPage() {
   return (
@@ -8,7 +8,7 @@ export default function ImportarPage() {
         Sube el archivo Excel <code className="bg-slate-100 px-1 py-0.5 rounded text-xs">rptPadresFamiliaEstudiantes.xlsx</code> exportado
         desde SIAGIE. Header en fila 12, datos desde fila 13.
       </p>
-      <ImportSiagie />
+      <ImportarSiagie />
     </div>
   );
 }

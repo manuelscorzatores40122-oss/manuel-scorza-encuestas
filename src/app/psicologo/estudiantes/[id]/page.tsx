@@ -4,7 +4,7 @@ import { ArrowLeft, Phone, User, Mail, Star } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
 import { RiskBadge } from '@/components/EtiquetaRiesgo';
-import { StudentTimeline } from './StudentTimeline';
+import { LineaTiempo } from './LineaTiempo';
 import styles from './page.module.css';
 
 export default async function HistorialEstudiante({
@@ -84,7 +84,7 @@ export default async function HistorialEstudiante({
       </div>
 
       {/* Timeline */}
-      {trend.length > 0 && <StudentTimeline data={trend} />}
+      {trend.length > 0 && <LineaTiempo data={trend} />}
 
       {/* Apoderados */}
       <div className={styles.card}>

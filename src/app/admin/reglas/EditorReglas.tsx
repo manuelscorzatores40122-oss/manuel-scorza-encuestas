@@ -14,7 +14,7 @@ type Rule = {
   isActive: boolean;
 };
 
-export function RulesEditor({ rules }: { rules: Rule[] }) {
+export function EditorReglas({ rules }: { rules: Rule[] }) {
   const router = useRouter();
   const [editing, setEditing] = useState<Rule | null>(null);
   const [pending, startTransition] = useTransition();

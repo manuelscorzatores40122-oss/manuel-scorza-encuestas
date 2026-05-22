@@ -1,0 +1,46 @@
+/* ══════════════════════════════════════════
+   Página de Anuncios — Psicólogo
+   ══════════════════════════════════════════ */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeUp 0.35s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cabecera ────────────────────────── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: #1c241a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.headingIcon {
+  width: 1.375rem;
+  height: 1.375rem;
+  color: #3c7424;
+  flex-shrink: 0;
+}
+
+.sub {
+  font-size: 0.875rem;
+  color: #7a8773;
+  margin: 0;
+}

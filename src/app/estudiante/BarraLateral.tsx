@@ -3,30 +3,26 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutGrid,
-  GraduationCap,
-  ClipboardCheck,
-  Bell,
-  BarChart2,
-  TrendingUp,
-  Newspaper,
+  Home,
+  ClipboardList,
+  Megaphone,
+  History,
+  UserRound,
   LogOut,
-  Brain,
+  GraduationCap,
 } from 'lucide-react';
 import { logoutAction } from '@/app/login/actions';
-import styles from './psicologo-layout.module.css';
+import styles from './layout.module.css';
 
 const NAV_ITEMS = [
-  { href: '/psicologo',              label: 'Inicio',       icon: LayoutGrid     },
-  { href: '/psicologo/estudiantes',  label: 'Estudiantes',  icon: GraduationCap  },
-  { href: '/psicologo/encuestas',    label: 'Encuestas',    icon: ClipboardCheck },
-  { href: '/psicologo/alertas',      label: 'Alertas',      icon: Bell           },
-  { href: '/psicologo/respuestas',   label: 'Respuestas',   icon: BarChart2      },
-  { href: '/psicologo/estadisticas', label: 'Estadísticas', icon: TrendingUp     },
-  { href: '/psicologo/anuncios',     label: 'Anuncios',     icon: Newspaper      },
+  { href: '/estudiante',           label: 'Inicio',      icon: Home          },
+  { href: '/estudiante/encuestas', label: 'Encuestas',   icon: ClipboardList },
+  { href: '/estudiante/anuncios',  label: 'Anuncios',    icon: Megaphone     },
+  { href: '/estudiante/historial', label: 'Mi historial',icon: History       },
+  { href: '/estudiante/perfil',    label: 'Mi perfil',   icon: UserRound     },
 ];
 
-export function SidebarPsicologo() {
+export function BarraLateral() {
   const pathname = usePathname();
   const router   = useRouter();
 
@@ -37,7 +33,7 @@ export function SidebarPsicologo() {
   }
 
   function isActive(href: string) {
-    if (href === '/psicologo') return pathname === '/psicologo';
+    if (href === '/estudiante') return pathname === '/estudiante';
     return pathname.startsWith(href);
   }
 
@@ -47,17 +43,16 @@ export function SidebarPsicologo() {
       {/* Cabecera */}
       <div className={styles.sidebarHeader}>
         <div className={styles.sidebarLogo}>
-          <Brain className={styles.sidebarLogoIcon} />
+          <GraduationCap className={styles.sidebarLogoIcon} />
         </div>
-        <div className={styles.sidebarMeta}>
+        <div>
           <p className={styles.sidebarAppName}>PsicoEscolar</p>
-          <p className={styles.sidebarRole}>Psicólogo</p>
+          <p className={styles.sidebarRole}>Estudiante</p>
         </div>
       </div>
 
       {/* Navegación */}
       <nav className={styles.sidebarNav}>
-        <p className={styles.sidebarNavLabel}>Menú</p>
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}

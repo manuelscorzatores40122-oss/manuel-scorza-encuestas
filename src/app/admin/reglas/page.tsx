@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { ShieldAlert } from 'lucide-react';
-import { RulesEditor } from './RulesEditor';
+import { EditorReglas } from './EditorReglas';
 
 export default async function ReglasPage() {
   const rules = await prisma.alertRule.findMany({ orderBy: { createdAt: 'asc' } });
@@ -12,7 +12,7 @@ export default async function ReglasPage() {
       <p className="text-slate-600 text-sm">
         Tres mecanismos en paralelo: palabras clave en texto abierto, combinaciones de respuestas y umbrales de score acumulado.
       </p>
-      <RulesEditor rules={rules.map((r) => ({
+      <EditorReglas rules={rules.map((r) => ({
         id: r.id, name: r.name, type: r.type, severity: r.severity,
         config: r.config as any, isActive: r.isActive,
       }))} />

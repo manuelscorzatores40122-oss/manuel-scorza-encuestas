@@ -3,18 +3,58 @@ import { Download, FileBarChart } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
 import { RiskBadge } from '@/components/EtiquetaRiesgo';
-import { ImportResponsesExcel } from './ImportResponsesExcel';
+import { ImportarExcel } from './ImportarExcel';
+import { FiltrosRespuestas } from './FiltrosRespuestas';
+import styles from './page.module.css';
+
+const PAGE_SIZE = 50;
 
 export default async function RespuestasPsicologo({
   searchParams,
-}: { searchParams: { riesgo?: string; gradoId?: string; sectionId?: string; surveyId?: string } }) {
-  const where: any = {};
-  if (searchParams.riesgo) where.riskLevel = searchParams.riesgo;
-  if (searchParams.surveyId) where.surveyId = searchParams.surveyId;
-  if (searchParams.sectionId) where.student = { sectionId: searchParams.sectionId };
-  else if (searchParams.gradoId) where.student = { section: { gradeId: searchParams.gradoId } };
+}: {
+  searchParams: {
+    q?: string;
+    surveyId?: string;
+    nivel?: string;
+    gradoId?: string;
+    sectionId?: string;
+    riesgo?: string;
+    page?: string;
+  };
+}) {
+  const page = Number(searchParams.page || '1');
 
-  const [responses, surveys, grades, sections] = await Promise.all([
+  /* ── Where principal ─────────────────────────────────────────────── */
+  const where: any = {};
+
+  if (searchParams.riesgo)   where.riskLevel = searchParams.riesgo;
+  if (searchParams.surveyId) where.surveyId  = searchParams.surveyId;
+
+  /* filtro de estudiante: sección > grado > nivel, + búsqueda por nombre */
+  const q = searchParams.q?.trim().toUpperCase() ?? '';
+
+  const studentFilter: any = {};
+
+  if (q) {
+    studentFilter.OR = [
+      { nombres:         { contains: q } },
+      { apellidoPaterno: { contains: q } },
+      { apellidoMaterno: { contains: q } },
+    ];
+  }
+
+  if (searchParams.sectionId) {
+    studentFilter.sectionId = searchParams.sectionId;
+  } else if (searchParams.gradoId) {
+    studentFilter.section = { gradeId: searchParams.gradoId };
+  } else if (searchParams.nivel) {
+    studentFilter.section = { grade: { nivel: searchParams.nivel } };
+  }
+
+  if (Object.keys(studentFilter).length > 0) where.student = studentFilter;
+
+  /* ── Consultas ──────────────────────────────────────────────────── */
+  const [responses, total, surveys, grades, sections] = await Promise.all([
     prisma.response.findMany({
       where,
       include: {
@@ -22,159 +62,189 @@ export default async function RespuestasPsicologo({
         survey: true,
       },
       orderBy: { submittedAt: 'desc' },
-      take: 200,
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
     }),
+    prisma.response.count({ where }),
     prisma.survey.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.grade.findMany({ orderBy: [{ nivel: 'asc' }, { order: 'asc' }] }),
     prisma.section.findMany({
-      include: { grade: true },
-      orderBy: [{ grade: { nivel: 'asc' } }, { grade: { order: 'asc' } }, { name: 'asc' }],
+      select: { id: true, name: true, gradeId: true },
+      orderBy: [{ grade: { order: 'asc' } }, { name: 'asc' }],
     }),
   ]);
-  const visibleSections = searchParams.gradoId
-    ? sections.filter((section) => section.gradeId === searchParams.gradoId)
-    : sections;
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const from = (page - 1) * PAGE_SIZE + 1;
+  const to   = Math.min(page * PAGE_SIZE, total);
+
+  function buildHref(extra: Record<string, string>) {
+    const p = new URLSearchParams();
+    if (searchParams.q)         p.set('q',         searchParams.q);
+    if (searchParams.surveyId)  p.set('surveyId',  searchParams.surveyId);
+    if (searchParams.nivel)     p.set('nivel',     searchParams.nivel);
+    if (searchParams.gradoId)   p.set('gradoId',   searchParams.gradoId);
+    if (searchParams.sectionId) p.set('sectionId', searchParams.sectionId);
+    if (searchParams.riesgo)    p.set('riesgo',    searchParams.riesgo);
+    Object.entries(extra).forEach(([k, v]) => p.set(k, v));
+    return `?${p.toString()}`;
+  }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <FileBarChart className="w-6 h-6 text-brand-600" /> Respuestas
-        </h1>
-      </div>
+    <div className={styles.page}>
 
-      <form className="card flex flex-wrap gap-3 items-end">
+      {/* ── Header ── */}
+      <header className={styles.header}>
         <div>
-          <label className="label text-xs">Encuesta</label>
-          <select name="surveyId" defaultValue={searchParams.surveyId || ''} className="input">
-            <option value="">Todas</option>
-            {surveys.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
-          </select>
+          <div className={styles.headerLeft}>
+            <FileBarChart className={styles.headerIcon} />
+            <h1 className={styles.pageTitle}>Respuestas</h1>
+          </div>
+          <p className={styles.pageSubtitle}>
+            {total} respuesta{total !== 1 ? 's' : ''}
+          </p>
         </div>
-        <div>
-          <label className="label text-xs">Grado</label>
-          <select name="gradoId" defaultValue={searchParams.gradoId || ''} className="input">
-            <option value="">Todos</option>
-            {grades.map((g) => <option key={g.id} value={g.id}>{g.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {g.name}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="label text-xs">Sección</label>
-          <select name="sectionId" defaultValue={searchParams.sectionId || ''} className="input">
-            <option value="">Todas</option>
-            {visibleSections.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {s.grade.name} {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="label text-xs">Nivel de riesgo</label>
-          <select name="riesgo" defaultValue={searchParams.riesgo || ''} className="input">
-            <option value="">Todos</option>
-            <option value="LOW">Sin riesgo</option>
-            <option value="MID">Medio</option>
-            <option value="HIGH">Alto</option>
-          </select>
-        </div>
-        <button className="btn-primary" type="submit">Filtrar</button>
-      </form>
+      </header>
 
-      <form action="/api/export/responses" method="GET" className="card space-y-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      {/* ── Filtros ── */}
+      <FiltrosRespuestas surveys={surveys} grades={grades} sections={sections} />
+
+      {/* ── Exportar ── */}
+      <form action="/api/export/responses" method="GET" className={styles.exportCard}>
+        <div className={styles.exportHeader}>
           <div>
-            <h2 className="font-semibold text-slate-900">Exportar respuestas</h2>
-            <p className="text-sm text-slate-500">
-              Selecciona la encuesta, el grado y la sección antes de generar el archivo.
+            <p className={styles.exportTitle}>Exportar respuestas</p>
+            <p className={styles.exportDesc}>
+              Selecciona la encuesta, grado y sección antes de generar el archivo.
             </p>
           </div>
-          <Download className="h-5 w-5 text-brand-600" />
+          <Download className={styles.exportIcon} />
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5 xl:items-end">
-          <div>
-            <label className="label text-xs">Encuesta</label>
-            <select name="surveyId" defaultValue={searchParams.surveyId || ''} className="input">
+        <div className={styles.exportGrid}>
+          <div className={styles.exportField}>
+            <label className={styles.exportLabel}>Encuesta</label>
+            <select name="surveyId" defaultValue={searchParams.surveyId || ''} className={styles.exportSelect}>
               <option value="">Todas</option>
               {surveys.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
             </select>
           </div>
 
-          <div>
-            <label className="label text-xs">Grado</label>
-            <select name="gradoId" defaultValue={searchParams.gradoId || ''} className="input">
+          <div className={styles.exportField}>
+            <label className={styles.exportLabel}>Grado</label>
+            <select name="gradoId" defaultValue={searchParams.gradoId || ''} className={styles.exportSelect}>
               <option value="">Todos</option>
-              {grades.map((g) => <option key={g.id} value={g.id}>{g.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {g.name}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <label className="label text-xs">Sección</label>
-            <select name="sectionId" defaultValue={searchParams.sectionId || ''} className="input">
-              <option value="">Todas</option>
-              {visibleSections.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {s.grade.name} {s.name}
+              {grades.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {g.name}
                 </option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="label text-xs">Formato</label>
-            <select name="format" defaultValue="xlsx" className="input">
+          <div className={styles.exportField}>
+            <label className={styles.exportLabel}>Sección</label>
+            <select name="sectionId" defaultValue={searchParams.sectionId || ''} className={styles.exportSelect}>
+              <option value="">Todas</option>
+              {sections.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.exportField}>
+            <label className={styles.exportLabel}>Formato</label>
+            <select name="format" defaultValue="xlsx" className={styles.exportSelect}>
               <option value="xlsx">Excel</option>
               <option value="csv">CSV</option>
             </select>
           </div>
 
-          <button className="btn-primary" type="submit">
-            <Download className="w-4 h-4" />
-            Exportar respuestas
+          <button className={styles.exportBtn} type="submit">
+            <Download className={styles.exportBtnIcon} />
+            Exportar
           </button>
         </div>
       </form>
 
-      <ImportResponsesExcel surveys={surveys.map((survey) => ({ id: survey.id, title: survey.title }))} />
+      {/* ── Importar ── */}
+      <ImportarExcel surveys={surveys.map((s) => ({ id: s.id, title: s.title }))} />
 
-      <div className="card !p-0 overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-600">
+      {/* ── Tabla ── */}
+      <div className={styles.tableCard}>
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3">Fecha</th>
-              <th className="text-left px-4 py-3">Estudiante</th>
-              <th className="text-left px-4 py-3">Grado</th>
-              <th className="text-left px-4 py-3">Encuesta</th>
-              <th className="text-center px-4 py-3">Riesgo</th>
-              <th className="text-center px-4 py-3">Score</th>
-              <th></th>
+              <th className={styles.th}>Fecha</th>
+              <th className={styles.th}>Estudiante</th>
+              <th className={styles.th}>Grado / Secc.</th>
+              <th className={styles.th}>Encuesta</th>
+              <th className={`${styles.th} ${styles.thCenter}`}>Riesgo</th>
+              <th className={`${styles.th} ${styles.thCenter}`}>Score</th>
+              <th className={styles.th}></th>
             </tr>
           </thead>
           <tbody>
             {responses.map((r) => (
-              <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{formatDateTime(r.submittedAt)}</td>
-                <td className="px-4 py-3">
-                  <p className="font-medium">{r.student.nombres} {r.student.apellidoPaterno}</p>
+              <tr key={r.id} className={styles.row}>
+                <td className={styles.td} style={{ whiteSpace: 'nowrap' }}>
+                  {formatDateTime(r.submittedAt)}
                 </td>
-                <td className="px-4 py-3 text-xs">
-                  {r.student.section.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {r.student.section.grade.name} {r.student.section.name}
+                <td className={styles.tdName}>
+                  {r.student.apellidoPaterno} {r.student.apellidoMaterno},{' '}
+                  {r.student.nombres}
                 </td>
-                <td className="px-4 py-3">{r.survey.title}</td>
-                <td className="px-4 py-3 text-center"><RiskBadge level={r.riskLevel} /></td>
-                <td className="px-4 py-3 text-center font-mono">{r.riskScore}</td>
-                <td className="px-4 py-3">
-                  <Link href={`/psicologo/respuestas/${r.id}`} className="text-brand-600 text-sm hover:underline">Ver</Link>
+                <td className={styles.tdGrade}>
+                  <span
+                    className={styles.gradeBadge}
+                    data-nivel={r.student.section.grade.nivel}
+                  >
+                    {r.student.section.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'}
+                  </span>
+                  {r.student.section.grade.name} {r.student.section.name}
+                </td>
+                <td className={styles.td}>{r.survey.title}</td>
+                <td className={`${styles.td} ${styles.tdCenter}`}>
+                  <RiskBadge level={r.riskLevel} />
+                </td>
+                <td className={`${styles.td} ${styles.tdCenter}`} style={{ fontFamily: 'monospace' }}>
+                  {r.riskScore}
+                </td>
+                <td className={styles.td}>
+                  <Link href={`/psicologo/respuestas/${r.id}`} className={styles.viewLink}>
+                    Ver →
+                  </Link>
                 </td>
               </tr>
             ))}
             {responses.length === 0 && (
-              <tr><td colSpan={7} className="text-center text-slate-500 py-12">Sin respuestas para los filtros aplicados.</td></tr>
+              <tr className={styles.emptyRow}>
+                <td colSpan={7}>Sin respuestas para los filtros aplicados.</td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* ── Paginación ── */}
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          {page > 1 ? (
+            <Link href={buildHref({ page: String(page - 1) })} className={styles.pageBtn}>
+              ← Anterior
+            </Link>
+          ) : <span />}
+
+          <span className={styles.pageInfo}>{from}–{to} de {total}</span>
+
+          {page < totalPages ? (
+            <Link href={buildHref({ page: String(page + 1) })} className={styles.pageBtn}>
+              Siguiente →
+            </Link>
+          ) : <span />}
+        </div>
+      )}
+
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export function ComparativasCharts({ data }: { data: { nivel: string; total: number; alto: number; medio: number }[] }) {
+export function GraficosComparativas({ data }: { data: { nivel: string; total: number; alto: number; medio: number }[] }) {
   return (
     <div className="card">
       <div className="h-80">

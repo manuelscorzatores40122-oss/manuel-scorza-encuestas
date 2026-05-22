@@ -11,7 +11,7 @@ import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
 
 import styles from './page.module.css';
-import { SurveyActions } from './SurveyActions';
+import { AccionesEncuesta } from './AccionesEncuesta';
 
 export default async function EncuestasPsicologo() {
   const surveys = await prisma.survey.findMany({
@@ -90,7 +90,7 @@ export default async function EncuestasPsicologo() {
                         <Users className={styles.smallIcon} />
                         Ver
                       </Link>
-                      <SurveyActions
+                      <AccionesEncuesta
                         id={survey.id}
                         title={survey.title}
                         isActive={survey.isActive}
@@ -159,7 +159,7 @@ export default async function EncuestasPsicologo() {
                   <Users className={styles.smallIcon} />
                   Ver respondientes
                 </Link>
-                <SurveyActions
+                <AccionesEncuesta
                   id={survey.id}
                   title={survey.title}
                   isActive={survey.isActive}

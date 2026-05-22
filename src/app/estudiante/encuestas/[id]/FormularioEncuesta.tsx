@@ -22,7 +22,7 @@ type Survey = {
   questions: Question[];
 };
 
-export function SurveyForm({ survey }: { survey: Survey }) {
+export function FormularioEncuesta({ survey }: { survey: Survey }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});

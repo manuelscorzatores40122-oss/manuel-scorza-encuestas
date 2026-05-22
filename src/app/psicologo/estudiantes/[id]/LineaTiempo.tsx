@@ -1,9 +1,9 @@
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import timelineStyles from './StudentTimeline.module.css';
+import timelineStyles from './LineaTiempo.module.css';
 
-export function StudentTimeline({ data }: { data: { fecha: string; score: number }[] }) {
+export function LineaTiempo({ data }: { data: { fecha: string; score: number }[] }) {
   return (
     <div className={timelineStyles.card}>
       <h2 className={timelineStyles.title}>Evolución del score de riesgo</h2>

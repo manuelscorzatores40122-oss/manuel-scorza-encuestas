@@ -9,7 +9,7 @@ type SurveyOption = {
   title: string;
 };
 
-export function ImportResponsesExcel({ surveys }: { surveys: SurveyOption[] }) {
+export function ImportarExcel({ surveys }: { surveys: SurveyOption[] }) {
   const [surveyId, setSurveyId] = useState(surveys[0]?.id || '');
   const [file, setFile] = useState<File | null>(null);
   const [pending, startTransition] = useTransition();

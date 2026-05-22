@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 
 import { prisma } from '@/lib/prisma';
-import { DashboardCharts } from './DashboardCharts';
-import { DashboardStudentSearch } from './DashboardStudentSearch';
+import { GraficosDashboard } from './GraficosDashboard';
+import { BuscadorEstudiantes } from './BuscadorEstudiantes';
 import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
 import styles from './dashboard.module.css';
 
@@ -111,7 +111,7 @@ async function renderDashboard() {
       </header>
 
       {/* Buscador de alumnos */}
-      <DashboardStudentSearch />
+      <BuscadorEstudiantes />
 
       {/* Grupo 1: Requiere atención */}
       <p className={styles.sectionLabel}>Requiere tu atención</p>
@@ -156,7 +156,7 @@ async function renderDashboard() {
           Ver estadísticas →
         </Link>
       </div>
-      <DashboardCharts riskDist={riskDist} trend={trend} riskByGrade={riskByGrade} />
+      <GraficosDashboard riskDist={riskDist} trend={trend} riskByGrade={riskByGrade} />
 
       {/* Alertas recientes */}
       <div className={styles.alertsHead}>

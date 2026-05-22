@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Loader2, GraduationCap, Phone, ArrowRight } from 'lucide-react';
-import styles from './DashboardStudentSearch.module.css';
+import styles from './BuscadorEstudiantes.module.css';
 
 type Result = {
   id: string;
@@ -15,7 +15,7 @@ type Result = {
   contactoParentesco: string | null;
 };
 
-export function DashboardStudentSearch() {
+export function BuscadorEstudiantes() {
   const router = useRouter();
   const [q,         setQ]        = useState('');
   const [results,   setResults]  = useState<Result[]>([]);

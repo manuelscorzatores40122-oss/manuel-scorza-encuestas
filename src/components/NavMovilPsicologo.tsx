@@ -1,122 +1,104 @@
-
-// src/components/PsicologoMobileBottomNav.tsx
-
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-
+import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  ClipboardList,
-  AlertTriangle,
-  Users,
-  FileBarChart,
+  LayoutGrid,
+  GraduationCap,
+  ClipboardCheck,
   Megaphone,
-  Menu,
-  BarChart3,
+  MoreHorizontal,
+  Bell,
+  BarChart2,
+  FileBarChart,
   LogOut,
-  Plus,
 } from 'lucide-react';
-
 import { logoutAction } from '@/app/login/actions';
-
-import styles from '@/app/estudiante/layout.module.css';
+import styles from './NavMovilPsicologo.module.css';
 
 export function PsicologoMobileBottomNav() {
-  const router = useRouter();
+  const pathname = usePathname();
+  const router   = useRouter();
 
   async function logout() {
     await logoutAction();
-
     router.push('/login');
     router.refresh();
   }
 
+  function isActive(href: string) {
+    if (href === '/psicologo') return pathname === '/psicologo';
+    return pathname.startsWith(href);
+  }
+
+  function btnCls(href: string) {
+    return `${styles.btn} ${isActive(href) ? styles.btnActive : ''}`;
+  }
+
   return (
-    <nav className={styles.mobileBottomNav}>
-      <Link
-        href="/psicologo"
-        className={styles.mobileNavButton}
-      >
-        <LayoutDashboard className={styles.mobileIcon} />
-        <span>Inicio</span>
+    <nav className={styles.nav}>
+
+      {/* 1 — Alumnos */}
+      <Link href="/psicologo/estudiantes" className={btnCls('/psicologo/estudiantes')}>
+        <span className={styles.iconWrap}>
+          <GraduationCap className={styles.icon} />
+        </span>
+        <span>Alumnos</span>
       </Link>
 
-      <Link
-        href="/psicologo/encuestas"
-        className={styles.mobileNavButton}
-      >
-        <ClipboardList className={styles.mobileIcon} />
+      {/* 2 — Encuestas */}
+      <Link href="/psicologo/encuestas" className={btnCls('/psicologo/encuestas')}>
+        <span className={styles.iconWrap}>
+          <ClipboardCheck className={styles.icon} />
+        </span>
         <span>Encuestas</span>
       </Link>
 
-      <Link
-        href="/psicologo/alertas"
-        className={styles.mobileNavButton}
-      >
-        <AlertTriangle className={styles.mobileIcon} />
-        <span>Alertas</span>
+      {/* 3 — Inicio */}
+      <Link href="/psicologo" className={btnCls('/psicologo')}>
+        <span className={styles.iconWrap}>
+          <LayoutGrid className={styles.icon} />
+        </span>
+        <span>Inicio</span>
       </Link>
 
-      <details className={styles.mobileMenu}>
-        <summary className={styles.mobileNavButton}>
-          <Menu className={styles.mobileIcon} />
+      {/* 4 — Anuncios */}
+      <Link href="/psicologo/anuncios" className={btnCls('/psicologo/anuncios')}>
+        <span className={styles.iconWrap}>
+          <Megaphone className={styles.icon} />
+        </span>
+        <span>Anuncios</span>
+      </Link>
+
+      {/* 5 — Más */}
+      <details className={styles.more}>
+        <summary className={styles.btn}>
+          <span className={styles.iconWrap}>
+            <MoreHorizontal className={styles.icon} />
+          </span>
           <span>Más</span>
         </summary>
 
-        <div className={styles.mobileMenuContent}>
-          <Link
-            href="/psicologo/anuncios"
-            className={styles.mobileMenuItem}
-          >
-            <Megaphone className={styles.icon} />
-            Anuncios
+        <div className={styles.morePanel}>
+          <Link href="/psicologo/alertas" className={styles.moreItem}>
+            <Bell className={styles.moreIcon} />
+            Alertas
           </Link>
-
-          <Link
-            href="/psicologo/respuestas"
-            className={styles.mobileMenuItem}
-          >
-            <FileBarChart className={styles.icon} />
+          <Link href="/psicologo/respuestas" className={styles.moreItem}>
+            <FileBarChart className={styles.moreIcon} />
             Respuestas
           </Link>
-
-          <Link
-            href="/psicologo/estadisticas"
-            className={styles.mobileMenuItem}
-          >
-            <BarChart3 className={styles.icon} />
-            Analítica
+          <Link href="/psicologo/estadisticas" className={styles.moreItem}>
+            <BarChart2 className={styles.moreIcon} />
+            Estadísticas
           </Link>
-
-          <Link
-            href="/psicologo/encuestas/nueva"
-            className={styles.mobileMenuItem}
-          >
-            <Plus className={styles.icon} />
-            Nueva encuesta
-          </Link>
-
-          <Link
-            href="/psicologo/estudiantes"
-            className={styles.mobileMenuItem}
-          >
-            <Users className={styles.icon} />
-            Estudiantes
-          </Link>
-
-          <button
-            type="button"
-            onClick={logout}
-            className={styles.mobileMenuItem}
-          >
-            <LogOut className={styles.icon} />
+          <button type="button" onClick={logout} className={styles.moreItemLogout}>
+            <LogOut className={styles.moreIcon} />
             Cerrar sesión
           </button>
         </div>
       </details>
+
     </nav>
   );
 }
-

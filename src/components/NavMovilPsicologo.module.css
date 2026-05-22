@@ -1,0 +1,166 @@
+/* ══════════════════════════════════════════
+   Nav Móvil — Psicólogo (blanco, pantalla completa)
+   ══════════════════════════════════════════ */
+
+.nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: stretch;
+  padding: 0.5rem 0.25rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-top: 1.5px solid #e8ede5;
+  box-shadow: 0 -4px 24px rgba(31, 61, 18, 0.08);
+}
+
+@media (min-width: 768px) {
+  .nav { display: none; }
+}
+
+/* ── Botón genérico ──────────────────────── */
+.btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0.625rem 0.25rem 0.375rem;
+  border-radius: 1rem;
+  min-height: 3.75rem;
+  color: #a3b09a;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: color 0.18s, background 0.18s;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  outline: none;
+}
+
+.btn:hover { color: #3c7424; }
+
+/* ── Estado activo ───────────────────────── */
+.btnActive {
+  color: #3c7424;
+}
+
+.btnActive .iconWrap {
+  background: #e8f5e0;
+}
+
+/* ── Wrapper del ícono ───────────────────── */
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 2.25rem;
+  border-radius: 0.875rem;
+  transition: background 0.18s;
+}
+
+.btn:hover .iconWrap {
+  background: #f0f7ea;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  stroke-width: 1.75;
+}
+
+/* ── Menú "Más" ─────────────────────────── */
+.more {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.more summary { list-style: none; outline: none; }
+.more summary::-webkit-details-marker { display: none; }
+
+.morePanel {
+  position: absolute;
+  right: 0.25rem;
+  bottom: calc(100% + 0.625rem);
+  min-width: 12rem;
+  padding: 0.5rem;
+  background: #ffffff;
+  border: 1.5px solid #e8ede5;
+  border-radius: 1.25rem;
+  box-shadow:
+    0 16px 48px rgba(31, 61, 18, 0.14),
+    0 4px 12px  rgba(31, 61, 18, 0.07);
+  animation: popUp 0.18s ease both;
+}
+
+@keyframes popUp {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+.moreItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.875rem;
+  color: #1c241a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s, color 0.12s;
+}
+
+.moreItem:hover {
+  background: #f0f7ea;
+  color: #3c7424;
+}
+
+.moreItemLogout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.875rem;
+  color: #dc2626;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.12s;
+  margin-top: 2px;
+  border-top: 1.5px solid #f0f0ef;
+  padding-top: 0.75rem;
+}
+
+.moreItemLogout:hover {
+  background: #fff5f5;
+}
+
+.moreIcon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  stroke-width: 1.75;
+}

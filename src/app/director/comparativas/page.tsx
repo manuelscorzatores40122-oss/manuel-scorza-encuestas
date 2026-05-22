@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { FileText } from 'lucide-react';
-import { ComparativasCharts } from './ComparativasCharts';
+import { GraficosComparativas } from './GraficosComparativas';
 
 export default async function ComparativasDirector() {
   const responses = await prisma.response.findMany({
@@ -29,7 +29,7 @@ export default async function ComparativasDirector() {
         <FileText className="w-6 h-6 text-brand-600" /> Comparativa primaria vs secundaria
       </h1>
       <p className="text-slate-600 text-sm">Datos completamente anonimizados.</p>
-      <ComparativasCharts data={compareData} />
+      <GraficosComparativas data={compareData} />
     </div>
   );
 }

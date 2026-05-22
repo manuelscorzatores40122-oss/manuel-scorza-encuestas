@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { Upload, CheckCircle2, AlertTriangle, Download } from 'lucide-react';
 import { importSiagieAction } from './actions';
 
-export function ImportSiagie() {
+export function ImportarSiagie() {
   const [file, setFile] = useState<File | null>(null);
   const [nivel, setNivel] = useState<'PRIMARIA' | 'SECUNDARIA'>('PRIMARIA');
   const [anio, setAnio] = useState(new Date().getFullYear());

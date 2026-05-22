@@ -82,7 +82,7 @@ function defaultOptions(type: QType): Option[] {
   return [];
 }
 
-export function SurveyBuilder({ grades }: { grades: GradeWithSections[] }) {
+export function ConstructorEncuesta({ grades }: { grades: GradeWithSections[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [title, setTitle] = useState('');

@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { SurveyForm } from './SurveyForm';
+import { FormularioEncuesta } from './FormularioEncuesta';
 
 export default async function ResponderEncuesta({
   params,
@@ -88,5 +88,5 @@ export default async function ResponderEncuesta({
   }
 
   // Mostrar formulario
-  return <SurveyForm survey={survey} />;
+  return <FormularioEncuesta survey={survey} />;
 }

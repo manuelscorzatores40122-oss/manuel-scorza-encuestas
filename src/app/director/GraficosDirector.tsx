@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export function DirectorCharts({
+export function GraficosDirector({
   riskData,
   gradeData,
 }: {

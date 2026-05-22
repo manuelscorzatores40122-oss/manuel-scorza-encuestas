@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import { PieChart as PieChartIcon, BarChart2, TrendingUp as TrendIcon } from 'lucide-react';
 
-import styles from './DashboardCharts.module.css';
+import styles from './GraficosDashboard.module.css';
 
 type RiskDist = { LOW: number; MID: number; HIGH: number };
 
@@ -33,7 +33,7 @@ const C = {
   HIGH:   '#dc2626',
 };
 
-export function DashboardCharts({
+export function GraficosDashboard({
   riskDist,
   trend,
   riskByGrade,

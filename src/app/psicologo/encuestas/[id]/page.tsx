@@ -4,48 +4,93 @@ import { ArrowLeft, CheckCircle2, Clock, Users, BarChart2 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
 import { RiskBadge } from '@/components/EtiquetaRiesgo';
+import { FiltrosEncuesta } from './FiltrosEncuesta';
 import styles from './page.module.css';
 
-export default async function EncuestaDetalle({ params }: { params: { id: string } }) {
+export default async function EncuestaDetalle({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { q?: string; nivel?: string; gradoId?: string; sectionId?: string };
+}) {
   const survey = await prisma.survey.findUnique({
     where: { id: params.id },
-    include: {
-      _count: { select: { responses: true, questions: true } },
-      responses: {
-        include: {
-          student: { include: { section: { include: { grade: true } } } },
-        },
-        orderBy: { submittedAt: 'desc' },
-      },
-    },
+    include: { _count: { select: { responses: true, questions: true } } },
   });
   if (!survey) notFound();
 
-  /* estudiantes objetivo: por secciones específicas o por grados */
-  const targetWhere: any = { estadoMatricula: 'DEFINITIVA' };
-  if (survey.targetSections.length > 0) {
-    targetWhere.sectionId = { in: survey.targetSections };
-  } else if (survey.targetGrades.length > 0) {
-    targetWhere.section = { gradeId: { in: survey.targetGrades } };
+  /* ── Filtros del usuario ─────────────────────────────────────────── */
+  const q = searchParams.q?.trim().toUpperCase() ?? '';
+
+  const locFilter: any = {};
+  if (searchParams.sectionId) {
+    locFilter.sectionId = searchParams.sectionId;
+  } else if (searchParams.gradoId) {
+    locFilter.section = { gradeId: searchParams.gradoId };
+  } else if (searchParams.nivel) {
+    locFilter.section = { grade: { nivel: searchParams.nivel } };
   }
 
-  const targetStudents = await prisma.student.findMany({
-    where: targetWhere,
-    include: { section: { include: { grade: true } } },
-    orderBy: [{ apellidoPaterno: 'asc' }],
-  });
+  const nameOR = q
+    ? [
+        { nombres:         { contains: q } },
+        { apellidoPaterno: { contains: q } },
+        { apellidoMaterno: { contains: q } },
+      ]
+    : null;
 
-  const respondedIds = new Set(survey.responses.map((r) => r.studentId));
-  const pending = targetStudents.filter((s) => !respondedIds.has(s.id));
+  const studentFilter: any = { ...locFilter };
+  if (nameOR) studentFilter.OR = nameOR;
 
-  const total    = targetStudents.length;
-  const answered = survey.responses.length;
-  const rate     = total > 0 ? Math.round((answered / total) * 100) : 0;
+  const hasFilter = !!(q || searchParams.sectionId || searchParams.gradoId || searchParams.nivel);
 
-  const riskCount = { HIGH: 0, MID: 0, LOW: 0 };
-  survey.responses.forEach((r) => {
-    if (r.riskLevel in riskCount) riskCount[r.riskLevel as keyof typeof riskCount]++;
-  });
+  /* ── Where para respuestas (table "Respondieron") ────────────────── */
+  const responseWhere: any = { surveyId: params.id };
+  if (hasFilter) responseWhere.student = studentFilter;
+
+  /* ── Where para alumnos pendientes ──────────────────────────────── */
+  const targetWhere: any = { estadoMatricula: 'DEFINITIVA', ...locFilter };
+  if (nameOR) targetWhere.OR = nameOR;
+
+  /* Sin filtro de usuario → aplicar scope de la encuesta */
+  if (!hasFilter) {
+    if (survey.targetSections.length > 0) {
+      targetWhere.sectionId = { in: survey.targetSections };
+    } else if (survey.targetGrades.length > 0) {
+      targetWhere.section = { gradeId: { in: survey.targetGrades } };
+    }
+  }
+
+  /* ── Consultas paralelas ─────────────────────────────────────────── */
+  const [responses, targetStudents, grades, sections] = await Promise.all([
+    prisma.response.findMany({
+      where: responseWhere,
+      include: {
+        student: { include: { section: { include: { grade: true } } } },
+      },
+      orderBy: { submittedAt: 'desc' },
+    }),
+    prisma.student.findMany({
+      where: targetWhere,
+      include: { section: { include: { grade: true } } },
+      orderBy: [{ apellidoPaterno: 'asc' }],
+    }),
+    prisma.grade.findMany({ orderBy: [{ nivel: 'asc' }, { order: 'asc' }] }),
+    prisma.section.findMany({
+      select: { id: true, name: true, gradeId: true },
+      orderBy: [{ grade: { order: 'asc' } }, { name: 'asc' }],
+    }),
+  ]);
+
+  const respondedIds = new Set(responses.map((r) => r.studentId));
+  const pending      = targetStudents.filter((s) => !respondedIds.has(s.id));
+
+  /* ── Stats (basados en datos filtrados) ──────────────────────────── */
+  const answered  = responses.length;
+  const total     = answered + pending.length;
+  const rate      = total > 0 ? Math.round((answered / total) * 100) : 0;
+  const highRisk  = responses.filter((r) => r.riskLevel === 'HIGH').length;
 
   return (
     <div className={styles.page}>
@@ -94,11 +139,14 @@ export default async function EncuestaDetalle({ params }: { params: { id: string
         <div className={styles.statCard}>
           <CheckCircle2 className={styles.statIcon} />
           <div>
-            <p className={styles.statValue}>{riskCount.HIGH}</p>
+            <p className={styles.statValue}>{highRisk}</p>
             <p className={styles.statLabel}>Alto riesgo</p>
           </div>
         </div>
       </div>
+
+      {/* Filtros */}
+      <FiltrosEncuesta grades={grades} sections={sections} />
 
       {/* ── Respondieron ── */}
       <section className={styles.section}>
@@ -109,7 +157,7 @@ export default async function EncuestaDetalle({ params }: { params: { id: string
         </h2>
 
         <div className={styles.tableCard}>
-          {survey.responses.length > 0 ? (
+          {responses.length > 0 ? (
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -122,7 +170,7 @@ export default async function EncuestaDetalle({ params }: { params: { id: string
                 </tr>
               </thead>
               <tbody>
-                {survey.responses.map((r) => (
+                {responses.map((r) => (
                   <tr key={r.id} className={styles.row}>
                     <td className={styles.tdName}>
                       {r.student.apellidoPaterno} {r.student.apellidoMaterno},{' '}
@@ -150,13 +198,17 @@ export default async function EncuestaDetalle({ params }: { params: { id: string
               </tbody>
             </table>
           ) : (
-            <p className={styles.emptyMsg}>Ningún estudiante ha respondido aún.</p>
+            <p className={styles.emptyMsg}>
+              {hasFilter
+                ? 'Ningún estudiante con esos filtros ha respondido.'
+                : 'Ningún estudiante ha respondido aún.'}
+            </p>
           )}
         </div>
       </section>
 
       {/* ── Pendientes ── */}
-      {pending.length > 0 && (
+      {(pending.length > 0 || hasFilter) && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>
             <Clock className={styles.sectionIconMuted} />
@@ -165,37 +217,43 @@ export default async function EncuestaDetalle({ params }: { params: { id: string
           </h2>
 
           <div className={styles.tableCard}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.th}>Estudiante</th>
-                  <th className={styles.th}>Grado / Secc.</th>
-                  <th className={`${styles.th} ${styles.thCenter}`}>Edad</th>
-                  <th className={styles.th}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {pending.map((s) => (
-                  <tr key={s.id} className={styles.row}>
-                    <td className={styles.tdName}>
-                      {s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}
-                    </td>
-                    <td className={styles.td}>
-                      {s.section.grade.name} — {s.section.name}
-                    </td>
-                    <td className={`${styles.td} ${styles.tdCenter}`}>{s.edad}</td>
-                    <td className={styles.td}>
-                      <Link
-                        href={`/psicologo/estudiantes/${s.id}`}
-                        className={styles.viewLink}
-                      >
-                        Ver alumno →
-                      </Link>
-                    </td>
+            {pending.length > 0 ? (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th className={styles.th}>Estudiante</th>
+                    <th className={styles.th}>Grado / Secc.</th>
+                    <th className={`${styles.th} ${styles.thCenter}`}>Edad</th>
+                    <th className={styles.th}></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {pending.map((s) => (
+                    <tr key={s.id} className={styles.row}>
+                      <td className={styles.tdName}>
+                        {s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}
+                      </td>
+                      <td className={styles.td}>
+                        {s.section.grade.name} — {s.section.name}
+                      </td>
+                      <td className={`${styles.td} ${styles.tdCenter}`}>{s.edad}</td>
+                      <td className={styles.td}>
+                        <Link
+                          href={`/psicologo/estudiantes/${s.id}`}
+                          className={styles.viewLink}
+                        >
+                          Ver alumno →
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className={styles.emptyMsg}>
+                Todos los estudiantes con esos filtros ya respondieron.
+              </p>
+            )}
           </div>
         </section>
       )}

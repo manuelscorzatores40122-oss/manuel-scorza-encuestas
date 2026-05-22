@@ -1,6 +1,6 @@
 import { Users, ClipboardList, AlertTriangle, TrendingUp } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
-import { DirectorCharts } from './DirectorCharts';
+import { GraficosDirector } from './GraficosDirector';
 
 type GradeRiskRow = {
   grado: string;
@@ -94,7 +94,7 @@ export default async function DirectorDashboard() {
           <p className="text-xs text-slate-500 mt-4">Encuestas activas: {encuestasActivas}</p>
         </div>
 
-        <DirectorCharts riskData={riskData} gradeData={gradeData} />
+        <GraficosDirector riskData={riskData} gradeData={gradeData} />
       </div>
 
       <div className="card bg-slate-50 border-slate-200">

@@ -1,6 +1,6 @@
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { ProfileForm } from './ProfileForm';
+import { FormularioPerfil } from './FormularioPerfil';
 import styles from './perfil.module.css';
 
 export default async function PerfilEstudiantePage() {
@@ -38,7 +38,7 @@ export default async function PerfilEstudiantePage() {
         </div>
       </div>
 
-      <ProfileForm contacts={contacts} />
+      <FormularioPerfil contacts={contacts} />
     </div>
   );
 }

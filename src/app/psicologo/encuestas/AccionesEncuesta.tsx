@@ -6,7 +6,7 @@ import { Power, Trash2 } from 'lucide-react';
 import { deleteSurveyAction, toggleSurveyAction } from './actions';
 import styles from './page.module.css';
 
-type SurveyActionsProps = {
+type AccionesEncuestaProps = {
   id: string;
   title: string;
   isActive: boolean;
@@ -14,13 +14,13 @@ type SurveyActionsProps = {
   variant?: 'desktop' | 'mobile';
 };
 
-export function SurveyActions({
+export function AccionesEncuesta({
   id,
   title,
   isActive,
   responsesCount,
   variant = 'desktop',
-}: SurveyActionsProps) {
+}: AccionesEncuestaProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const toggleClass = variant === 'mobile' ? styles.mobileToggleButton : styles.toggleButton;

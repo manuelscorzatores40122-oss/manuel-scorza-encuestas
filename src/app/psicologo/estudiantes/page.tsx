@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Users, ArrowRight } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
-import { StudentFilters } from './StudentFilters';
+import { FiltrosEstudiantes } from './FiltrosEstudiantes';
 import styles from './page.module.css';
 
 const PAGE_SIZE = 15;
@@ -100,7 +100,7 @@ export default async function EstudiantesPsicologo({
       </header>
 
       {/* ── Filters ── */}
-      <StudentFilters grades={grades} sections={sections} />
+      <FiltrosEstudiantes grades={grades} sections={sections} />
 
       {/* ══ MOBILE list (< 768 px) ══════════════════ */}
       <div className={styles.mobileList}>

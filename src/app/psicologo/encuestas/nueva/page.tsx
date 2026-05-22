@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { SurveyBuilder } from './SurveyBuilder';
+import { ConstructorEncuesta } from './ConstructorEncuesta';
 
 export default async function NuevaEncuestaPage() {
   const grades = await prisma.grade.findMany({
@@ -12,5 +12,5 @@ export default async function NuevaEncuestaPage() {
       },
     },
   });
-  return <SurveyBuilder grades={grades} />;
+  return <ConstructorEncuesta grades={grades} />;
 }

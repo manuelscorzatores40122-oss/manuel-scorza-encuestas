@@ -1,6 +1,6 @@
 import { Megaphone } from 'lucide-react';
 import { listAnnouncements } from '@/lib/announcements';
-import { AnnouncementsManager } from './AnnouncementsManager';
+import { GestorAnuncios } from './GestorAnuncios';
 
 export default async function AdminAnunciosPage() {
   const announcements = await listAnnouncements(50);
@@ -16,7 +16,7 @@ export default async function AdminAnunciosPage() {
         </p>
       </header>
 
-      <AnnouncementsManager
+      <GestorAnuncios
         announcements={announcements.map((a) => ({
           id: a.id,
           title: a.title,

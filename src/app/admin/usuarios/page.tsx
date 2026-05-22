@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { ROLE_LABELS } from '@/lib/constants';
 import { Users, Plus } from 'lucide-react';
-import { UsersTable } from './UsersTable';
+import { TablaUsuarios } from './TablaUsuarios';
 
 export default async function UsuariosPage({ searchParams }: { searchParams: { rol?: string } }) {
   const where: any = { isActive: true };
@@ -34,7 +34,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { r
         <button className="btn-primary" type="submit">Filtrar</button>
       </form>
 
-      <UsersTable users={users.map((u) => ({
+      <TablaUsuarios users={users.map((u) => ({
         id: u.id,
         username: u.username,
         fullName: u.fullName,

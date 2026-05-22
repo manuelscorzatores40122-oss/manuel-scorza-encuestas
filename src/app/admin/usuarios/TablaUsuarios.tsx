@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 type U = { id: string; username: string; fullName: string; role: string; email: string | null; lastLogin: string | null };
 
-export function UsersTable({ users }: { users: U[] }) {
+export function TablaUsuarios({ users }: { users: U[] }) {
   const router = useRouter();
   const [showNew, setShowNew] = useState(false);
   const [pending, startTransition] = useTransition();

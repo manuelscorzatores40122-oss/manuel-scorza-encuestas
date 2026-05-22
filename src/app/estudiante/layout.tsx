@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { StudentMobileBottomNav } from '@/components/NavMovilEstudiante';
-import { SidebarEstudiante } from './SidebarEstudiante';
+import { BarraLateral } from './BarraLateral';
 import styles from './layout.module.css';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -10,7 +10,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
 
   return (
     <div className={styles.shell}>
-      <SidebarEstudiante />
+      <BarraLateral />
       <main className={styles.main}>
         <div className={styles.pageWrapper}>{children}</div>
       </main>

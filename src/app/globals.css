@@ -7,19 +7,22 @@
   --foreground: #0f172a;
 
   /* ── Design tokens (panel psicólogo) ── */
-  --brand:          #0f766e;
-  --brand-strong:   #0b5a54;
-  --bg-page:        #f5f6f7;
+  --brand:          #3c7424;
+  --brand-strong:   #2d5a1b;
+  --brand-light:    #f0f7ea;
+  --teal:           #2f9e8f;
+  --teal-strong:    #24796c;
+  --bg-page:        #f4f6f0;
   --bg-surface:     #ffffff;
-  --bg-muted:       #f1f3f4;
-  --text-primary:   #1a1d1f;
-  --text-secondary: #6b7280;
-  --text-tertiary:  #9aa0a6;
-  --border:         rgba(0, 0, 0, 0.10);
-  --border-strong:  rgba(0, 0, 0, 0.18);
+  --bg-muted:       #eef1e8;
+  --text-primary:   #1c241a;
+  --text-secondary: #46523f;
+  --text-tertiary:  #7a8773;
+  --border:         rgba(60, 116, 36, 0.12);
+  --border-strong:  rgba(60, 116, 36, 0.22);
   --danger-bg:      #fceaea;  --danger-text:  #a32d2d;
   --info-bg:        #e6f1fb;  --info-text:    #185fa5;
-  --success-text:   #0f6e56;
+  --success-text:   #2d5a1b;
   --r-md:           8px;
   --r-lg:           12px;
 
@@ -58,7 +61,7 @@ body {
     @apply btn bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500 shadow-sm;
   }
   .btn-secondary {
-    @apply btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 focus:ring-brand-500;
+    @apply btn bg-white text-slate-700 border border-slate-200 hover:bg-brand-50 focus:ring-brand-500;
   }
   .btn-danger {
     @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
@@ -67,17 +70,20 @@ body {
     @apply btn bg-warm-500 text-white hover:bg-warm-600 focus:ring-warm-500 shadow-sm;
   }
   .input {
-    @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white
+    @apply w-full px-4 py-2.5 rounded-xl border bg-white
            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
            transition-all placeholder:text-slate-400;
+    border-color: rgba(60, 116, 36, 0.18);
   }
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-slate-100 p-6;
+    @apply bg-white rounded-2xl shadow-sm p-6;
+    border: 1px solid rgba(60, 116, 36, 0.1);
   }
   .badge {
     @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
   }
   .label {
-    @apply block text-sm font-medium text-slate-700 mb-1.5;
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--text-secondary);
   }
 }
