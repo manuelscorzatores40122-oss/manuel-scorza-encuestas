@@ -30,7 +30,7 @@
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -41,7 +41,8 @@
   content: '';
   width: 30px;
   height: 1.5px;
-  background: #1f5132;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -59,8 +60,8 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  background: #15201a;
-  color: #f3f1ea;
+  background: #16a34a;
+  color: #fff;
   font-weight: 600;
   font-size: .92rem;
   padding: 13px 22px;
@@ -74,7 +75,7 @@
   white-space: nowrap;
 }
 
-.btnSolid:hover { background: #15291b; }
+.btnSolid:hover { background: #15803d; }
 .btnIcon { width: 16px; height: 16px; }
 
 /* ── Cuerpo ─────────────────────────────── */
@@ -163,8 +164,8 @@
   flex-shrink: 0;
 }
 
-.stateOn { color: #1f5132; }
-.stateOn .stateDot { background: #1f5132; }
+.stateOn { color: #16a34a; }
+.stateOn .stateDot { background: #16a34a; }
 
 .stateOff { color: #8a9089; }
 .stateOff .stateDot { background: #8a9089; }
@@ -203,8 +204,8 @@
 .act:hover         { color: #15201a; border-bottom-color: #15201a; }
 .act:disabled      { opacity: .45; cursor: default; }
 
-.actGreen          { color: #1f5132; }
-.actGreen:hover    { color: #1f5132; border-bottom-color: #1f5132; }
+.actGreen          { color: #16a34a; }
+.actGreen:hover    { color: #16a34a; border-bottom-color: #16a34a; }
 
 .actDanger         { color: #a32d2d; }
 .actDanger:hover   { color: #a32d2d; border-bottom-color: #a32d2d; }

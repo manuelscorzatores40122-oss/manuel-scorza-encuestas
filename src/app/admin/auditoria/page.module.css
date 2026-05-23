@@ -1,0 +1,168 @@
+/* ════════════════════════════════
+   Auditoría — editorial style
+   ════════════════════════════════ */
+
+.page { font-size: 15px; color: #1a1a18; }
+
+/* ── Encabezado ── */
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 2px solid #1a1a18;
+}
+
+.kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a887f;
+  margin: 0 0 10px;
+}
+
+.title {
+  font-family: var(--font-fraunces), 'Fraunces', Georgia, serif;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  margin: 0;
+  color: #1a1a18;
+}
+
+.rule {
+  height: 4px;
+  width: 64px;
+  background: #1a1a18;
+  margin: 0 0 36px;
+}
+
+/* ── Sección ── */
+.section { margin-bottom: 40px; }
+
+.sectHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #d3d1c7;
+  margin-bottom: 16px;
+}
+.sectTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #52514c;
+}
+.sectCount {
+  font-size: 12.5px;
+  color: #8a887f;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Tabla ── */
+.tableWrap {
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+
+.th {
+  text-align: left;
+  padding: 9px 18px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a887f;
+  background: #f7f6f1;
+  border-bottom: 1px solid #d3d1c7;
+  white-space: nowrap;
+}
+
+.tr { border-bottom: 1px solid #e4e2da; transition: background 0.1s; }
+.tr:last-child { border-bottom: none; }
+.tr:hover { background: #faf9f5; }
+
+.td { padding: 11px 18px; vertical-align: middle; }
+
+/* Hora */
+.tdTime { white-space: nowrap; }
+.timeMain { font-size: 13px; font-weight: 600; color: #1a1a18; font-variant-numeric: tabular-nums; }
+.timeSub  { font-size: 11.5px; color: #8a887f; margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+/* Usuario / Alumno */
+.nameMain { font-size: 13px; font-weight: 500; color: #1a1a18; }
+.nameSub  { font-size: 11.5px; color: #8a887f; margin-top: 1px; }
+
+/* Encuesta */
+.surveyCell { font-size: 13px; color: #52514c; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Score */
+.score { font-weight: 700; color: #1a1a18; font-variant-numeric: tabular-nums; }
+
+/* Detalle */
+.detail { font-size: 12.5px; color: #8a887f; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Empty */
+.empty { text-align: center; color: #8a887f; padding: 2.5rem; font-size: 13.5px; }
+
+/* ── Paginación ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 18px;
+  border-top: 1px solid #e4e2da;
+  background: #faf9f5;
+  flex-wrap: wrap;
+}
+.pgInfo { font-size: 12.5px; color: #8a887f; font-variant-numeric: tabular-nums; }
+.pgBtns { display: flex; gap: 8px; }
+.pgBtn {
+  display: inline-block;
+  padding: 5px 14px;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #1a1a18;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pgBtn:hover { border-color: #1a1a18; background: #f7f6f1; }
+.pgBtnDisabled {
+  composes: pgBtn;
+  color: #b8b5ac;
+  background: #f7f6f1;
+  border-color: #e4e2da;
+  pointer-events: none;
+}
+
+/* ── Chips de acción ── */
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Chips de riesgo ── */
+.riskLow  { composes: chip; background: #e1f5ee; color: #0f6e56; }
+.riskMid  { composes: chip; background: #fefce8; color: #b45309; }
+.riskHigh { composes: chip; background: #fef2f2; color: #c0392b; }

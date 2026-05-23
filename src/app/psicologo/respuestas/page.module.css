@@ -30,7 +30,7 @@
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -41,7 +41,8 @@
   content: '';
   width: 30px;
   height: 1.5px;
-  background: #1f5132;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -92,7 +93,7 @@
   margin-bottom: 6px;
 }
 
-.toolHeadIcon { width: 18px; height: 18px; color: #1f5132; }
+.toolHeadIcon { width: 18px; height: 18px; color: #16a34a; }
 
 .toolTitle {
   font-family: var(--font-fraunces), 'Fraunces', serif;
@@ -158,8 +159,8 @@
 }
 
 .fileBtn {
-  background: #15201a;
-  color: #f3f1ea;
+  background: #16a34a;
+  color: #fff;
   font-weight: 600;
   font-size: .88rem;
   padding: 11px 16px;
@@ -174,7 +175,7 @@
   transition: background .2s;
 }
 
-.fileBtn:hover { background: #15291b; }
+.fileBtn:hover { background: #15803d; }
 .fileBtnIcon { width: 15px; height: 15px; }
 
 .fileName {
@@ -194,8 +195,8 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  background: #15201a;
-  color: #f3f1ea;
+  background: #16a34a;
+  color: #fff;
   font-weight: 600;
   font-size: .92rem;
   padding: 12px 22px;
@@ -207,14 +208,14 @@
   white-space: nowrap;
 }
 
-.btnSolid:hover    { background: #15291b; }
+.btnSolid:hover    { background: #15803d; }
 .btnSolid:disabled { opacity: .5; cursor: default; }
 .btnSolidIcon { width: 16px; height: 16px; }
 
 /* ── Nota informativa ─────────────────── */
 .note {
   background: rgba(31, 81, 50, .06);
-  border-left: 2px solid #1f5132;
+  border-left: 2px solid #16a34a;
   padding: 12px 16px;
   font-size: .82rem;
   color: #56605a;
@@ -243,7 +244,7 @@
 
 .importResult {
   background: rgba(31, 81, 50, .06);
-  border-left: 2px solid #1f5132;
+  border-left: 2px solid #16a34a;
   padding: 14px 16px;
 }
 
@@ -257,7 +258,7 @@
   margin-bottom: 12px;
 }
 
-.importResultIcon { width: 15px; height: 15px; color: #1f5132; }
+.importResultIcon { width: 15px; height: 15px; color: #16a34a; }
 
 .importMetrics {
   display: grid;
@@ -393,14 +394,14 @@
   gap: 5px;
   font-size: .85rem;
   font-weight: 500;
-  color: #1f5132;
+  color: #16a34a;
   border-bottom: 1px solid transparent;
   transition: border-color .16s;
   text-decoration: none;
   white-space: nowrap;
 }
 
-.viewLink:hover { border-bottom-color: #1f5132; }
+.viewLink:hover { border-bottom-color: #16a34a; }
 .viewLinkIcon { width: 13px; height: 13px; }
 
 /* ── Estado vacío ────────────────────── */

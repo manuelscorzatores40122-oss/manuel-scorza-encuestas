@@ -1,0 +1,270 @@
+/* ════════════════════════════════
+   Editor de Reglas — editorial
+   ════════════════════════════════ */
+
+/* ── Botón nueva regla ── */
+.newBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #1a1a18;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.newBtn:hover { background: #333; }
+
+/* ── Banner mensaje ── */
+.msgBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #e6f1fb;
+  border: 1px solid #b3d4f0;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #185fa5;
+}
+.msgClose {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #185fa5;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ── Formulario ── */
+.form {
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a887f;
+  margin: 0 0 4px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.formField { display: flex; flex-direction: column; gap: 6px; }
+.formFieldFull { grid-column: 1 / -1; }
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a887f;
+}
+
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #1a1a18;
+  background: #fff;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.input:focus { border-color: #1a1a18; }
+
+.inputMono {
+  composes: input;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+}
+
+.hint {
+  font-size: 11.5px;
+  color: #8a887f;
+  margin: 2px 0 0;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 22px;
+  background: #1a1a18;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnPrimary:hover { background: #333; }
+.btnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btnSecondary {
+  padding: 9px 22px;
+  background: #fff;
+  color: #1a1a18;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btnSecondary:hover { border-color: #1a1a18; background: #f7f6f1; }
+
+/* ── Lista de reglas ── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ruleCard {
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  transition: border-color 0.15s;
+}
+.ruleCard:hover { border-color: #b8b5ac; }
+
+/* left – regla info */
+.ruleInfo { flex: 1; min-width: 0; }
+
+.ruleTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ruleName {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1a1a18;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.ruleType {
+  font-size: 12px;
+  color: #8a887f;
+  margin: 0 0 6px;
+}
+
+.ruleSummary {
+  font-size: 13px;
+  color: #52514c;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* right – actions */
+.ruleActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btnEdit {
+  padding: 5px 14px;
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #1a1a18;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.btnEdit:hover { border-color: #1a1a18; background: #f7f6f1; }
+
+.btnIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #8a887f;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.btnIcon:hover { border-color: #1a1a18; color: #1a1a18; background: #f7f6f1; }
+.btnIcon:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btnIconDanger { composes: btnIcon; }
+.btnIconDanger:hover { background: #fef2f2; border-color: #f0a8a8; color: #c0392b; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.severityHigh { composes: badge; background: #fef2f2; color: #c0392b; }
+.severityMid  { composes: badge; background: #fefce8; color: #b45309; }
+.severityLow  { composes: badge; background: #e1f5ee; color: #0f6e56; }
+
+.statusActive   { composes: badge; background: #e1f5ee; color: #0f6e56; }
+.statusInactive { composes: badge; background: #f0efea; color: #8a887f; }
+
+/* ── Empty ── */
+.empty {
+  text-align: center;
+  color: #8a887f;
+  padding: 3rem;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .formGrid { grid-template-columns: 1fr; }
+  .ruleCard { flex-direction: column; }
+  .ruleActions { width: 100%; }
+}

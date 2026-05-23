@@ -1,19 +1,21 @@
 import { prisma } from '@/lib/prisma';
 import { ROLE_LABELS } from '@/lib/constants';
-import { Users, Plus } from 'lucide-react';
 import { TablaUsuarios } from './TablaUsuarios';
+import styles from './page.module.css';
 
-export default async function UsuariosPage({ searchParams }: { searchParams: { rol?: string; q?: string } }) {
+export default async function UsuariosPage({
+  searchParams,
+}: {
+  searchParams: { rol?: string; q?: string };
+}) {
   const q = searchParams.q?.trim() || '';
   const where: any = {};
 
   if (searchParams.rol) {
     where.role = searchParams.rol;
   } else if (!q) {
-    // Sin búsqueda y sin rol: solo staff (los alumnos son cientos)
     where.role = { not: 'STUDENT' };
   }
-  // Con búsqueda sin rol: busca en todos los roles, incluidos alumnos
 
   if (q) {
     where.fullName = { contains: q, mode: 'insensitive' };
@@ -26,43 +28,54 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { r
   });
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Users className="w-6 h-6 text-brand-600" /> Usuarios
-        </h1>
-      </div>
+    <div className={styles.page}>
 
-      <form className="card flex flex-wrap gap-3 items-end">
-        <div className="flex-1 min-w-[180px]">
-          <label className="label text-xs">Buscar por nombre</label>
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Nombre o apellido (incluye alumnos)…"
-            className="input"
-            autoComplete="off"
-          />
+      {/* ── Encabezado ── */}
+      <header className={styles.head}>
+        <p className={styles.kicker}>Panel · Administrador</p>
+        <h1 className={styles.title}>Usuarios</h1>
+      </header>
+      <div className={styles.rule} />
+
+      {/* ── Búsqueda ── */}
+      <form className={styles.searchBox}>
+        <p className={styles.searchKicker}>Buscar y filtrar</p>
+        <div className={styles.searchRow}>
+          <div className={styles.fieldWrap}>
+            <label className={styles.label}>Nombre o apellido</label>
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Incluye alumnos…"
+              className={styles.input}
+              autoComplete="off"
+            />
+          </div>
+          <div>
+            <label className={styles.label}>Filtrar por rol</label>
+            <select name="rol" defaultValue={searchParams.rol || ''} className={styles.select}>
+              <option value="">Solo staff</option>
+              {Object.entries(ROLE_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </div>
+          <button className={styles.searchBtn} type="submit">Buscar</button>
         </div>
-        <div>
-          <label className="label text-xs">Filtrar por rol</label>
-          <select name="rol" defaultValue={searchParams.rol || ''} className="input">
-            <option value="">Solo staff</option>
-            {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
-        </div>
-        <button className="btn-primary" type="submit">Buscar</button>
       </form>
 
-      <TablaUsuarios users={users.map((u) => ({
-        id: u.id,
-        username: u.username,
-        fullName: u.fullName,
-        role: u.role,
-        email: u.email,
-        isActive: u.isActive,
-        lastLogin: u.lastLogin?.toISOString() || null,
-      }))} />
+      {/* ── Tabla interactiva ── */}
+      <TablaUsuarios
+        users={users.map(u => ({
+          id:        u.id,
+          username:  u.username,
+          fullName:  u.fullName,
+          role:      u.role,
+          email:     u.email,
+          isActive:  u.isActive,
+          lastLogin: u.lastLogin?.toISOString() || null,
+        }))}
+      />
     </div>
   );
 }

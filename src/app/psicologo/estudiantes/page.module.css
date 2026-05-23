@@ -32,7 +32,7 @@
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -43,7 +43,8 @@
   content: '';
   width: 30px;
   height: 1.5px;
-  background: #1f5132;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -129,7 +130,7 @@
   place-items: center;
   font-size: .78rem;
   font-weight: 600;
-  color: #1f5132;
+  color: #16a34a;
   flex-shrink: 0;
   font-family: var(--font-fraunces), 'Fraunces', serif;
 }
@@ -153,7 +154,7 @@
   margin-top: 3px;
 }
 
-.levelPri { color: #1f5132; }
+.levelPri { color: #16a34a; }
 .levelSec { color: #534ab7; }
 
 /* ── Celdas ─────────────────────────────── */
@@ -192,12 +193,12 @@
   gap: 6px;
   font-size: .86rem;
   font-weight: 500;
-  color: #1f5132;
+  color: #16a34a;
   border-bottom: 1px solid transparent;
   transition: border-color .16s;
 }
 
-.row:hover .viewLink { border-color: #1f5132; }
+.row:hover .viewLink { border-color: #16a34a; }
 
 .viewLinkIcon { width: 13px; height: 13px; flex-shrink: 0; }
 

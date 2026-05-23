@@ -1,0 +1,115 @@
+/* ════════════════════════════════
+   Usuarios — editorial style
+   ════════════════════════════════ */
+
+.page { font-size: 15px; color: #1a1a18; }
+
+/* ── Encabezado ── */
+.head {
+  padding-bottom: 18px;
+  border-bottom: 2px solid #1a1a18;
+}
+
+.kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a887f;
+  margin: 0 0 10px;
+}
+
+.title {
+  font-family: var(--font-fraunces), 'Fraunces', Georgia, serif;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  margin: 0;
+  color: #1a1a18;
+}
+
+.rule {
+  height: 4px;
+  width: 64px;
+  background: #1a1a18;
+  margin: 0 0 36px;
+}
+
+/* ── Búsqueda ── */
+.searchBox {
+  background: #fff;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.searchKicker {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a887f;
+  font-weight: 600;
+  margin: 0 0 14px;
+}
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.fieldWrap { flex: 1; min-width: 200px; }
+
+.label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a887f;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #1a1a18;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus { border-color: #1a1a18; }
+
+.select {
+  padding: 9px 12px;
+  border: 1px solid #d3d1c7;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: #1a1a18;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  min-width: 160px;
+  transition: border-color 0.15s;
+}
+.select:focus { border-color: #1a1a18; }
+
+.searchBtn {
+  padding: 9px 22px;
+  background: #1a1a18;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.searchBtn:hover { background: #333; }

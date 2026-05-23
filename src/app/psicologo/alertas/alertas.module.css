@@ -33,7 +33,7 @@
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -44,7 +44,8 @@
   content: '';
   width: 30px;
   height: 1.5px;
-  background: #1f5132;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -83,8 +84,8 @@
 .tab:hover { color: #56605a; }
 
 .tabActive {
-  color: #15201a;
-  border-bottom-color: #15201a;
+  color: #16a34a;
+  border-bottom-color: #16a34a;
 }
 
 .tabN {
@@ -97,8 +98,8 @@
 }
 
 .tabActive .tabN {
-  background: #15201a;
-  color: #f3f1ea;
+  background: #16a34a;
+  color: #fff;
 }
 
 /* ── Cuerpo ─────────────────────────── */
@@ -217,12 +218,12 @@
 .abtn:disabled { opacity: .45; cursor: default; }
 
 .abtnPrimary {
-  background: #15201a;
-  color: #f3f1ea;
-  border-color: #15201a;
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
 }
 
-.abtnPrimary:hover { background: #15291b; color: #f3f1ea; border-color: #15291b; }
+.abtnPrimary:hover { background: #15803d; color: #fff; border-color: #15803d; }
 
 /* ── Estado vacío ────────────────────── */
 .empty {
@@ -237,7 +238,7 @@
   display: grid;
   place-items: center;
   margin: 0 auto 18px;
-  color: #1f5132;
+  color: #16a34a;
 }
 
 .emptyIc svg { width: 26px; height: 26px; }

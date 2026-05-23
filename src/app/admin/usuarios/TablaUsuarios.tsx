@@ -3,16 +3,38 @@
 import { useState, useTransition } from 'react';
 import { Plus, KeyRound, UserX, UserCheck } from 'lucide-react';
 import { ROLE_LABELS } from '@/lib/constants';
-import { createUserAction, resetPasswordAction, deactivateUserAction, activateUserAction } from './actions';
+import {
+  createUserAction,
+  resetPasswordAction,
+  deactivateUserAction,
+  activateUserAction,
+} from './actions';
 import { useRouter } from 'next/navigation';
+import styles from './TablaUsuarios.module.css';
 
-type U = { id: string; username: string; fullName: string; role: string; email: string | null; isActive: boolean; lastLogin: string | null };
+type U = {
+  id: string;
+  username: string;
+  fullName: string;
+  role: string;
+  email: string | null;
+  isActive: boolean;
+  lastLogin: string | null;
+};
+
+const ROLE_BADGE: Record<string, string> = {
+  ADMIN:        styles.roleAdmin,
+  PSYCHOLOGIST: styles.rolePsychologist,
+  DIRECTOR:     styles.roleDirector,
+  AUXILIAR:     styles.roleAuxiliar,
+  STUDENT:      styles.roleStudent,
+};
 
 export function TablaUsuarios({ users }: { users: U[] }) {
   const router = useRouter();
-  const [showNew, setShowNew] = useState(false);
+  const [showNew, setShowNew]   = useState(false);
   const [pending, startTransition] = useTransition();
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg]           = useState<string | null>(null);
 
   function newUser(formData: FormData) {
     startTransition(async () => {
@@ -21,7 +43,9 @@ export function TablaUsuarios({ users }: { users: U[] }) {
         setMsg(`Usuario creado. Clave temporal: ${r.tempPassword}`);
         setShowNew(false);
         router.refresh();
-      } else setMsg(`Error: ${r.error}`);
+      } else {
+        setMsg(`Error: ${r.error}`);
+      }
     });
   }
 
@@ -29,8 +53,8 @@ export function TablaUsuarios({ users }: { users: U[] }) {
     if (!confirm('¿Generar nueva clave para este usuario?')) return;
     startTransition(async () => {
       const r = await resetPasswordAction(id);
-      if (r.ok) setMsg(`Nueva clave: ${r.tempPassword}`);
-      else setMsg(`Error: ${r.error}`);
+      if (r.ok) setMsg(`Nueva clave temporal: ${r.tempPassword}`);
+      else       setMsg(`Error: ${r.error}`);
     });
   }
 
@@ -51,86 +75,136 @@ export function TablaUsuarios({ users }: { users: U[] }) {
   }
 
   return (
-    <div className="space-y-4">
-      <button onClick={() => setShowNew(!showNew)} className="btn-primary">
-        <Plus className="w-4 h-4" /> Nuevo usuario
-      </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+      <div>
+        <button onClick={() => setShowNew(!showNew)} className={styles.newBtn}>
+          <Plus style={{ width: 15, height: 15 }} strokeWidth={2} />
+          Nuevo usuario
+        </button>
+      </div>
 
       {msg && (
-        <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-3 text-sm">
-          {msg} <button onClick={() => setMsg(null)} className="ml-2 text-xs underline">cerrar</button>
+        <div className={styles.msgBanner}>
+          <span>{msg}</span>
+          <button onClick={() => setMsg(null)} className={styles.msgClose}>cerrar</button>
         </div>
       )}
 
       {showNew && (
-        <form action={newUser} className="card grid gap-3 sm:grid-cols-2">
+        <form action={newUser} className={styles.newForm}>
           <div>
-            <label className="label">Nombre completo</label>
-            <input name="fullName" required className="input" />
+            <label className={styles.formLabel}>Nombre completo</label>
+            <input name="fullName" required className={styles.formInput} />
           </div>
           <div>
-            <label className="label">Correo / usuario</label>
-            <input name="username" required className="input" placeholder="usuario@scorzatorres.edu.pe" />
+            <label className={styles.formLabel}>Correo / usuario</label>
+            <input
+              name="username"
+              required
+              className={styles.formInput}
+              placeholder="usuario@scorzatorres.edu.pe"
+            />
           </div>
           <div>
-            <label className="label">Rol</label>
-            <select name="role" required className="input">
-              {Object.entries(ROLE_LABELS).filter(([k]) => k !== 'STUDENT').map(([k, v]) => (
-                <option key={k} value={k}>{v}</option>
-              ))}
+            <label className={styles.formLabel}>Rol</label>
+            <select name="role" required className={styles.formInput}>
+              {Object.entries(ROLE_LABELS)
+                .filter(([k]) => k !== 'STUDENT')
+                .map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
             </select>
           </div>
-          <div className="sm:col-span-2 flex justify-end gap-2">
-            <button type="button" onClick={() => setShowNew(false)} className="btn-secondary">Cancelar</button>
-            <button type="submit" disabled={pending} className="btn-primary">{pending ? 'Creando...' : 'Crear'}</button>
+          <div className={styles.formActions}>
+            <button
+              type="button"
+              onClick={() => setShowNew(false)}
+              className={styles.btnSecondary}
+            >
+              Cancelar
+            </button>
+            <button type="submit" disabled={pending} className={styles.btnPrimary}>
+              {pending ? 'Creando…' : 'Crear usuario'}
+            </button>
           </div>
         </form>
       )}
 
-      <div className="card !p-0 overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-600">
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <th className="text-left px-4 py-3">Nombre</th>
-              <th className="text-left px-4 py-3">Usuario</th>
-              <th className="text-left px-4 py-3">Rol</th>
-              <th className="text-left px-4 py-3">Último acceso</th>
-              <th className="text-right px-4 py-3">Acciones</th>
+              <th className={styles.th}>Nombre</th>
+              <th className={styles.th}>Usuario</th>
+              <th className={styles.th}>Rol</th>
+              <th className={styles.th}>Último acceso</th>
+              <th className={`${styles.th} ${styles.thRight}`}>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className={`border-t border-slate-100 ${!u.isActive ? 'bg-slate-50 opacity-60' : ''}`}>
-                <td className="px-4 py-3 font-medium">
-                  <span className={!u.isActive ? 'line-through text-slate-400' : ''}>{u.fullName}</span>
+            {users.map(u => (
+              <tr key={u.id} className={`${styles.tr} ${!u.isActive ? styles.trInactive : ''}`}>
+                <td className={styles.td}>
+                  <span className={`${styles.tdName} ${!u.isActive ? styles.nameStrike : ''}`}>
+                    {u.fullName}
+                  </span>
                   {!u.isActive && (
-                    <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">Inactivo</span>
+                    <span className={styles.badgeInactive}>Inactivo</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-600 font-mono text-xs">{u.username}</td>
-                <td className="px-4 py-3"><span className="badge bg-slate-100 text-slate-700">{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS]}</span></td>
-                <td className="px-4 py-3 text-xs text-slate-500" suppressHydrationWarning>
-                  {u.lastLogin ? new Date(u.lastLogin).toLocaleString('es-PE') : 'Nunca'}
+                <td className={`${styles.td} ${styles.tdUser}`}>{u.username}</td>
+                <td className={styles.td}>
+                  <span className={`${styles.badge} ${ROLE_BADGE[u.role] ?? styles.roleDefault}`}>
+                    {ROLE_LABELS[u.role as keyof typeof ROLE_LABELS] ?? u.role}
+                  </span>
                 </td>
-                <td className="px-4 py-3 text-right">
+                <td className={`${styles.td} ${styles.tdTime}`} suppressHydrationWarning>
+                  {u.lastLogin
+                    ? new Date(u.lastLogin).toLocaleString('es-PE', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit',
+                      })
+                    : 'Nunca'}
+                </td>
+                <td className={`${styles.td} ${styles.tdActions}`}>
                   {u.isActive ? (
                     <>
-                      <button onClick={() => reset(u.id)} className="text-brand-600 text-xs hover:underline mr-3" disabled={pending}>
-                        <KeyRound className="w-3 h-3 inline" /> Resetear clave
+                      <button
+                        onClick={() => reset(u.id)}
+                        disabled={pending}
+                        className={`${styles.actionBtn} ${styles.actionReset}`}
+                      >
+                        <KeyRound style={{ width: 13, height: 13 }} strokeWidth={1.8} />
+                        Resetear clave
                       </button>
-                      <button onClick={() => deactivate(u.id)} className="text-red-600 text-xs hover:underline" disabled={pending}>
-                        <UserX className="w-3 h-3 inline" /> Desactivar
+                      <button
+                        onClick={() => deactivate(u.id)}
+                        disabled={pending}
+                        className={`${styles.actionBtn} ${styles.actionDeactivate}`}
+                      >
+                        <UserX style={{ width: 13, height: 13 }} strokeWidth={1.8} />
+                        Desactivar
                       </button>
                     </>
                   ) : (
-                    <button onClick={() => activate(u.id)} className="text-green-600 text-xs hover:underline" disabled={pending}>
-                      <UserCheck className="w-3 h-3 inline" /> Reactivar
+                    <button
+                      onClick={() => activate(u.id)}
+                      disabled={pending}
+                      className={`${styles.actionBtn} ${styles.actionActivate}`}
+                    >
+                      <UserCheck style={{ width: 13, height: 13 }} strokeWidth={1.8} />
+                      Reactivar
                     </button>
                   )}
                 </td>
               </tr>
             ))}
-            {users.length === 0 && <tr><td colSpan={5} className="text-center text-slate-500 py-8">No hay usuarios.</td></tr>}
+            {users.length === 0 && (
+              <tr>
+                <td colSpan={5} className={styles.empty}>No hay usuarios.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

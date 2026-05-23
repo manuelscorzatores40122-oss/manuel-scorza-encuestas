@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Megaphone, Send, EyeOff, Eye, Trash2, ChevronDown } from 'lucide-react';
+import { Send, EyeOff, Eye, Trash2, ChevronDown } from 'lucide-react';
 import {
   createAnnouncementAction,
   deleteAnnouncementAction,
@@ -21,8 +21,8 @@ type Announcement = {
 
 export function GestorAnuncios({ announcements }: { announcements: Announcement[] }) {
   const [pending, startTransition] = useTransition();
-  const [msg, setMsg] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [msg, setMsg]               = useState<string | null>(null);
+  const [expanded, setExpanded]     = useState<Set<string>>(new Set());
 
   function toggleExpanded(id: string) {
     setExpanded(prev => {
@@ -48,46 +48,29 @@ export function GestorAnuncios({ announcements }: { announcements: Announcement[
   }
 
   function toggle(id: string) {
-    startTransition(async () => {
-      await toggleAnnouncementAction(id);
-    });
+    startTransition(async () => { await toggleAnnouncementAction(id); });
   }
 
   function remove(id: string) {
     if (!confirm('¿Eliminar este anuncio?')) return;
-    startTransition(async () => {
-      await deleteAnnouncementAction(id);
-    });
+    startTransition(async () => { await deleteAnnouncementAction(id); });
   }
 
   return (
     <div className={styles.grid}>
+
       {/* ── Formulario ── */}
       <form id="announcement-form" action={create} className={styles.form}>
-        <h2 className={styles.formHeading}>
-          <Megaphone className={styles.formIcon} /> Nuevo anuncio
-        </h2>
+        <h2 className={styles.formHeading}>Nuevo anuncio</h2>
 
         <div className={styles.field}>
           <label className={styles.label}>Título</label>
-          <input
-            name="title"
-            className={styles.input}
-            required
-            maxLength={120}
-            placeholder="Ej. Reunión de padres"
-          />
+          <input name="title" className={styles.input} required maxLength={120} placeholder="Ej. Reunión de padres" />
         </div>
 
         <div className={styles.field}>
           <label className={styles.label}>Mensaje</label>
-          <textarea
-            name="content"
-            className={styles.textarea}
-            required
-            maxLength={1200}
-            placeholder="Escribe el comunicado que verán los estudiantes..."
-          />
+          <textarea name="content" className={styles.textarea} required maxLength={1200} placeholder="Escribe el comunicado que verán los estudiantes..." />
         </div>
 
         <fieldset className={styles.fieldset}>
@@ -96,9 +79,7 @@ export function GestorAnuncios({ announcements }: { announcements: Announcement[
             <input type="checkbox" name="targetRoles" value="STUDENT" defaultChecked />
             Estudiantes
           </label>
-          <p className={styles.hint}>
-            Por ahora los anuncios se muestran en el panel del estudiante.
-          </p>
+          <p className={styles.hint}>Por ahora los anuncios se muestran en el panel del estudiante.</p>
         </fieldset>
 
         {msg && <div className={styles.msg}>{msg}</div>}
@@ -115,34 +96,25 @@ export function GestorAnuncios({ announcements }: { announcements: Announcement[
           const open = expanded.has(a.id);
           return (
             <article key={a.id} className={styles.card} data-open={open ? 'true' : 'false'}>
-              <div className={styles.cardTop}>
-                {/* título + badge + fecha — clicable en móvil para desplegar */}
-                <button
-                  type="button"
-                  className={styles.cardSummary}
-                  onClick={() => toggleExpanded(a.id)}
-                  aria-expanded={open}
-                >
-                  <div className={styles.cardMeta}>
-                    <div className={styles.cardTitleRow}>
-                      <h3 className={styles.cardTitle}>{a.title}</h3>
-                      <span className={a.isPublished ? styles.badgePublished : styles.badgeHidden}>
-                        {a.isPublished ? 'Publicado' : 'Oculto'}
-                      </span>
-                    </div>
-                    <p className={styles.cardDate} suppressHydrationWarning>
-                      {new Date(a.createdAt).toLocaleString('es-PE')} · {a.createdBy.fullName}
-                    </p>
+
+              {/* Cabecera: título + acciones */}
+              <div className={styles.cardHeader}>
+                <div className={styles.cardMeta}>
+                  <div className={styles.cardTitleRow}>
+                    <h3 className={styles.cardTitle}>{a.title}</h3>
+                    <span className={a.isPublished ? styles.badgePublished : styles.badgeHidden}>
+                      {a.isPublished ? 'Publicado' : 'Oculto'}
+                    </span>
                   </div>
+                  <p className={styles.cardDate} suppressHydrationWarning>
+                    {new Date(a.createdAt).toLocaleString('es-PE', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit',
+                    })} · {a.createdBy.fullName}
+                  </p>
+                </div>
 
-                  <ChevronDown
-                    className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}
-                  />
-                </button>
-
-                {/* acciones siempre visibles */}
                 <div className={styles.cardActions}>
-                  {/* Muestra el estado ACTUAL; al hacer clic lo cambia al opuesto */}
                   <button
                     onClick={() => toggle(a.id)}
                     className={a.isPublished ? styles.btnVisible : styles.btnHidden}
@@ -164,17 +136,28 @@ export function GestorAnuncios({ announcements }: { announcements: Announcement[
                 </div>
               </div>
 
+              {/* Acordeón: botón Ver más / Ver menos */}
+              <button
+                type="button"
+                onClick={() => toggleExpanded(a.id)}
+                className={styles.expandBtn}
+                aria-expanded={open}
+              >
+                <ChevronDown className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`} />
+                <span>{open ? 'Ver menos' : 'Ver más'}</span>
+              </button>
+
+              {/* Contenido expandible */}
               <div className={styles.cardContent}>
                 <p className={styles.cardText}>{a.content}</p>
               </div>
+
             </article>
           );
         })}
 
         {announcements.length === 0 && (
-          <div className={styles.empty}>
-            Todavía no hay anuncios publicados.
-          </div>
+          <div className={styles.empty}>Todavía no hay anuncios publicados.</div>
         )}
       </section>
     </div>

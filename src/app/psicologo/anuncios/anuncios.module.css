@@ -31,7 +31,7 @@
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -42,7 +42,8 @@
   content: '';
   width: 30px;
   height: 1.5px;
-  background: #1f5132;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -162,7 +163,7 @@
 }
 
 .checkBox svg { opacity: 0; transition: opacity .16s; color: #f3f1ea; }
-.checkOn .checkBox { background: #15201a; }
+.checkOn .checkBox { background: #16a34a; }
 .checkOn .checkBox svg { opacity: 1; }
 
 .hint {
@@ -179,8 +180,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: #15201a;
-  color: #f3f1ea;
+  background: #16a34a;
+  color: #fff;
   border: none;
   cursor: pointer;
   font-family: inherit;
@@ -192,7 +193,7 @@
   transition: background .2s, opacity .2s;
 }
 
-.submit:hover    { background: #15291b; }
+.submit:hover    { background: #15803d; }
 .submit:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── Feed header ─────────────────────────── */
@@ -264,7 +265,7 @@
   flex-shrink: 0;
 }
 
-.tagPub { color: #1f5132; }
+.tagPub { color: #16a34a; }
 .tagHid { color: #854f0b; }
 
 /* ── Acciones del post ───────────────────── */

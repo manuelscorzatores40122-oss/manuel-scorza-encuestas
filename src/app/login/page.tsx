@@ -177,7 +177,7 @@ export default function LoginPage() {
             { num: '100%', cap: 'Confidencial' },
             { num: '2',    cap: 'Niveles educativos' },
             { num: '24/7', cap: 'Acceso a la plataforma' },
-            { num: '',    cap: 'Equipo de psicología que te acompaña' },
+            { num: '∞',   cap: 'Apoyo del equipo de psicología' },
           ].map((s) => (
             <div key={s.cap} className={`${styles.stat} ${styles.reveal}`}>
               <div className={styles.statNum}>{s.num}</div>

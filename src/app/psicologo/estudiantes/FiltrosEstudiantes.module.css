@@ -29,7 +29,7 @@
   pointer-events: none;
 }
 
-.spin { animation: spin 0.7s linear infinite; color: #1f5132; }
+.spin { animation: spin 0.7s linear infinite; color: #16a34a; }
 
 .searchInput {
   flex: 1;

@@ -26,7 +26,7 @@
   font-weight: 600;
   letter-spacing: .2em;
   text-transform: uppercase;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -37,7 +37,8 @@
   content: '';
   width: 30px;
   height: 1.5px;
-  background: #1f5132;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -171,7 +172,7 @@
   min-height: 4px;
 }
 
-.barLow  { background: #3a7d44; }
+.barLow  { background: #16a34a; }
 .barMid  { background: #c08a2e; }
 .barHigh { background: #b3473f; }
 
@@ -249,7 +250,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #1f5132;
+  color: #16a34a;
   margin-bottom: 16px;
 }
 
