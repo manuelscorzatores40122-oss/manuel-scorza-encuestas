@@ -3,11 +3,21 @@ import { ROLE_LABELS } from '@/lib/constants';
 import { Users, Plus } from 'lucide-react';
 import { TablaUsuarios } from './TablaUsuarios';
 
-export default async function UsuariosPage({ searchParams }: { searchParams: { rol?: string } }) {
+export default async function UsuariosPage({ searchParams }: { searchParams: { rol?: string; q?: string } }) {
+  const q = searchParams.q?.trim() || '';
   const where: any = {};
-  if (searchParams.rol) where.role = searchParams.rol;
-  // Por defecto NO mostramos estudiantes (son cientos), solo staff
-  if (!searchParams.rol) where.role = { not: 'STUDENT' };
+
+  if (searchParams.rol) {
+    where.role = searchParams.rol;
+  } else if (!q) {
+    // Sin búsqueda y sin rol: solo staff (los alumnos son cientos)
+    where.role = { not: 'STUDENT' };
+  }
+  // Con búsqueda sin rol: busca en todos los roles, incluidos alumnos
+
+  if (q) {
+    where.fullName = { contains: q, mode: 'insensitive' };
+  }
 
   const users = await prisma.user.findMany({
     where,
@@ -23,7 +33,17 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { r
         </h1>
       </div>
 
-      <form className="card flex gap-3 items-end">
+      <form className="card flex flex-wrap gap-3 items-end">
+        <div className="flex-1 min-w-[180px]">
+          <label className="label text-xs">Buscar por nombre</label>
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Nombre o apellido (incluye alumnos)…"
+            className="input"
+            autoComplete="off"
+          />
+        </div>
         <div>
           <label className="label text-xs">Filtrar por rol</label>
           <select name="rol" defaultValue={searchParams.rol || ''} className="input">
@@ -31,7 +51,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { r
             {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </div>
-        <button className="btn-primary" type="submit">Filtrar</button>
+        <button className="btn-primary" type="submit">Buscar</button>
       </form>
 
       <TablaUsuarios users={users.map((u) => ({

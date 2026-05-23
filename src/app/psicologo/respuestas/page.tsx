@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
 import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
 import { FiltrosRespuestas } from './FiltrosRespuestas';
-import { ImportarExcel } from './ImportarExcel';
 import styles from './page.module.css';
 
 const PAGE_SIZE = 50;
@@ -191,15 +190,6 @@ async function renderPage(searchParams: {
               Exportar archivo
             </button>
           </form>
-
-          {/* Importar */}
-          <ImportarExcel surveys={surveys} />
-        </div>
-
-        {/* ── Nota ── */}
-        <div className={styles.note}>
-          Encabezados aceptados: <b>DNI</b>, <b>P1</b>, <b>P2</b>, etc. También puedes usar el texto exacto de cada pregunta.
-          En selección múltiple, separa respuestas con coma, punto y coma o barra vertical.
         </div>
 
         {/* ── Tabla de resultados ── */}

@@ -76,14 +76,14 @@
 /* ── Herramientas (exportar | importar) ─── */
 .tools {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   border: 1.5px solid #15201a;
   margin-bottom: 48px;
 }
 
 .tool { padding: 30px 32px; }
 
-.tool:first-child { border-right: 1.5px solid #15201a; }
+.tool:first-child { border-right: none; }
 
 .toolHead {
   display: flex;
@@ -461,7 +461,7 @@
     grid-template-columns: 1fr;
   }
 
-  .tool:first-child { border-right: none; border-bottom: 1.5px solid #15201a; }
+  .tool:first-child { border-right: none; border-bottom: none; }
 }
 
 @media (max-width: 760px) {

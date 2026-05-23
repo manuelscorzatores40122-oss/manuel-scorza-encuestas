@@ -6,8 +6,12 @@ import {
   FileText,
   Upload,
   ShieldAlert,
+  ChevronRight,
+  GraduationCap,
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
+import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
+import styles from './page.module.css';
 
 export default async function AdminDashboard() {
   try {
@@ -24,226 +28,142 @@ export default async function AdminDashboard() {
       prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA' } }),
       prisma.user.count({ where: { isActive: true } }),
       prisma.survey.count(),
-      prisma.alert.count(),
+      prisma.alert.count({ where: { reviewedAt: null } }),
       prisma.alertRule.count({ where: { isActive: true } }),
       prisma.auditLog.findMany({
         orderBy: { createdAt: 'desc' },
         take: 8,
-        include: { user: true },
+        include: { user: { select: { fullName: true } } },
       }),
       prisma.student.count({
-        where: {
-          estadoMatricula: 'DEFINITIVA',
-          section: { grade: { nivel: 'PRIMARIA' } },
-        },
+        where: { estadoMatricula: 'DEFINITIVA', section: { grade: { nivel: 'PRIMARIA' } } },
       }),
       prisma.student.count({
-        where: {
-          estadoMatricula: 'DEFINITIVA',
-          section: { grade: { nivel: 'SECUNDARIA' } },
-        },
+        where: { estadoMatricula: 'DEFINITIVA', section: { grade: { nivel: 'SECUNDARIA' } } },
       }),
     ]);
 
     return (
-      <DashboardView
-        totalStudents={totalStudents}
-        totalUsers={totalUsers}
-        totalSurveys={totalSurveys}
-        totalAlerts={totalAlerts}
-        activeRules={activeRules}
-        recentLogs={recentLogs}
-        primaria={primaria}
-        secundaria={secundaria}
-      />
-    );
-  } catch (error) {
-    console.error('Error conectando a la base de datos:', error);
+      <div className={styles.page}>
 
-    return (
-      <div className="space-y-6 animate-fade-in">
-        <header>
-          <h1 className="text-2xl md:text-3xl font-bold">
-            Panel del Administrador
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Configuración y gestión global del sistema
-          </p>
+        {/* ── Encabezado ── */}
+        <header className={styles.header}>
+          <div>
+            <p className={styles.kick}>Panel · Administrador</p>
+            <h1 className={styles.pageTitle}>Resumen</h1>
+            <p className={styles.pageDesc}>Vista general del sistema PsicoEscolar</p>
+          </div>
         </header>
 
-        <div className="card border-red-200 bg-red-50">
-          <h2 className="font-semibold text-red-700 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            No se pudo conectar con la base de datos
-          </h2>
-
-          <p className="text-sm text-red-700 mt-2">
-            Prisma no puede conectarse a PostgreSQL/Neon. Revisa tu archivo
-            <code className="mx-1">.env</code>, la contraseña, el estado del
-            proyecto en Neon y la conexión de red.
-          </p>
-
-          <div className="mt-4 text-sm text-red-700 space-y-1">
-            <p>Prueba estos comandos:</p>
-            <pre className="bg-white rounded-lg p-3 overflow-x-auto text-xs">
-{`npx prisma db pull
-npx prisma generate
-npm run dev`}
-            </pre>
+        {/* ── Stats ── */}
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.iconBlue}`}>
+              <GraduationCap style={{ width: '1.1rem', height: '1.1rem' }} />
+            </div>
+            <p className={styles.statLabel}>Estudiantes</p>
+            <p className={styles.statValue}>{totalStudents}</p>
           </div>
+
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.iconPurple}`}>
+              <Users style={{ width: '1.1rem', height: '1.1rem' }} />
+            </div>
+            <p className={styles.statLabel}>Usuarios activos</p>
+            <p className={styles.statValue}>{totalUsers}</p>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.iconGreen}`}>
+              <ClipboardList style={{ width: '1.1rem', height: '1.1rem' }} />
+            </div>
+            <p className={styles.statLabel}>Encuestas</p>
+            <p className={styles.statValue}>{totalSurveys}</p>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.iconRed}`}>
+              <AlertTriangle style={{ width: '1.1rem', height: '1.1rem' }} />
+            </div>
+            <p className={styles.statLabel}>Alertas sin revisar</p>
+            <p className={styles.statValue}>{totalAlerts}</p>
+          </div>
+        </div>
+
+        {/* ── Fila inferior ── */}
+        <div className={styles.bottomGrid}>
+
+          {/* Distribución */}
+          <div className={styles.card}>
+            <p className={styles.cardTitle}>Distribución</p>
+            <div className={styles.distGrid}>
+              <div className={`${styles.distBox} ${styles.distBoxBlue}`}>
+                <p className={styles.distBoxLabel}>Primaria</p>
+                <p className={styles.distBoxValue}>{primaria}</p>
+              </div>
+              <div className={`${styles.distBox} ${styles.distBoxIndigo}`}>
+                <p className={styles.distBoxLabel}>Secundaria</p>
+                <p className={styles.distBoxValue}>{secundaria}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Acciones rápidas */}
+          <div className={styles.card}>
+            <p className={styles.cardTitle}>Acciones rápidas</p>
+            <div className={styles.actionsList}>
+              <Link href="/admin/usuarios" className={styles.actionBtn}>
+                <Users className={styles.actionIcon} />
+                Gestionar usuarios
+                <ChevronRight className={styles.actionArrow} />
+              </Link>
+              <Link href="/admin/importar" className={styles.actionBtn}>
+                <Upload className={styles.actionIcon} />
+                Importar SIAGIE
+                <ChevronRight className={styles.actionArrow} />
+              </Link>
+              <Link href="/admin/reglas" className={styles.actionBtn}>
+                <ShieldAlert className={styles.actionIcon} />
+                Reglas de alerta ({activeRules} activas)
+                <ChevronRight className={styles.actionArrow} />
+              </Link>
+              <Link href="/admin/auditoria" className={styles.actionBtn}>
+                <FileText className={styles.actionIcon} />
+                Ver auditoría
+                <ChevronRight className={styles.actionArrow} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Actividad reciente */}
+          <div className={styles.card}>
+            <p className={styles.cardTitle}>Actividad reciente</p>
+            <div className={styles.logList}>
+              {recentLogs.length === 0 && (
+                <p className={styles.logEmpty}>Sin registros aún.</p>
+              )}
+              {recentLogs.map((l) => (
+                <div key={l.id} className={styles.logItem}>
+                  <span className={styles.logDot} />
+                  <div>
+                    <p className={styles.logAction}>{l.action}</p>
+                    <p className={styles.logMeta}>
+                      {l.user?.fullName || 'Sistema'} ·{' '}
+                      {l.createdAt.toLocaleString('es-PE', {
+                        day: '2-digit', month: '2-digit',
+                        hour: '2-digit', minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
     );
+  } catch {
+    return <DatabaseUnavailable />;
   }
-}
-
-function DashboardView({
-  totalStudents,
-  totalUsers,
-  totalSurveys,
-  totalAlerts,
-  activeRules,
-  recentLogs,
-  primaria,
-  secundaria,
-}: {
-  totalStudents: number;
-  totalUsers: number;
-  totalSurveys: number;
-  totalAlerts: number;
-  activeRules: number;
-  recentLogs: Array<{
-    id: string;
-    action: string;
-    createdAt: Date;
-    user: { fullName: string | null } | null;
-  }>;
-  primaria: number;
-  secundaria: number;
-}) {
-  return (
-    <div className="space-y-6 animate-fade-in">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-bold">
-          Panel del Administrador
-        </h1>
-        <p className="text-slate-600 mt-1">
-          Configuración y gestión global del sistema
-        </p>
-      </header>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard
-          label="Estudiantes activos"
-          value={totalStudents}
-          icon={<Users className="w-5 h-5" />}
-          color="bg-brand-100 text-brand-700"
-        />
-        <StatCard
-          label="Usuarios del sistema"
-          value={totalUsers}
-          icon={<Users className="w-5 h-5" />}
-          color="bg-purple-100 text-purple-700"
-        />
-        <StatCard
-          label="Encuestas creadas"
-          value={totalSurveys}
-          icon={<ClipboardList className="w-5 h-5" />}
-          color="bg-emerald-100 text-emerald-700"
-        />
-        <StatCard
-          label="Alertas generadas"
-          value={totalAlerts}
-          icon={<AlertTriangle className="w-5 h-5" />}
-          color="bg-red-100 text-red-700"
-        />
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-4">
-        <div className="card lg:col-span-2">
-          <h2 className="font-semibold mb-4">
-            Distribución de estudiantes
-          </h2>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-xl bg-brand-50 border border-brand-100">
-              <p className="text-xs text-slate-500">Primaria</p>
-              <p className="text-3xl font-bold text-brand-700">
-                {primaria}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-warm-50 border border-warm-100">
-              <p className="text-xs text-slate-500">Secundaria</p>
-              <p className="text-3xl font-bold text-warm-700">
-                {secundaria}
-              </p>
-            </div>
-          </div>
-
-          <h3 className="font-semibold mt-6 mb-2">Acciones rápidas</h3>
-
-          <div className="grid sm:grid-cols-3 gap-2">
-            <Link href="/admin/importar" className="btn-secondary justify-start text-sm">
-              <Upload className="w-4 h-4" /> Importar SIAGIE
-            </Link>
-
-            <Link href="/admin/reglas" className="btn-secondary justify-start text-sm">
-              <ShieldAlert className="w-4 h-4" /> Reglas ({activeRules})
-            </Link>
-
-            <Link href="/admin/usuarios" className="btn-secondary justify-start text-sm">
-              <Users className="w-4 h-4" /> Usuarios
-            </Link>
-          </div>
-        </div>
-
-        <div className="card">
-          <h2 className="font-semibold mb-3 flex items-center gap-2">
-            <FileText className="w-4 h-4" /> Actividad reciente
-          </h2>
-
-          <ul className="space-y-2 text-sm">
-            {recentLogs.map((l) => (
-              <li key={l.id} className="border-l-2 border-slate-200 pl-3">
-                <p className="font-medium text-slate-900">{l.action}</p>
-                <p className="text-xs text-slate-500">
-                  {l.user?.fullName || 'Sistema'} ·{' '}
-                  {l.createdAt.toLocaleString('es-PE')}
-                </p>
-              </li>
-            ))}
-
-            {recentLogs.length === 0 && (
-              <li className="text-slate-500 text-xs">
-                Sin registros aún.
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  icon,
-  color,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  color: string;
-}) {
-  return (
-    <div className="card !p-4">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${color}`}>
-        {icon}
-      </div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
-    </div>
-  );
 }
