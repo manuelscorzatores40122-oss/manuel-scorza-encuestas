@@ -1,137 +1,110 @@
-/* ── Barra de filtros ───────────────────── */
+/* ── Barra de filtros — editorial ─────── */
 .bar {
   display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
   flex-wrap: wrap;
-  gap: 0.625rem;
-  align-items: center;
-  background: var(--bg-surface);
-  border: 0.5px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 0.875rem 1rem;
 }
 
-/* ── Buscador ────────────────────────────── */
+/* ── Buscador ────────────────────────── */
 .searchWrap {
-  position: relative;
   flex: 1;
-  min-width: 220px;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: #fbfaf6;
+  border: 1.5px solid rgba(21, 32, 26, .12);
+  padding: 12px 15px;
+  transition: border-color .18s;
 }
+
+.searchWrap:focus-within { border-color: #15201a; }
 
 .searchIcon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0.9rem;
-  height: 0.9rem;
-  color: var(--text-tertiary);
-  pointer-events: none;
+  width: 17px;
+  height: 17px;
+  color: #8a9089;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
-.spin {
-  animation: spin 0.7s linear infinite;
-  color: var(--brand);
-}
+.spin { animation: spin 0.7s linear infinite; color: #1f5132; }
 
 .searchInput {
-  width: 100%;
-  height: 2.25rem;
-  padding: 0 2.25rem 0 2.25rem; /* espacio para icono izq + X der */
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  font-size: 0.875rem;
-  background: var(--bg-surface);
-  color: var(--text-primary);
+  flex: 1;
+  border: none;
+  background: none;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  /* ocultar botón nativo del tipo search */
+  font-family: inherit;
+  font-size: .95rem;
+  color: #15201a;
   -webkit-appearance: none;
 }
 
-.searchInput:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
-}
-
-.searchInput::placeholder { color: var(--text-tertiary); }
-
-/* quitar X nativa del input[type=search] en webkit */
+.searchInput::placeholder { color: #8a9089; }
 .searchInput::-webkit-search-cancel-button { display: none; }
 
-/* botón limpiar texto */
 .clearInput {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border: none;
-  background: var(--bg-muted);
-  border-radius: 50%;
+  background: rgba(21, 32, 26, .08);
   cursor: pointer;
-  transition: background 0.1s;
   padding: 0;
+  flex-shrink: 0;
+  transition: background .1s;
 }
 
-.clearInput:hover { background: var(--border); }
+.clearInput:hover { background: rgba(21, 32, 26, .15); }
 
-.clearIcon {
-  width: 0.7rem;
-  height: 0.7rem;
-  color: var(--text-secondary);
-}
+.clearIcon { width: .65rem; height: .65rem; color: #56605a; }
 
-/* ── Dropdowns ───────────────────────────── */
+/* ── Selects ─────────────────────────── */
 .select {
-  height: 2.25rem;
-  padding: 0 0.75rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  font-size: 0.875rem;
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  outline: none;
+  background: #fbfaf6;
+  border: 1.5px solid rgba(21, 32, 26, .12);
+  padding: 12px 32px 12px 15px;
+  font-size: .9rem;
+  color: #56605a;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color .16s, color .16s;
+  font-weight: 500;
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%238a9089' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 13px;
 }
 
-.select:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
-}
+.select:hover,
+.select:focus { border-color: #15201a; color: #15201a; }
 
-/* ── Limpiar todo ────────────────────────── */
+/* ── Limpiar todo ────────────────────── */
 .clearAll {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  height: 2.25rem;
-  padding: 0 0.875rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
+  gap: 5px;
+  padding: 12px 15px;
+  border: 1.5px solid rgba(21, 32, 26, .12);
   background: transparent;
-  font-size: 0.8rem;
+  font-size: .88rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: #56605a;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition: border-color .15s, color .15s;
   white-space: nowrap;
+  font-family: inherit;
 }
 
-.clearAll:hover {
-  border-color: #dc2626;
-  color: #dc2626;
-  background: #fef2f2;
-}
+.clearAll:hover { border-color: #dc2626; color: #dc2626; }
 
-.clearAllIcon { width: 0.75rem; height: 0.75rem; }
+.clearAllIcon { width: .75rem; height: .75rem; }
 
-/* ── Spin animation ─────────────────────── */
-@keyframes spin {
-  to { transform: translateY(-50%) rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }

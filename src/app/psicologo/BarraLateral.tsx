@@ -11,7 +11,6 @@ import {
   TrendingUp,
   Newspaper,
   LogOut,
-  Brain,
 } from 'lucide-react';
 import { logoutAction } from '@/app/login/actions';
 import styles from './psicologo-layout.module.css';
@@ -46,13 +45,8 @@ export function BarraLateral() {
 
       {/* Cabecera */}
       <div className={styles.sidebarHeader}>
-        <div className={styles.sidebarLogo}>
-          <Brain className={styles.sidebarLogoIcon} />
-        </div>
-        <div className={styles.sidebarMeta}>
-          <p className={styles.sidebarAppName}>Bienestar Escolar</p>
-          <p className={styles.sidebarRole}>Psicólogo</p>
-        </div>
+        <p className={styles.sidebarAppName}>PsicoEscolar</p>
+        <span className={styles.sidebarRole}>Panel · Psicólogo</span>
       </div>
 
       {/* Navegación */}

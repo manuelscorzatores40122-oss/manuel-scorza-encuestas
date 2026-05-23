@@ -1,46 +1,355 @@
-/* ══════════════════════════════════════════
-   Página de Anuncios — Psicólogo
-   ══════════════════════════════════════════ */
+/* ══ Anuncios — editorial ═════════════════════ */
 
-.page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  animation: fadeUp 0.35s ease both;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Cabecera ────────────────────────── */
-.header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.heading {
+.page {
+  margin: -1.5rem -1.25rem;
+  animation: fadeIn 0.3s ease both;
+}
+
+@media (min-width: 640px)  { .page { margin: -1.75rem -1.5rem; } }
+@media (min-width: 1024px) { .page { margin: -2rem -2.5rem; } }
+
+/* ── Encabezado ──────────────────────────── */
+.header {
+  padding: 24px 20px 24px;
+  border-bottom: 1.5px solid #15201a;
+}
+
+@media (min-width: 768px) { .header { padding: 36px 48px 24px; } }
+
+.kick {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #1f5132;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  font-size: 1.375rem;
-  font-weight: 800;
-  color: #1c241a;
-  margin: 0;
-  letter-spacing: -0.02em;
+  gap: 11px;
 }
 
-.headingIcon {
-  width: 1.375rem;
-  height: 1.375rem;
-  color: #3c7424;
+.kick::before {
+  content: '';
+  width: 30px;
+  height: 1.5px;
+  background: #1f5132;
   flex-shrink: 0;
 }
 
-.sub {
-  font-size: 0.875rem;
-  color: #7a8773;
+.pageTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.2rem;
+  letter-spacing: -.02em;
+  line-height: 1;
+  color: #15201a;
+  margin: 0 0 9px;
+}
+
+.pageSub {
+  font-size: 1rem;
+  color: #56605a;
   margin: 0;
+}
+
+/* ── Layout dos columnas ─────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 400px) 1fr;
+}
+
+/* ── Columna formulario ──────────────────── */
+.colForm {
+  border-right: 1.5px solid #15201a;
+  padding: 36px 40px;
+}
+
+/* ── Columna feed ────────────────────────── */
+.colFeed {
+  padding: 36px 48px;
+  min-width: 0;
+}
+
+/* ── Título de sección ───────────────────── */
+.formTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: #15201a;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(21, 32, 26, .14);
+}
+
+/* ── Campos ──────────────────────────────── */
+.field {
+  margin-bottom: 22px;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #56605a;
+  margin-bottom: 9px;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: .96rem;
+  color: #15201a;
+  background: #fbfaf6;
+  border: 1.5px solid rgba(21, 32, 26, .12);
+  padding: 13px 15px;
+  border-radius: 0;
+  outline: none;
+  transition: border-color .18s;
+}
+
+.input::placeholder,
+.textarea::placeholder { color: #8a9089; }
+
+.input:focus,
+.textarea:focus { border-color: #15201a; }
+
+.textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.55;
+}
+
+.charRow {
+  display: flex;
+  justify-content: flex-end;
+  font-size: .74rem;
+  color: #8a9089;
+  margin-top: 6px;
+}
+
+/* ── Checkbox personalizado ──────────────── */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  user-select: none;
+  font-size: .95rem;
+  color: #15201a;
+}
+
+.checkBox {
+  width: 19px;
+  height: 19px;
+  border: 1.5px solid #15201a;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: background .16s;
+}
+
+.checkBox svg { opacity: 0; transition: opacity .16s; color: #f3f1ea; }
+.checkOn .checkBox { background: #15201a; }
+.checkOn .checkBox svg { opacity: 1; }
+
+.hint {
+  font-size: .78rem;
+  color: #8a9089;
+  margin-top: 10px;
+  line-height: 1.45;
+}
+
+/* ── Botón publicar ──────────────────────── */
+.submit {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #15201a;
+  color: #f3f1ea;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 16px;
+  border-radius: 0;
+  margin-top: 24px;
+  transition: background .2s, opacity .2s;
+}
+
+.submit:hover    { background: #15291b; }
+.submit:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Feed header ─────────────────────────── */
+.feedHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1.5px solid #15201a;
+  margin-bottom: 0;
+}
+
+.feedTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: #15201a;
+  margin: 0;
+}
+
+.feedCount { font-size: .85rem; color: #8a9089; }
+
+/* ── Post ────────────────────────────────── */
+.post {
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(21, 32, 26, .12);
+  animation: rise .4s ease both;
+}
+
+.post:last-child { border-bottom: none; }
+
+.postHidden { opacity: .55; }
+
+.postTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 5px;
+}
+
+.postTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.postH4 {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.22rem;
+  color: #15201a;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  margin: 0;
+}
+
+/* ── Tags ────────────────────────────────── */
+.tag {
+  font-size: .64rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tagPub { color: #1f5132; }
+.tagHid { color: #854f0b; }
+
+/* ── Acciones del post ───────────────────── */
+.postActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ibtn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(21, 32, 26, .14);
+  background: #fbfaf6;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #56605a;
+  transition: border-color .16s, color .16s;
+}
+
+.ibtn:hover { border-color: #15201a; color: #15201a; }
+.ibtn:disabled { opacity: .4; cursor: default; }
+
+.ibtnDanger:hover { border-color: #a32d2d; color: #a32d2d; }
+
+/* ── Meta y texto del post ───────────────── */
+.postMeta {
+  font-size: .82rem;
+  color: #8a9089;
+  margin-bottom: 16px;
+}
+
+.postMeta b { font-weight: 500; color: #56605a; }
+
+.postText {
+  font-size: .96rem;
+  color: #56605a;
+  white-space: pre-wrap;
+  line-height: 1.68;
+  max-width: 74ch;
+}
+
+/* ── Estado vacío ────────────────────────── */
+.empty {
+  padding: 60px 0 20px;
+  color: #8a9089;
+  font-size: .95rem;
+}
+
+/* ── Toast ───────────────────────────────── */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(16px);
+  background: #15201a;
+  color: #f3f1ea;
+  padding: 13px 22px;
+  font-size: .9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  z-index: 50;
+}
+
+.toastShow {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toastIcon { color: #5dcaa5; flex-shrink: 0; }
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: 1fr; }
+  .colForm { border-right: none; border-bottom: 1.5px solid #15201a; }
+}
+
+@media (max-width: 760px) {
+  .pageTitle { font-size: 1.8rem; }
+  .colForm,
+  .colFeed  { padding: 28px 20px; }
 }

@@ -12,3 +12,12 @@ export async function markAlertReviewedAction(alertId: string) {
   });
   revalidatePath('/psicologo/alertas');
 }
+
+export async function reopenAlertAction(alertId: string) {
+  await requireRole(['PSYCHOLOGIST']);
+  await prisma.alert.update({
+    where: { id: alertId },
+    data: { reviewedAt: null },
+  });
+  revalidatePath('/psicologo/alertas');
+}

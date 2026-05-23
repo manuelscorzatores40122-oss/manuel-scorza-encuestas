@@ -1,66 +1,94 @@
 .grid {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
   margin-bottom: 12px;
 }
 
 @media (min-width: 1024px) {
-  .grid         { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .cardWide     { grid-column: 1 / -1; }
+  .cardWide { grid-column: 1 / -1; }
 }
 
 .card {
-  background: var(--bg-surface);
-  border: 0.5px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 1.25rem;
+  padding: 28px 32px 28px 0;
+  border-right: 1px solid rgba(21, 32, 26, .14);
+  border-radius: 0;
+  background: transparent;
+}
+
+.card:last-child {
+  border-right: none;
+  padding-right: 0;
+  padding-left: 32px;
+}
+
+.cardWide {
+  grid-column: 1 / -1;
+  border-right: none;
+  padding: 28px 0 0;
+  border-top: 1px solid rgba(21, 32, 26, .14);
 }
 
 .header { margin-bottom: 16px; }
 
 .title {
-  margin: 0 0 2px;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-primary);
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #15201a;
 }
 
 .description {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-secondary);
+  margin: 0 0 24px;
+  font-size: .88rem;
+  color: #8a9089;
 }
 
 .chartBox      { height: 18rem; }
 .cardWide .chartBox { height: 14rem; }
 
-/* Estado vacío */
 .emptyChart {
-  height: 100%;
+  border: 1.5px dashed rgba(21, 32, 26, .14);
+  padding: 54px 24px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  gap: 6px;
-  padding: 2rem 1rem;
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--r-md);
 }
 
 .emptyIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--bg-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
+  width: 46px;
+  height: 46px;
+  border: 1.5px solid rgba(21, 32, 26, .14);
+  border-radius: 0;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  color: #8a9089;
   flex-shrink: 0;
 }
 
-.emptyIcon svg { width: 20px; height: 20px; color: var(--text-tertiary); }
+.emptyIcon svg { width: 22px; height: 22px; color: #8a9089; }
 
-.emptyTitle { margin: 0; font-size: 14px; font-weight: 500; color: var(--text-primary); }
-.emptyText  { margin: 0; font-size: 13px; color: var(--text-secondary); max-width: 240px; }
+.emptyTitle {
+  margin: 0 0 7px;
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #15201a;
+}
+
+.emptyText {
+  margin: 0;
+  font-size: .88rem;
+  color: #8a9089;
+  line-height: 1.55;
+  max-width: 32ch;
+}
+
+@media (max-width: 980px) {
+  .grid { grid-template-columns: 1fr; }
+  .card { border-right: none; border-bottom: 1px solid rgba(21, 32, 26, .14); padding: 24px 0; }
+  .card:last-child { padding-left: 0; border-bottom: none; }
+  .cardWide { padding: 24px 0 0; }
+}

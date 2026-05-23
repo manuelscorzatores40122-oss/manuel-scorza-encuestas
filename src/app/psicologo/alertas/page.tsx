@@ -1,100 +1,180 @@
 import Link from 'next/link';
-import { AlertTriangle, Check } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Check } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
-import { formatDateTime } from '@/lib/utils';
-import { RiskBadge } from '@/components/EtiquetaRiesgo';
-import { markAlertReviewedAction } from './actions';
+import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
+import { AccionesAlerta } from './AccionesAlerta';
+import styles from './alertas.module.css';
 
 export default async function AlertasPsicologo({
   searchParams,
-}: { searchParams: { tab?: string } }) {
-  const tab = searchParams.tab || 'pendientes';
+}: {
+  searchParams: { tab?: string };
+}) {
+  try {
+    return await renderPage(searchParams.tab || 'pendientes');
+  } catch {
+    return <DatabaseUnavailable />;
+  }
+}
 
-  const where: any = {};
-  if (tab === 'pendientes') where.reviewedAt = null;
-  if (tab === 'revisadas') where.reviewedAt = { not: null };
+async function renderPage(tab: string) {
+  const where =
+    tab === 'pendientes' ? { reviewedAt: null }
+    : tab === 'revisadas' ? { reviewedAt: { not: null } }
+    : {};
 
-  const alerts = await prisma.alert.findMany({
-    where,
-    include: {
-      rule: true,
-      response: {
-        include: {
-          student: { include: { section: { include: { grade: true } } } },
-          survey: true,
+  const [pendCount, revCount, totalCount, alerts] = await Promise.all([
+    prisma.alert.count({ where: { reviewedAt: null } }),
+    prisma.alert.count({ where: { reviewedAt: { not: null } } }),
+    prisma.alert.count(),
+    prisma.alert.findMany({
+      where,
+      include: {
+        rule: true,
+        response: {
+          include: {
+            survey: { select: { title: true } },
+            student: {
+              select: {
+                id: true,
+                nombres: true,
+                apellidoPaterno: true,
+                section: { include: { grade: { select: { name: true, nivel: true } } } },
+              },
+            },
+          },
         },
       },
-    },
-    orderBy: { triggeredAt: 'desc' },
-    take: 200,
-  });
+      orderBy: { triggeredAt: 'desc' },
+      take: 200,
+    }),
+  ]);
+
+  const tabs = [
+    { key: 'pendientes', label: 'Pendientes', count: pendCount },
+    { key: 'revisadas',  label: 'Revisadas',  count: revCount },
+    { key: 'todas',      label: 'Todas',       count: totalCount },
+  ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold flex items-center gap-2">
-        <AlertTriangle className="w-6 h-6 text-red-600" /> Bandeja de alertas
-      </h1>
+    <div className={styles.page}>
 
-      <div className="flex gap-1 border-b border-slate-200">
-        <Link href="?tab=pendientes" className={`px-4 py-2 text-sm font-medium ${tab === 'pendientes' ? 'text-brand-700 border-b-2 border-brand-600' : 'text-slate-500'}`}>
-          Pendientes
-        </Link>
-        <Link href="?tab=revisadas" className={`px-4 py-2 text-sm font-medium ${tab === 'revisadas' ? 'text-brand-700 border-b-2 border-brand-600' : 'text-slate-500'}`}>
-          Revisadas
-        </Link>
-        <Link href="?tab=todas" className={`px-4 py-2 text-sm font-medium ${tab === 'todas' ? 'text-brand-700 border-b-2 border-brand-600' : 'text-slate-500'}`}>
-          Todas
-        </Link>
-      </div>
+      {/* ── Encabezado + tabs ── */}
+      <header className={styles.header}>
+        <div className={styles.kick}>Seguimiento</div>
+        <h1 className={styles.pageTitle}>Bandeja de alertas</h1>
 
-      <div className="space-y-3">
-        {alerts.map((a) => (
-          <div key={a.id} className="card flex items-start gap-3 hover:shadow-md transition-shadow">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${a.severity === 'HIGH' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2 flex-wrap">
-                <div>
-                  <p className="font-semibold text-slate-900">
-                    {a.response.student.nombres} {a.response.student.apellidoPaterno}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {a.response.student.section.grade.nivel === 'PRIMARIA' ? 'Pri' : 'Sec'} {a.response.student.section.grade.name} {a.response.student.section.name}
-                  </p>
+        <div className={styles.tabs}>
+          {tabs.map((t) => (
+            <Link
+              key={t.key}
+              href={`?tab=${t.key}`}
+              className={`${styles.tab} ${tab === t.key ? styles.tabActive : ''}`}
+            >
+              {t.label}
+              <span className={styles.tabN}>{t.count}</span>
+            </Link>
+          ))}
+        </div>
+      </header>
+
+      {/* ── Lista ── */}
+      <div className={styles.body}>
+        {alerts.length === 0 ? (
+          <EmptyState tab={tab} />
+        ) : (
+          alerts.map((a) => {
+            const s      = a.response.student;
+            const grade  = s.section.grade;
+            const nivel  = grade.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria';
+            const sev    = a.severity as 'HIGH' | 'MID';
+            const isHigh = sev === 'HIGH';
+            const done   = !!a.reviewedAt;
+
+            return (
+              <div
+                key={a.id}
+                className={`${styles.alert} ${done ? styles.alertDone : ''}`}
+              >
+                {/* Ícono severidad */}
+                <div className={`${styles.sev} ${isHigh ? styles.sevHigh : styles.sevMid}`}>
+                  {isHigh
+                    ? <AlertTriangle />
+                    : <AlertCircle />
+                  }
                 </div>
-                <RiskBadge level={a.severity} />
+
+                {/* Contenido */}
+                <div className={styles.aBody}>
+                  <div className={styles.aTop}>
+                    <span className={styles.aName}>
+                      {s.apellidoPaterno}, {s.nombres}
+                    </span>
+                    <span className={`${styles.tag} ${isHigh ? styles.tagHigh : styles.tagMid}`}>
+                      {isHigh ? 'Riesgo alto' : 'Riesgo medio'}
+                    </span>
+                  </div>
+
+                  <div className={styles.aMeta}>
+                    <b>{a.rule.name}</b> · {a.response.survey.title} · {nivel} {grade.name} {s.section.name} · {timeAgo(a.triggeredAt)}
+                  </div>
+
+                  {a.detail && (
+                    <div className={styles.aText}>{a.detail}</div>
+                  )}
+
+                  {done && a.reviewedAt && (
+                    <div className={styles.aMeta} style={{ marginTop: '8px' }}>
+                      <Check style={{ display: 'inline', width: '12px', height: '12px', marginRight: '4px', color: '#1f5132' }} />
+                      Revisada {timeAgo(a.reviewedAt)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Acciones */}
+                <AccionesAlerta
+                  alertId={a.id}
+                  studentId={s.id}
+                  isReviewed={done}
+                />
               </div>
-              <p className="mt-2 text-sm text-slate-700">
-                <strong>{a.rule.name}:</strong> {a.detail}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">{formatDateTime(a.triggeredAt)}</p>
-              <div className="mt-3 flex gap-2 flex-wrap">
-                <Link href={`/psicologo/respuestas/${a.responseId}`} className="btn-secondary text-xs !py-1.5 !px-3">
-                  Ver respuesta
-                </Link>
-                {!a.reviewedAt && (
-                  <form action={markAlertReviewedAction.bind(null, a.id)}>
-                    <button className="btn-secondary text-xs !py-1.5 !px-3">
-                      <Check className="w-3 h-3" /> Marcar revisada
-                    </button>
-                  </form>
-                )}
-                {a.reviewedAt && (
-                  <span className="text-xs text-emerald-600 inline-flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Revisada {formatDateTime(a.reviewedAt)}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-        {alerts.length === 0 && (
-          <div className="card text-center text-slate-500 py-12">
-            No hay alertas {tab === 'pendientes' ? 'pendientes' : tab === 'revisadas' ? 'revisadas' : ''}.
-          </div>
+            );
+          })
         )}
       </div>
     </div>
   );
+}
+
+/* ── Estado vacío ── */
+function EmptyState({ tab }: { tab: string }) {
+  const messages: Record<string, [string, string]> = {
+    pendientes: ['Sin alertas pendientes',   'Cuando una respuesta supere los umbrales de riesgo, la verás aquí para revisarla.'],
+    revisadas:  ['Sin alertas revisadas',    'Las alertas que marques como revisadas aparecerán aquí.'],
+    todas:      ['Sin alertas',              'No hay alertas registradas por el momento.'],
+  };
+  const [title, text] = messages[tab] ?? messages.todas;
+
+  return (
+    <div className={styles.empty}>
+      <div className={styles.emptyIc}>
+        <Check />
+      </div>
+      <h3 className={styles.emptyTitle}>{title}</h3>
+      <p className={styles.emptyText}>{text}</p>
+    </div>
+  );
+}
+
+/* ── Helper ── */
+function timeAgo(date: Date): string {
+  const diff  = Date.now() - new Date(date).getTime();
+  const mins  = Math.floor(diff / 60_000);
+  const hours = Math.floor(diff / 3_600_000);
+  const days  = Math.floor(diff / 86_400_000);
+  if (days  > 1) return `hace ${days}d`;
+  if (days  === 1) return 'ayer';
+  if (hours > 0) return `hace ${hours}h`;
+  if (mins  > 1) return `hace ${mins}m`;
+  return 'ahora';
 }

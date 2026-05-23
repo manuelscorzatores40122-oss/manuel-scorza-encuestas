@@ -6,25 +6,16 @@ import { Power, Trash2 } from 'lucide-react';
 import { deleteSurveyAction, toggleSurveyAction } from './actions';
 import styles from './page.module.css';
 
-type AccionesEncuestaProps = {
+type Props = {
   id: string;
   title: string;
   isActive: boolean;
   responsesCount: number;
-  variant?: 'desktop' | 'mobile';
 };
 
-export function AccionesEncuesta({
-  id,
-  title,
-  isActive,
-  responsesCount,
-  variant = 'desktop',
-}: AccionesEncuestaProps) {
+export function AccionesEncuesta({ id, title, isActive, responsesCount }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const toggleClass = variant === 'mobile' ? styles.mobileToggleButton : styles.toggleButton;
-  const deleteClass = variant === 'mobile' ? styles.mobileDeleteButton : styles.deleteButton;
 
   function toggleSurvey() {
     startTransition(async () => {
@@ -37,7 +28,6 @@ export function AccionesEncuesta({
     const message = responsesCount > 0
       ? `La encuesta "${title}" tiene ${responsesCount} respuesta(s). Se eliminarán la encuesta, sus preguntas, respuestas y alertas asociadas. ¿Continuar?`
       : `¿Eliminar definitivamente la encuesta "${title}"?`;
-
     if (!window.confirm(message)) return;
 
     startTransition(async () => {
@@ -48,14 +38,24 @@ export function AccionesEncuesta({
 
   return (
     <>
-      <button type="button" className={toggleClass} disabled={pending} onClick={toggleSurvey}>
-        <Power className={styles.smallIcon} />
+      <button
+        type="button"
+        className={styles.act}
+        disabled={pending}
+        onClick={toggleSurvey}
+      >
+        <Power className={styles.actIcon} />
         {isActive ? 'Desactivar' : 'Activar'}
       </button>
 
-      <button type="button" className={deleteClass} disabled={pending} onClick={deleteSurvey}>
-        <Trash2 className={styles.smallIcon} />
-        {pending ? 'Procesando...' : 'Eliminar'}
+      <button
+        type="button"
+        className={`${styles.act} ${styles.actDanger}`}
+        disabled={pending}
+        onClick={deleteSurvey}
+      >
+        <Trash2 className={styles.actIcon} />
+        {pending ? 'Procesando…' : 'Eliminar'}
       </button>
     </>
   );

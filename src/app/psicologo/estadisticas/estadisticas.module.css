@@ -1,0 +1,370 @@
+/* ══ Estadísticas — editorial ════════════════ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page {
+  margin: -1.5rem -1.25rem;
+  animation: fadeIn 0.3s ease both;
+}
+
+@media (min-width: 640px)  { .page { margin: -1.75rem -1.5rem; } }
+@media (min-width: 1024px) { .page { margin: -2rem -2.5rem; } }
+
+/* ── Encabezado ──────────────────────────── */
+.header {
+  padding: 24px 20px 24px;
+  border-bottom: 1.5px solid #15201a;
+}
+
+@media (min-width: 768px) { .header { padding: 36px 48px 24px; } }
+
+.kick {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #1f5132;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.kick::before {
+  content: '';
+  width: 30px;
+  height: 1.5px;
+  background: #1f5132;
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.2rem;
+  letter-spacing: -.02em;
+  line-height: 1;
+  color: #15201a;
+  margin: 0 0 9px;
+}
+
+.pageSub {
+  font-size: 1rem;
+  color: #56605a;
+  margin: 0;
+}
+
+/* ── Cuerpo ──────────────────────────────── */
+.body {
+  padding: 0 20px 60px;
+}
+
+@media (min-width: 768px) { .body { padding: 0 48px 60px; } }
+
+/* ── Etiqueta de sección ─────────────────── */
+.glabel {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #8a9089;
+  padding: 34px 0 14px;
+  border-bottom: 1px solid rgba(21, 32, 26, .12);
+}
+
+/* ── KPIs ────────────────────────────────── */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1.5px solid #15201a;
+  border-top: none;
+}
+
+.kpi {
+  padding: 24px 26px;
+  border-right: 1px solid rgba(21, 32, 26, .12);
+}
+
+.kpi:last-child { border-right: none; }
+
+.kpiLbl {
+  font-size: .82rem;
+  color: #56605a;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.kpiNum {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: #15201a;
+}
+
+.kpiNumAlert { color: #a32d2d; }
+
+.kpiSub {
+  font-size: .8rem;
+  color: #8a9089;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+/* ── Gráficos ────────────────────────────── */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1.5px solid #15201a;
+  border-left: 1.5px solid #15201a;
+  border-right: 1.5px solid #15201a;
+}
+
+.chart {
+  padding: 28px 30px;
+  border-bottom: 1.5px solid #15201a;
+}
+
+.chart:nth-child(odd) { border-right: 1.5px solid #15201a; }
+
+.chartTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #15201a;
+  margin: 0 0 4px;
+}
+
+.chartDesc {
+  font-size: .85rem;
+  color: #8a9089;
+  margin-bottom: 26px;
+  line-height: 1.45;
+}
+
+/* ── Barras ──────────────────────────────── */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  height: 180px;
+  padding-top: 10px;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 100%;
+  max-width: 46px;
+  min-height: 4px;
+}
+
+.barLow  { background: #3a7d44; }
+.barMid  { background: #c08a2e; }
+.barHigh { background: #b3473f; }
+
+.barVal {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: .95rem;
+  color: #15201a;
+}
+
+.barLbl {
+  font-size: .74rem;
+  color: #8a9089;
+  text-align: center;
+}
+
+/* ── Línea de tendencia ──────────────────── */
+.lineWrap {
+  height: 180px;
+  position: relative;
+}
+
+.lineSvg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.noData {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: .85rem;
+  color: #8a9089;
+}
+
+.legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.leg {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .78rem;
+  color: #56605a;
+}
+
+.sw {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Indicadores de conducta ─────────────── */
+.indGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1.5px solid #15201a;
+  border-top: none;
+}
+
+.ind {
+  padding: 24px 26px;
+  border-right: 1px solid rgba(21, 32, 26, .12);
+}
+
+.ind:last-child { border-right: none; }
+
+.indTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1f5132;
+  margin-bottom: 16px;
+}
+
+.indTop span {
+  font-size: .88rem;
+  color: #56605a;
+  font-weight: 500;
+}
+
+.indV {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: #15201a;
+}
+
+.indVscale {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: 1rem;
+  color: #8a9089;
+}
+
+.indVAlert { color: #b3473f; }
+
+.indVsub {
+  font-size: .8rem;
+  color: #8a9089;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+/* ── Proyección predictiva ───────────────── */
+.pred {
+  border: 1.5px solid #15201a;
+  border-top: none;
+  padding: 28px 30px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: end;
+}
+
+.predTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #15201a;
+  margin: 0 0 4px;
+}
+
+.predDesc {
+  font-size: .85rem;
+  color: #8a9089;
+  margin-bottom: 22px;
+  line-height: 1.45;
+}
+
+.predStats {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.predStat { display: flex; flex-direction: column; }
+
+.predStatL {
+  font-size: .78rem;
+  color: #8a9089;
+  margin-bottom: 6px;
+}
+
+.predStatN {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 1;
+  color: #15201a;
+}
+
+.conf { text-align: right; }
+
+.confL {
+  font-size: .78rem;
+  color: #8a9089;
+  margin-bottom: 6px;
+}
+
+.confN {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2rem;
+  color: #9a5a0c;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 1000px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi  { border-bottom: 1px solid rgba(21, 32, 26, .12); }
+
+  .charts  { grid-template-columns: 1fr; }
+  .indGrid { grid-template-columns: 1fr; }
+  .chart:nth-child(odd) { border-right: none; }
+  .ind { border-right: none; border-bottom: 1px solid rgba(21, 32, 26, .12); }
+  .ind:last-child { border-bottom: none; }
+
+  .pred { grid-template-columns: 1fr; }
+  .conf { text-align: left; }
+}
+
+@media (max-width: 760px) {
+  .pageTitle { font-size: 1.8rem; }
+  .kpi  { padding: 18px 16px; }
+  .chart { padding: 24px 20px; }
+  .ind  { padding: 20px 16px; }
+  .pred { padding: 24px 20px; }
+  .predStats { gap: 28px; }
+}

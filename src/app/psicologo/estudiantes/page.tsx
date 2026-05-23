@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { Users, ArrowRight } from 'lucide-react';
+import { ArrowRight, Users } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { FiltrosEstudiantes } from './FiltrosEstudiantes';
+import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
 import styles from './page.module.css';
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 20;
 
 export default async function EstudiantesPsicologo({
   searchParams,
@@ -18,6 +19,21 @@ export default async function EstudiantesPsicologo({
     page?: string;
   };
 }) {
+  try {
+    return await renderPage(searchParams);
+  } catch {
+    return <DatabaseUnavailable />;
+  }
+}
+
+async function renderPage(searchParams: {
+  q?: string;
+  nivel?: string;
+  gradoId?: string;
+  sectionId?: string;
+  riesgo?: string;
+  page?: string;
+}) {
   const page = Number(searchParams.page || '1');
 
   const where: any = { estadoMatricula: 'DEFINITIVA' };
@@ -30,7 +46,6 @@ export default async function EstudiantesPsicologo({
     ];
   }
 
-  /* filtro de ubicación: sección > grado > nivel (más específico gana) */
   if (searchParams.sectionId) {
     where.sectionId = searchParams.sectionId;
   } else if (searchParams.gradoId) {
@@ -47,12 +62,11 @@ export default async function EstudiantesPsicologo({
     prisma.student.findMany({
       where,
       include: {
-        section:    { include: { grade: true } },
-        apoderados: { take: 3 },
+        section: { include: { grade: true } },
         responses: {
           orderBy: { submittedAt: 'desc' },
           take: 1,
-          select: { riskLevel: true, riskScore: true, submittedAt: true },
+          select: { riskLevel: true },
         },
         _count: { select: { responses: true } },
       },
@@ -83,202 +97,136 @@ export default async function EstudiantesPsicologo({
     return `?${p.toString()}`;
   }
 
-  const riskLabel = (level?: string) =>
-    level === 'HIGH' ? 'Alto' : level === 'MID' ? 'Medio' : level === 'LOW' ? 'Bajo' : null;
-
   return (
     <div className={styles.page}>
 
-      {/* ── Header ── */}
+      {/* ── Encabezado ── */}
       <header className={styles.header}>
         <div>
+          <div className={styles.kick}>Directorio</div>
           <h1 className={styles.pageTitle}>Estudiantes</h1>
-          <p className={styles.pageSubtitle}>
-            {total} estudiante{total !== 1 ? 's' : ''} matriculados
-          </p>
+        </div>
+        <div className={styles.total}>
+          <b>{total}</b> matriculados · 2026
         </div>
       </header>
 
-      {/* ── Filters ── */}
-      <FiltrosEstudiantes grades={grades} sections={sections} />
+      <div className={styles.body}>
 
-      {/* ══ MOBILE list (< 768 px) ══════════════════ */}
-      <div className={styles.mobileList}>
-        {students.length > 0 ? students.map((s) => {
-          const lastResp = s.responses[0];
-          const contact =
-            s.apoderados.find((a) => a.esContactoPrincipal) ||
-            s.apoderados.find((a) => a.parentesco === 'APODERADO') ||
-            s.apoderados[0];
-          return (
-            <div key={s.id} className={styles.mobileRow}>
-              <div className={styles.mobileInfo}>
+        {/* ── Filtros ── */}
+        <FiltrosEstudiantes grades={grades} sections={sections} />
 
-                {/* Alumno */}
-                <span className={styles.mobileName}>
-                  {s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}
-                </span>
-                <span className={styles.mobileSub}>
-                  {s.section.grade.name} {s.section.name}
-                  {lastResp && (
-                    <>
-                      {' · '}
-                      <span className={styles.riskBadge} data-risk={lastResp.riskLevel}>
-                        {riskLabel(lastResp.riskLevel)}
-                      </span>
-                    </>
-                  )}
-                </span>
-
-                {/* Apoderado */}
-                {contact ? (
-                  <span className={styles.mobileParent}>
-                    <span className={styles.mobileParentName}>
-                      {contact.apellidosNombres}
-                    </span>
-                    <span className={styles.mobileParentPhone}>
-                      {contact.celular || 'Sin celular'}
-                    </span>
-                  </span>
-                ) : (
-                  <span className={styles.mobileParentEmpty}>Sin apoderado</span>
-                )}
-
-              </div>
-              <Link
-                href={`/psicologo/estudiantes/${s.id}`}
-                className={styles.mobileVerBtn}
-              >
-                Ver <ArrowRight className={styles.viewIcon} />
-              </Link>
-            </div>
-          );
-        }) : (
-          <div className={styles.empty}>
-            <Users className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>Sin resultados</p>
-            <p className={styles.emptyText}>No hay estudiantes con esos filtros.</p>
+        {/* ── Tabla ── */}
+        <div className={styles.table}>
+          <div className={styles.thead}>
+            <span>Estudiante</span>
+            <span>Grado / sección</span>
+            <span>Edad</span>
+            <span>Últ. riesgo</span>
+            <span className={styles.r}>Encuestas</span>
+            <span className={styles.r}>Acción</span>
           </div>
-        )}
-      </div>
 
-      {/* ══ DESKTOP table (≥ 768 px) ════════════════ */}
-      <div className={styles.tableCard}>
-        {students.length > 0 ? (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th className={styles.th}>Estudiante</th>
-                <th className={styles.th}>Grado / Secc.</th>
-                <th className={`${styles.th} ${styles.thCenter}`}>Edad</th>
-                <th className={`${styles.th} ${styles.thCenter}`}>Últ. riesgo</th>
-                <th className={`${styles.th} ${styles.thCenter}`}>Encuestas</th>
-                <th className={styles.th}>Contacto</th>
-                <th className={styles.th}></th>
-              </tr>
-            </thead>
-            <tbody>
+          {students.length === 0 ? (
+            <div className={styles.empty}>
+              <Users className={styles.emptyIcon} />
+              <p className={styles.emptyTitle}>Sin resultados</p>
+              <p className={styles.emptyText}>
+                No hay estudiantes que coincidan con los filtros aplicados.
+              </p>
+            </div>
+          ) : (
+            <div>
               {students.map((s) => {
                 const lastResp = s.responses[0];
-                const contact =
-                  s.apoderados.find((a) => a.esContactoPrincipal) ||
-                  s.apoderados.find((a) => a.parentesco === 'APODERADO') ||
-                  s.apoderados[0];
-
+                const nivel    = s.section.grade.nivel;
+                const initials = avatarInitials(s.apellidoPaterno, s.nombres);
                 return (
-                  <tr key={s.id} className={styles.row}>
+                  <Link
+                    key={s.id}
+                    href={`/psicologo/estudiantes/${s.id}`}
+                    className={styles.row}
+                  >
+                    {/* Estudiante */}
+                    <div className={styles.stu}>
+                      <div className={styles.ava}>{initials}</div>
+                      <div className={styles.stuInfo}>
+                        <div className={styles.stuName}>
+                          {s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}
+                        </div>
+                        <div className={`${styles.level} ${nivel === 'PRIMARIA' ? styles.levelPri : styles.levelSec}`}>
+                          {nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria'}
+                        </div>
+                      </div>
+                    </div>
 
-                    <td className={styles.tdName}>
-                      <span className={styles.studentName}>
-                        {s.apellidoPaterno} {s.apellidoMaterno}, {s.nombres}
-                      </span>
-                      <span
-                        className={styles.nivelBadge}
-                        data-nivel={s.section.grade.nivel}
-                      >
-                        {s.section.grade.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria'}
-                      </span>
-                    </td>
+                    {/* Grado / sección */}
+                    <div className={`${styles.cell} ${styles.cellGrade}`}>
+                      {s.section.grade.name} — {s.section.name}
+                    </div>
 
-                    <td className={styles.td}>
-                      {s.section.grade.name} &mdash; {s.section.name}
-                    </td>
+                    {/* Edad */}
+                    <div className={`${styles.cell} ${styles.cellEdad}`}>
+                      {s.edad}
+                    </div>
 
-                    <td className={`${styles.td} ${styles.tdCenter}`}>{s.edad}</td>
-
-                    <td className={`${styles.td} ${styles.tdCenter}`}>
+                    {/* Riesgo */}
+                    <div className={`${styles.cell} ${styles.cellRisk}`}>
                       {lastResp ? (
-                        <span className={styles.riskBadge} data-risk={lastResp.riskLevel}>
-                          {riskLabel(lastResp.riskLevel)}
-                        </span>
+                        <RiskBadge level={lastResp.riskLevel} />
                       ) : (
-                        <span className={styles.dash}>—</span>
+                        <span className={styles.riskNone} />
                       )}
-                    </td>
+                    </div>
 
-                    <td className={`${styles.td} ${styles.tdCenter}`}>
+                    {/* Encuestas */}
+                    <div className={`${styles.cell} ${styles.cellRight} ${styles.cellEnc}`}>
                       {s._count.responses}
-                    </td>
+                    </div>
 
-                    <td className={styles.tdContact}>
-                      {contact ? (
-                        <>
-                          <span className={styles.contactName}>
-                            {contact.apellidosNombres}
-                          </span>
-                          <span className={styles.contactPhone}>
-                            {contact.celular || 'Sin celular'}
-                          </span>
-                        </>
-                      ) : (
-                        <span className={styles.dash}>—</span>
-                      )}
-                    </td>
-
-                    <td className={styles.tdAction}>
-                      <Link
-                        href={`/psicologo/estudiantes/${s.id}`}
-                        className={styles.viewBtn}
-                      >
-                        Ver <ArrowRight className={styles.viewIcon} />
-                      </Link>
-                    </td>
-
-                  </tr>
+                    {/* Acción */}
+                    <div className={styles.viewCell}>
+                      <span className={styles.viewLink}>
+                        Ver ficha <ArrowRight className={styles.viewLinkIcon} />
+                      </span>
+                    </div>
+                  </Link>
                 );
               })}
-            </tbody>
-          </table>
-        ) : (
-          <div className={styles.empty}>
-            <Users className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>Sin resultados</p>
-            <p className={styles.emptyText}>
-              No hay estudiantes que coincidan con los filtros aplicados.
-            </p>
+            </div>
+          )}
+        </div>
+
+        {/* ── Paginación ── */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            {page > 1 ? (
+              <Link href={buildHref({ page: String(page - 1) })} className={styles.pageBtn}>
+                ← Anterior
+              </Link>
+            ) : <span />}
+            <span className={styles.pageInfo}>{from}–{to} de {total}</span>
+            {page < totalPages ? (
+              <Link href={buildHref({ page: String(page + 1) })} className={styles.pageBtn}>
+                Siguiente →
+              </Link>
+            ) : <span />}
           </div>
         )}
+
       </div>
-
-      {/* ── Pagination ── */}
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          {page > 1 ? (
-            <Link href={buildHref({ page: String(page - 1) })} className={styles.pageBtn}>
-              ← Anterior
-            </Link>
-          ) : <span />}
-
-          <span className={styles.pageInfo}>{from}–{to} de {total}</span>
-
-          {page < totalPages ? (
-            <Link href={buildHref({ page: String(page + 1) })} className={styles.pageBtn}>
-              Siguiente →
-            </Link>
-          ) : <span />}
-        </div>
-      )}
-
     </div>
   );
+}
+
+/* ── Helpers ── */
+
+function avatarInitials(apellido: string, nombres: string): string {
+  return ((apellido[0] || '') + (nombres[0] || '')).toUpperCase();
+}
+
+function RiskBadge({ level }: { level: string }) {
+  const cls = level === 'HIGH' ? styles.riskHigh : level === 'MID' ? styles.riskMid : styles.riskLow;
+  const txt = level === 'HIGH' ? 'Alto' : level === 'MID' ? 'Medio' : 'Bajo';
+  return <span className={`${styles.riskBadge} ${cls}`}>{txt}</span>;
 }

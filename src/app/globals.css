@@ -47,7 +47,7 @@ body {
   background: #fff;
   color-scheme: light;
   color: var(--foreground);
-  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-outfit), 'Outfit', system-ui, -apple-system, sans-serif;
   font-size: 1rem;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;

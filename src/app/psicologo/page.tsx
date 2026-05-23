@@ -16,9 +16,6 @@ import { BuscadorEstudiantes } from './BuscadorEstudiantes';
 import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
 import styles from './dashboard.module.css';
 
-/**
- * Panel principal del psicólogo.
- */
 export default async function PsicologoDashboard() {
   try {
     return await renderDashboard();
@@ -93,16 +90,17 @@ async function renderDashboard() {
 
   const tasaRespuesta = totalEstudiantes > 0
     ? `${Math.round((totalRespuestas / totalEstudiantes) * 100)}%`
-    : '—';
+    : '0%';
 
   return (
     <div className={styles.page}>
 
-      {/* Encabezado */}
+      {/* ── Encabezado ─────────────────────── */}
       <header className={styles.header}>
         <div>
-          <h1 className={styles.pageTitle}>Panel del psicólogo</h1>
-          <p className={styles.pageSubtitle}>Resumen del bienestar estudiantil · I.E. 40122</p>
+          <div className={styles.kick}>Panel del psicólogo</div>
+          <h1 className={styles.pageTitle}>Resumen de bienestar</h1>
+          <p className={styles.pageSubtitle}>Institución Educativa 40122 Manuel Scorza Torres</p>
         </div>
         <Link href="/psicologo/encuestas/nueva" className={styles.btnPrimary}>
           <Plus className={styles.btnPrimaryIcon} />
@@ -110,148 +108,141 @@ async function renderDashboard() {
         </Link>
       </header>
 
-      {/* Buscador de alumnos */}
-      <BuscadorEstudiantes />
+      <div className={styles.body}>
 
-      {/* Grupo 1: Requiere atención */}
-      <p className={styles.sectionLabel}>Requiere tu atención</p>
-      <section className={`${styles.grid} ${styles.gridAttention}`}>
-        <StatCard
-          icon={<AlertTriangle />}
-          iconVariant="danger"
-          label="Alertas pendientes"
-          value={alertasPendientes}
-          hint={alertasPendientes === 0 ? { text: 'Todo en orden', success: true } : undefined}
-          link={alertasPendientes > 0 ? { href: '/psicologo/alertas', text: 'Revisar ahora →' } : undefined}
-        />
-        <StatCard
-          icon={<ClipboardList />}
-          iconVariant="info"
-          label="Encuestas activas"
-          value={encuestasActivas}
-          link={{ href: '/psicologo/encuestas/nueva', text: 'Lanzar una →' }}
-        />
-        <StatCard
-          icon={<TrendingUp />}
-          iconVariant="neutral"
-          label="Respuestas recibidas"
-          value={totalRespuestas}
-          hint={encuestasActivas === 0 ? { text: 'Sin encuestas activas' } : undefined}
-          link={encuestasActivas > 0 ? { href: '/psicologo/respuestas', text: 'Ver respuestas →' } : undefined}
-        />
-      </section>
+        {/* ── Buscador ───────────────────── */}
+        <BuscadorEstudiantes />
 
-      {/* Grupo 2: Contexto general */}
-      <p className={styles.sectionLabel}>Contexto general</p>
-      <section className={`${styles.grid} ${styles.gridContext}`}>
-        <MiniStat icon={<Users />}       label="Estudiantes"        value={totalEstudiantes}    />
-        <MiniStat icon={<Megaphone />}   label="Anuncios"           value={anunciosPublicados}  />
-        <MiniStat icon={<TrendingUp />}  label="Tasa de respuesta"  value={tasaRespuesta} empty={totalRespuestas === 0} />
-      </section>
-
-      {/* Analítica */}
-      <div className={styles.analyticsHead}>
-        <h2 className={styles.analyticsTitle}>Analítica</h2>
-        <Link href="/psicologo/estadisticas" className={styles.linkArrow}>
-          Ver estadísticas →
-        </Link>
-      </div>
-      <GraficosDashboard riskDist={riskDist} trend={trend} riskByGrade={riskByGrade} />
-
-      {/* Alertas recientes */}
-      <div className={styles.alertsHead}>
-        <h2 className={styles.alertsTitle}>Alertas recientes</h2>
-        <Link href="/psicologo/alertas" className={styles.linkArrow}>Ver todas →</Link>
-      </div>
-      {ultimasAlertas.length === 0 ? (
-        <p className={styles.alertEmpty}>No hay alertas pendientes ✓</p>
-      ) : (
-        <div className={styles.alertList}>
-          {ultimasAlertas.map((a) => {
-            const level      = a.response.riskLevel as 'LOW' | 'MID' | 'HIGH';
-            const dotClass   = level === 'HIGH' ? styles.alertDotHigh   : level === 'MID' ? styles.alertDotMid   : styles.alertDotLow;
-            const badgeClass = level === 'HIGH' ? styles.alertBadgeHigh : level === 'MID' ? styles.alertBadgeMid : styles.alertBadgeLow;
-            const badgeText  = level === 'HIGH' ? 'ALTO' : level === 'MID' ? 'MEDIO' : 'BAJO';
-            return (
-              <Link key={a.id} href="/psicologo/alertas" className={styles.alertRow}>
-                <span className={`${styles.alertDot} ${dotClass}`} />
-                <span className={styles.alertName}>
-                  {a.response.student.apellidoPaterno}, {a.response.student.nombres}
-                </span>
-                <span className={styles.alertSurvey}>{a.response.survey.title}</span>
-                <span className={`${styles.alertBadge} ${badgeClass}`}>{badgeText}</span>
-                <span className={styles.alertTime}>{timeAgo(a.triggeredAt)}</span>
-              </Link>
-            );
-          })}
+        {/* ── KPIs: requiere atención ────── */}
+        <p className={styles.sectionLabel}>Requiere tu atención</p>
+        <div className={styles.kpiGrid}>
+          <KpiCell
+            icon={<AlertTriangle className={styles.kpiTopIcon} />}
+            alert
+            label="Alertas pendientes"
+            value={alertasPendientes}
+            meta={alertasPendientes === 0 ? 'Todo en orden' : undefined}
+            link={alertasPendientes > 0 ? { href: '/psicologo/alertas', text: 'Revisar ahora →' } : undefined}
+          />
+          <KpiCell
+            icon={<ClipboardList className={styles.kpiTopIcon} />}
+            label="Encuestas activas"
+            value={encuestasActivas}
+            link={{ href: '/psicologo/encuestas/nueva', text: 'Lanzar una →' }}
+          />
+          <KpiCell
+            icon={<TrendingUp className={styles.kpiTopIcon} />}
+            label="Respuestas recibidas"
+            value={totalRespuestas}
+            link={totalRespuestas > 0 ? { href: '/psicologo/respuestas', text: 'Ver respuestas →' } : undefined}
+          />
         </div>
-      )}
 
+        {/* ── Contexto general ───────────── */}
+        <p className={styles.sectionLabel}>Contexto general</p>
+        <div className={styles.ctxGrid}>
+          <CtxCell icon={<Users />}      label="Estudiantes"       value={totalEstudiantes} />
+          <CtxCell icon={<Megaphone />}  label="Anuncios"          value={anunciosPublicados} />
+          <CtxCell icon={<TrendingUp />} label="Tasa de respuesta" value={tasaRespuesta} />
+        </div>
+
+        {/* ── Analítica ──────────────────── */}
+        <div className={styles.secBar}>
+          <h2 className={styles.secBarTitle}>Analítica</h2>
+          <Link href="/psicologo/estadisticas" className={styles.linkArrow}>
+            Ver estadísticas completas →
+          </Link>
+        </div>
+        <GraficosDashboard riskDist={riskDist} trend={trend} riskByGrade={riskByGrade} />
+
+        {/* ── Alertas recientes ──────────── */}
+        <div className={styles.alertsHead}>
+          <h2 className={styles.alertsTitle}>Alertas recientes</h2>
+          <Link href="/psicologo/alertas" className={styles.linkArrow}>Ver todas →</Link>
+        </div>
+        {ultimasAlertas.length === 0 ? (
+          <p className={styles.alertEmpty}>No hay alertas pendientes.</p>
+        ) : (
+          <div className={styles.alertList}>
+            {ultimasAlertas.map((a) => {
+              const level      = a.response.riskLevel as 'LOW' | 'MID' | 'HIGH';
+              const dotClass   = level === 'HIGH' ? styles.alertDotHigh : level === 'MID' ? styles.alertDotMid : styles.alertDotLow;
+              const badgeClass = level === 'HIGH' ? styles.alertBadgeHigh : level === 'MID' ? styles.alertBadgeMid : styles.alertBadgeLow;
+              const badgeText  = level === 'HIGH' ? 'ALTO' : level === 'MID' ? 'MEDIO' : 'BAJO';
+              return (
+                <Link key={a.id} href="/psicologo/alertas" className={styles.alertRow}>
+                  <span className={`${styles.alertDot} ${dotClass}`} />
+                  <span className={styles.alertName}>
+                    {a.response.student.apellidoPaterno}, {a.response.student.nombres}
+                  </span>
+                  <span className={styles.alertSurvey}>{a.response.survey.title}</span>
+                  <span className={`${styles.alertBadge} ${badgeClass}`}>{badgeText}</span>
+                  <span className={styles.alertTime}>{timeAgo(a.triggeredAt)}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
 
-function StatCard({
+/* ── Componentes internos ────────────────── */
+
+function KpiCell({
   icon,
-  iconVariant,
+  alert,
   label,
   value,
-  hint,
+  meta,
   link,
 }: {
   icon: React.ReactNode;
-  iconVariant: 'danger' | 'info' | 'neutral';
+  alert?: boolean;
   label: string;
   value: number;
-  hint?: { text: string; success?: boolean };
+  meta?: string;
   link?: { href: string; text: string };
 }) {
-  const iconClass =
-    iconVariant === 'danger' ? styles.statIconDanger :
-    iconVariant === 'info'   ? styles.statIconInfo   :
-                               styles.statIconNeutral;
   return (
-    <article className={styles.card}>
-      <div className={styles.statHead}>
-        <span className={`${styles.statIcon} ${iconClass}`}>{icon}</span>
-        <span className={styles.statLabel}>{label}</span>
+    <div className={`${styles.kpi} ${alert ? styles.kpiAlert : ''}`}>
+      <div className={styles.kpiTop}>
+        {icon}
+        {label}
       </div>
-      <div className={styles.statValueRow}>
-        <span className={styles.statValue}>{value}</span>
-        {hint && (
-          <span className={`${styles.statHint} ${hint.success ? styles.statHintSuccess : ''}`}>
-            {hint.text}
-          </span>
-        )}
-        {link && <Link href={link.href} className={styles.statLink}>{link.text}</Link>}
+      <div className={styles.kpiNum}>{value}</div>
+      <div className={styles.kpiMeta}>
+        {meta ?? (link && (
+          <Link href={link.href} className={styles.kpiLink}>{link.text}</Link>
+        ))}
       </div>
-    </article>
+    </div>
   );
 }
 
-function MiniStat({
+function CtxCell({
   icon,
   label,
   value,
-  empty,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | number;
-  empty?: boolean;
 }) {
   return (
-    <article className={styles.ministat}>
-      <div className={styles.ministatHead}>
+    <div className={styles.ctxItem}>
+      <div className={styles.ctxLabel}>
         {icon}
-        <span>{label}</span>
+        {label}
       </div>
-      <span className={`${styles.ministatValue} ${empty ? styles.ministatValueEmpty : ''}`}>
-        {value}
-      </span>
-    </article>
+      <div className={styles.ctxValue}>{value}</div>
+    </div>
   );
 }
+
+/* ── Helpers ─────────────────────────────── */
 
 function timeAgo(date: Date): string {
   const diff  = Date.now() - date.getTime();
@@ -266,15 +257,10 @@ function timeAgo(date: Date): string {
 
 function daysAgo(days: number): Date {
   const date = new Date();
-
   date.setDate(date.getDate() - days);
-
   return date;
 }
 
-/**
- * Agrupa respuestas por día con desglose LOW/MID/HIGH
- */
 function bucketByDay(
   items: { submittedAt: Date; riskLevel: string }[],
   days: number
@@ -306,9 +292,6 @@ function bucketByDay(
   return buckets;
 }
 
-/**
- * Agrupa respuestas por grado con desglose LOW/MID/HIGH
- */
 function buildRiskByGrade(
   items: {
     riskLevel: string;

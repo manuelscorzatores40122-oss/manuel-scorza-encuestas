@@ -1,182 +1,144 @@
 import Link from 'next/link';
-
-import {
-  Plus,
-  ClipboardList,
-  ChevronDown,
-  Users,
-} from 'lucide-react';
+import { Plus, Eye, ClipboardList } from 'lucide-react';
 
 import { prisma } from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
-
-import styles from './page.module.css';
+import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
 import { AccionesEncuesta } from './AccionesEncuesta';
+import styles from './page.module.css';
 
 export default async function EncuestasPsicologo() {
+  try {
+    return await renderPage();
+  } catch {
+    return <DatabaseUnavailable />;
+  }
+}
+
+async function renderPage() {
   const surveys = await prisma.survey.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-    include: {
-      _count: {
-        select: {
-          responses: true,
-          questions: true,
-        },
-      },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      isActive: true,
+      createdAt: true,
+      _count: { select: { responses: true, questions: true } },
     },
   });
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>
-          <ClipboardList className={styles.titleIcon} />
-          Encuestas
-        </h1>
+    <div className={styles.page}>
 
-        <Link href="/psicologo/encuestas/nueva" className={styles.newButton}>
-          <Plus className={styles.buttonIcon} />
+      {/* ── Encabezado ── */}
+      <header className={styles.header}>
+        <div>
+          <div className={styles.kick}>Gestión</div>
+          <h1 className={styles.pageTitle}>Encuestas</h1>
+        </div>
+        <Link href="/psicologo/encuestas/nueva" className={styles.btnSolid}>
+          <Plus className={styles.btnIcon} />
           Nueva encuesta
         </Link>
-      </div>
+      </header>
 
-      {/* Vista escritorio */}
-      <div className={styles.desktopTable}>
-        <div className={styles.tableCard}>
-          <table className={styles.table}>
-            <thead className={styles.thead}>
-              <tr>
-                <th>Título</th>
-                <th className={styles.center}>Preguntas</th>
-                <th className={styles.center}>Respuestas</th>
-                <th className={styles.center}>Estado</th>
-                <th>Creada</th>
-                <th className={styles.right}>Acciones</th>
-              </tr>
-            </thead>
+      <div className={styles.body}>
+        <div className={styles.table}>
 
-            <tbody>
-              {surveys.map((survey) => (
-                <tr key={survey.id} className={styles.row}>
-                  <td className={styles.surveyTitle}>{survey.title}</td>
-                  <td className={styles.center}>{survey._count.questions}</td>
-                  <td className={styles.center}>{survey._count.responses}</td>
+          {/* Cabecera de columnas */}
+          <div className={styles.thead}>
+            <span>Encuesta</span>
+            <span className={styles.c}>Preguntas</span>
+            <span className={styles.c}>Respuestas</span>
+            <span>Estado</span>
+            <span>Creada</span>
+            <span className={styles.r}>Acciones</span>
+          </div>
 
-                  <td className={styles.center}>
-                    <span
-                      className={
-                        survey.isActive
-                          ? styles.activeBadge
-                          : styles.inactiveBadge
-                      }
-                    >
-                      {survey.isActive ? 'Activa' : 'Inactiva'}
+          {surveys.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div>
+              {surveys.map((s) => (
+                <div
+                  key={s.id}
+                  className={`${styles.row} ${!s.isActive ? styles.rowOff : ''}`}
+                >
+                  {/* Encuesta */}
+                  <div>
+                    <div className={styles.eTitle}>{s.title}</div>
+                    {s.description && (
+                      <div className={styles.eSub}>{s.description}</div>
+                    )}
+                  </div>
+
+                  {/* Preguntas */}
+                  <div className={`${styles.num} ${s._count.questions === 0 ? styles.numZero : ''}`}>
+                    {s._count.questions}
+                  </div>
+
+                  {/* Respuestas */}
+                  <div className={`${styles.num} ${s._count.responses === 0 ? styles.numZero : ''}`}>
+                    {s._count.responses}
+                  </div>
+
+                  {/* Estado */}
+                  <div>
+                    <span className={`${styles.state} ${s.isActive ? styles.stateOn : styles.stateOff}`}>
+                      <span className={styles.stateDot} />
+                      {s.isActive ? 'Activa' : 'Inactiva'}
                     </span>
-                  </td>
+                  </div>
 
-                  <td className={styles.date}>
-                    {formatDate(survey.createdAt)}
-                  </td>
+                  {/* Creada */}
+                  <div className={styles.date}>{formatDate(s.createdAt)}</div>
 
-                  <td className={styles.right}>
-                    <div className={styles.actions}>
-                      <Link
-                        href={`/psicologo/encuestas/${survey.id}`}
-                        className={styles.toggleButton}
-                        title="Ver respondientes"
-                      >
-                        <Users className={styles.smallIcon} />
-                        Ver
-                      </Link>
-                      <AccionesEncuesta
-                        id={survey.id}
-                        title={survey.title}
-                        isActive={survey.isActive}
-                        responsesCount={survey._count.responses}
-                      />
-                    </div>
-                  </td>
-                </tr>
+                  {/* Resumen para móvil */}
+                  <div className={styles.metaMob}>
+                    {s._count.questions} preguntas · {s._count.responses} respuestas · {formatDate(s.createdAt)}
+                  </div>
+
+                  {/* Acciones */}
+                  <div className={styles.acts}>
+                    <Link
+                      href={`/psicologo/encuestas/${s.id}`}
+                      className={`${styles.act} ${styles.actGreen}`}
+                    >
+                      <Eye className={styles.actIcon} />
+                      Ver
+                    </Link>
+                    <AccionesEncuesta
+                      id={s.id}
+                      title={s.title}
+                      isActive={s.isActive}
+                      responsesCount={s._count.responses}
+                    />
+                  </div>
+                </div>
               ))}
-
-              {surveys.length === 0 && (
-                <tr>
-                  <td colSpan={6} className={styles.empty}>
-                    No hay encuestas creadas todavía.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+            </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Vista móvil tipo combo box */}
-      <div className={styles.mobileList}>
-        {surveys.map((survey) => (
-          <details key={survey.id} className={styles.mobileSurvey}>
-            <summary className={styles.mobileSummary}>
-              <div>
-                <p className={styles.mobileTitle}>{survey.title}</p>
-
-                <span
-                  className={
-                    survey.isActive
-                      ? styles.activeBadge
-                      : styles.inactiveBadge
-                  }
-                >
-                  {survey.isActive ? 'Activa' : 'Inactiva'}
-                </span>
-              </div>
-
-              <ChevronDown className={styles.chevronIcon} />
-            </summary>
-
-            <div className={styles.mobileContent}>
-              <div className={styles.mobileInfo}>
-                <span>Preguntas</span>
-                <strong>{survey._count.questions}</strong>
-              </div>
-
-              <div className={styles.mobileInfo}>
-                <span>Respuestas</span>
-                <strong>{survey._count.responses}</strong>
-              </div>
-
-              <div className={styles.mobileInfo}>
-                <span>Creada</span>
-                <strong>{formatDate(survey.createdAt)}</strong>
-              </div>
-
-              <div className={styles.mobileActions}>
-                <Link
-                  href={`/psicologo/encuestas/${survey.id}`}
-                  className={styles.mobileToggleButton}
-                >
-                  <Users className={styles.smallIcon} />
-                  Ver respondientes
-                </Link>
-                <AccionesEncuesta
-                  id={survey.id}
-                  title={survey.title}
-                  isActive={survey.isActive}
-                  responsesCount={survey._count.responses}
-                  variant="mobile"
-                />
-              </div>
-            </div>
-          </details>
-        ))}
-
-        {surveys.length === 0 && (
-          <div className={styles.emptyMobile}>
-            No hay encuestas creadas todavía.
-          </div>
-        )}
+function EmptyState() {
+  return (
+    <div className={styles.empty}>
+      <div className={styles.emptyIc}>
+        <ClipboardList className={styles.emptyIcSvg} />
       </div>
+      <h3 className={styles.emptyTitle}>Aún no hay encuestas</h3>
+      <p className={styles.emptyText}>
+        Crea tu primera encuesta para empezar a recoger respuestas de los estudiantes.
+      </p>
+      <Link href="/psicologo/encuestas/nueva" className={styles.btnSolid}>
+        <Plus className={styles.btnIcon} />
+        Nueva encuesta
+      </Link>
     </div>
   );
 }
