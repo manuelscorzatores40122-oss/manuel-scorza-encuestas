@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Plus, KeyRound, UserX } from 'lucide-react';
+import { Plus, KeyRound, UserX, UserCheck } from 'lucide-react';
 import { ROLE_LABELS } from '@/lib/constants';
-import { createUserAction, resetPasswordAction, deactivateUserAction } from './actions';
+import { createUserAction, resetPasswordAction, deactivateUserAction, activateUserAction } from './actions';
 import { useRouter } from 'next/navigation';
 
-type U = { id: string; username: string; fullName: string; role: string; email: string | null; lastLogin: string | null };
+type U = { id: string; username: string; fullName: string; role: string; email: string | null; isActive: boolean; lastLogin: string | null };
 
 export function TablaUsuarios({ users }: { users: U[] }) {
   const router = useRouter();
@@ -38,6 +38,14 @@ export function TablaUsuarios({ users }: { users: U[] }) {
     if (!confirm('¿Desactivar este usuario? Ya no podrá iniciar sesión.')) return;
     startTransition(async () => {
       await deactivateUserAction(id);
+      router.refresh();
+    });
+  }
+
+  function activate(id: string) {
+    if (!confirm('¿Reactivar este usuario? Podrá volver a iniciar sesión.')) return;
+    startTransition(async () => {
+      await activateUserAction(id);
       router.refresh();
     });
   }
@@ -92,20 +100,33 @@ export function TablaUsuarios({ users }: { users: U[] }) {
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.id} className="border-t border-slate-100">
-                <td className="px-4 py-3 font-medium">{u.fullName}</td>
+              <tr key={u.id} className={`border-t border-slate-100 ${!u.isActive ? 'bg-slate-50 opacity-60' : ''}`}>
+                <td className="px-4 py-3 font-medium">
+                  <span className={!u.isActive ? 'line-through text-slate-400' : ''}>{u.fullName}</span>
+                  {!u.isActive && (
+                    <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-600">Inactivo</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-slate-600 font-mono text-xs">{u.username}</td>
                 <td className="px-4 py-3"><span className="badge bg-slate-100 text-slate-700">{ROLE_LABELS[u.role as keyof typeof ROLE_LABELS]}</span></td>
                 <td className="px-4 py-3 text-xs text-slate-500" suppressHydrationWarning>
                   {u.lastLogin ? new Date(u.lastLogin).toLocaleString('es-PE') : 'Nunca'}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => reset(u.id)} className="text-brand-600 text-xs hover:underline mr-3" disabled={pending}>
-                    <KeyRound className="w-3 h-3 inline" /> Resetear clave
-                  </button>
-                  <button onClick={() => deactivate(u.id)} className="text-red-600 text-xs hover:underline" disabled={pending}>
-                    <UserX className="w-3 h-3 inline" /> Desactivar
-                  </button>
+                  {u.isActive ? (
+                    <>
+                      <button onClick={() => reset(u.id)} className="text-brand-600 text-xs hover:underline mr-3" disabled={pending}>
+                        <KeyRound className="w-3 h-3 inline" /> Resetear clave
+                      </button>
+                      <button onClick={() => deactivate(u.id)} className="text-red-600 text-xs hover:underline" disabled={pending}>
+                        <UserX className="w-3 h-3 inline" /> Desactivar
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => activate(u.id)} className="text-green-600 text-xs hover:underline" disabled={pending}>
+                      <UserCheck className="w-3 h-3 inline" /> Reactivar
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

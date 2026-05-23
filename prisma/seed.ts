@@ -39,7 +39,7 @@ async function main() {
       });
     }
   }
-  console.log(`✅ ${allGrades.length} grados × 2 secciones creados`);
+  console.log(`✅ ${allGrades.length} grados × 2 secciones creados`);//
 
   // ============================================================
   // 2. USUARIOS DEMO (admin, psicólogo, director, tutor, auxiliar, estudiante)
@@ -118,7 +118,7 @@ async function main() {
 
   console.log('✅ Usuarios staff creados');
 
-  // ============================================================
+  /*/ ============================================================
   // 3. ESTUDIANTES DEMO (3 para probar)
   // ============================================================
   const demoStudents = [
@@ -201,7 +201,7 @@ async function main() {
     });
   }
   console.log('✅ 3 estudiantes demo creados (login: DNI / clave: últimos 6 del DNI)');
-
+*/
   // ============================================================
   // 4. ENCUESTA INICIAL (los 9 campos del bienestar semanal)
   // ============================================================

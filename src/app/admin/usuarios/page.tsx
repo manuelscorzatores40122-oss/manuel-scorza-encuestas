@@ -4,7 +4,7 @@ import { Users, Plus } from 'lucide-react';
 import { TablaUsuarios } from './TablaUsuarios';
 
 export default async function UsuariosPage({ searchParams }: { searchParams: { rol?: string } }) {
-  const where: any = { isActive: true };
+  const where: any = {};
   if (searchParams.rol) where.role = searchParams.rol;
   // Por defecto NO mostramos estudiantes (son cientos), solo staff
   if (!searchParams.rol) where.role = { not: 'STUDENT' };
@@ -40,6 +40,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: { r
         fullName: u.fullName,
         role: u.role,
         email: u.email,
+        isActive: u.isActive,
         lastLogin: u.lastLogin?.toISOString() || null,
       }))} />
     </div>

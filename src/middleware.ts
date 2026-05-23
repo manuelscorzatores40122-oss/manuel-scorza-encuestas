@@ -43,7 +43,15 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // Impedir que el navegador cachee páginas protegidas.
+  // Así, al presionar "atrás" tras cerrar sesión, el browser
+  // hace una nueva petición que el middleware intercepta y
+  // redirige a /login en lugar de mostrar la página guardada.
+  const res = NextResponse.next();
+  res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.headers.set('Pragma', 'no-cache');
+  res.headers.set('Expires', '0');
+  return res;
 }
 
 export const config = {

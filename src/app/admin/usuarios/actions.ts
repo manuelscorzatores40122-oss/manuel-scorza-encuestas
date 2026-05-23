@@ -67,3 +67,13 @@ export async function deactivateUserAction(userId: string) {
   revalidatePath('/admin/usuarios');
   return { ok: true as const };
 }
+
+export async function activateUserAction(userId: string) {
+  const session = await requireRole(['ADMIN']);
+  await prisma.user.update({ where: { id: userId }, data: { isActive: true } });
+  await prisma.auditLog.create({
+    data: { userId: session.userId, action: 'ACTIVATE_USER', entity: 'User', entityId: userId },
+  });
+  revalidatePath('/admin/usuarios');
+  return { ok: true as const };
+}

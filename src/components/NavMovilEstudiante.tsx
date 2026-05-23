@@ -21,8 +21,7 @@ export function StudentMobileBottomNav() {
 
   async function logout() {
     await logoutAction();
-    router.push('/login');
-    router.refresh();
+    router.replace('/login');
   }
 
   return (

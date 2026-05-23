@@ -31,8 +31,7 @@ export function BarraLateral() {
 
   async function logout() {
     await logoutAction();
-    router.push('/login');
-    router.refresh();
+    router.replace('/login');
   }
 
   function isActive(href: string) {
