@@ -902,47 +902,101 @@
 
 /* ══ Responsive ═════════════════════════════ */
 @media (max-width: 900px) {
-  .wrap         { padding: 0 24px; }
+  .wrap         { padding: 0 20px; }
   .navLinks     { display: none; }
+
+  /* header */
+  .nav          { height: 64px; }
+  .brandName    { font-size: 1.12rem; }
+  .brandSub     { font-size: .56rem; margin-top: 4px; letter-spacing: .16em; }
+  .navCta       { padding: 9px 15px; font-size: .84rem; gap: 7px; }
 
   /* hero */
   .hero         { grid-template-columns: 1fr; }
-  .heroLeft     { padding: 52px 0; border-right: none; border-bottom: 1.5px solid var(--rule); }
+  .heroLeft     { padding: 48px 0 40px; border-right: none; border-bottom: 1.5px solid var(--rule); }
   .heroLeft::before { display: none; }
-  .heroRight    { padding: 48px 0; background: none; }
+  .heroRight    { padding: 40px 0 48px; background: none; }
+  .heroEyebrow  { margin-bottom: 18px; font-size: .68rem; }
+  .heroLead     { font-size: 1rem; margin-bottom: 28px; max-width: none; }
+  .heroActions  { flex-direction: column; align-items: stretch; gap: 10px; }
+  .btnSolid     { justify-content: center; padding: 15px 24px; }
+  .btnText      { text-align: center; padding: 13px 6px; }
+  .heroNote     { margin-top: 4px; }
+
+  /* login box — acento verde izquierdo en móvil */
+  .loginBox     { border-left: 3px solid var(--green); }
 
   /* stats */
   .stats        { grid-template-columns: 1fr 1fr; }
-  .stat         { border-bottom: 1px solid var(--rule-soft); padding: 32px 16px; }
-  .stat:nth-child(2) { border-right: none; }
+  .stat         { padding: 28px 18px; border-bottom: 1px solid var(--rule-soft); }
+  .stat:nth-child(2)  { border-right: none; }
+  .stat:nth-child(3)  { border-bottom: none; }
+  .stat:nth-child(4)  { border-right: none; border-bottom: none; }
+  .statNum      { font-size: 2.2rem; }
+  .statCap      { font-size: .84rem; margin-top: 8px; }
 
   /* features */
-  .featGrid     { grid-template-columns: 1fr; }
+  .featGrid     { grid-template-columns: 1fr; gap: 14px; }
+  .feat         { border-radius: 14px; padding: 22px; }
+  .block        { padding: 56px 0; }
 
   /* steps */
+  .stepsSection { padding: 56px 0; }
   .stepsHead    { grid-template-columns: 1fr; align-items: start; }
-  .stepsAside   { text-align: left; margin-top: 16px; max-width: none; }
-  .stepRow      { grid-template-columns: auto 1fr; gap: 18px 20px; padding: 28px 0; }
-  .stepDesc     { grid-column: 1 / -1; padding-top: 4px; max-width: none; }
-  .stepIdx      { font-size: 3rem; }
-  .stepTtl      { font-size: 1.25rem; padding-top: 4px; }
+  .stepsAside   { text-align: left; margin-top: 12px; max-width: none; font-size: .9rem; }
+  .stepRow      { grid-template-columns: auto 1fr; gap: 14px 18px; padding: 24px 0; }
+  .stepDesc     { grid-column: 1 / -1; padding-top: 4px; max-width: none; font-size: .98rem; }
+  .stepIdx      { font-size: 2.6rem; }
+  .stepTtl      { font-size: 1.2rem; padding-top: 2px; }
 
   /* privacy */
-  .privacySection   { padding: 56px 0; }
-  .privacyBody      { grid-template-columns: 1fr; }
-  .privacyLede      { border-right: none; border-bottom: 1px solid var(--rule-soft); padding: 32px 0; font-size: 1.4rem; }
-  .privacyGuarantees { padding: 32px 0 0; }
+  .privacySection    { padding: 52px 0; }
+  .privacyBody       { grid-template-columns: 1fr; }
+  .privacyLede       { border-right: none; border-bottom: 1px solid var(--rule-soft); padding: 28px 0; font-size: 1.35rem; }
+  .privacyGuarantees { padding: 28px 0 0; }
 
   /* footer */
-  .footGrid     { grid-template-columns: 1fr; gap: 32px; }
-  .block        { padding: 60px 0; }
+  .footGrid     { grid-template-columns: 1fr; gap: 28px; }
 }
 
 @media (max-width: 520px) {
-  .heroTitle        { font-size: 2.4rem; }
-  .loginBox         { padding: 28px 22px 24px; }
-  .privacyLede      { font-size: 1.2rem; }
-  .footBottom       { flex-direction: column; gap: 8px; }
+  .wrap         { padding: 0 16px; }
+  .nav          { height: 58px; }
+  .brandSub     { display: none; }
+  .navCta       { padding: 8px 13px; font-size: .8rem; }
+
+  .heroTitle    { font-size: 2.1rem; }
+  .heroLead     { font-size: .93rem; line-height: 1.58; }
+  .btnSolid     { padding: 14px 20px; font-size: .93rem; }
+
+  .loginBox     { padding: 24px 18px 22px; }
+  .loginTitle   { font-size: 1.45rem; }
+  .loginTop     { padding-bottom: 18px; margin-bottom: 20px; }
+  .loginForm    { gap: 16px; }
+  .inputRow     { padding: 12px 13px; }
+  .submitBtn    { padding: 15px; font-size: .96rem; }
+
+  .statNum      { font-size: 1.9rem; }
+  .stat         { padding: 22px 14px; }
+  .statCap      { font-size: .8rem; }
+
+  .secTitle     { font-size: 1.65rem; }
+  .feat         { padding: 18px; }
+  .featTitle    { font-size: 1rem; }
+  .block        { padding: 48px 0; }
+
+  .stepsSection { padding: 44px 0; }
+  .stepsTitle   { font-size: 2.2rem; }
+  .stepIdx      { font-size: 2.2rem; }
+  .stepTtl      { font-size: 1.1rem; }
+  .stepDesc     { font-size: .92rem; }
+
+  .privacyTitle  { font-size: 2rem; }
+  .privacyLede   { font-size: 1.15rem; }
+
+  .footBottom    { flex-direction: column; gap: 8px; }
+  .footAbout     { font-size: .88rem; }
+  .footLink      { font-size: .9rem; }
 }
 
 /* ══ Logo ═══════════════════════════════════ */
