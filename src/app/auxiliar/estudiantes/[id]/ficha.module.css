@@ -1,0 +1,221 @@
+/* ══ Ficha estudiante — Auxiliar — editorial ══ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.page {
+  margin: -1.5rem -1.25rem;
+  animation: fadeIn .3s ease both;
+  padding-bottom: 60px;
+}
+@media (min-width: 640px)  { .page { margin: -1.75rem -1.5rem; } }
+@media (min-width: 1024px) { .page { margin: -2rem -2.5rem; } }
+
+/* ── Volver ── */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #16a34a;
+  text-decoration: none;
+  padding: 16px 20px;
+  display: flex;
+}
+@media (min-width: 768px) { .back { padding: 20px 48px; } }
+.back:hover { text-decoration: underline; }
+
+/* ── Hero ── */
+.heroCard {
+  border-top: 1.5px solid #1c241a;
+  border-bottom: 1.5px solid #1c241a;
+  padding: 24px 20px 22px;
+}
+@media (min-width: 768px) { .heroCard { padding: 28px 48px 24px; } }
+
+.heroKick {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #16a34a;
+  margin: 0 0 10px;
+}
+
+.heroName {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.9rem;
+  letter-spacing: -.02em;
+  color: #1c241a;
+  margin: 0 0 10px;
+  line-height: 1.15;
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: .88rem;
+  color: #56605a;
+}
+.heroDot {
+  width: 3px;
+  height: 3px;
+  background: #b0b8ae;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Grid de secciones ── */
+.grid {
+  padding: 24px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) { .grid { padding: 28px 48px; } }
+@media (max-width: 768px)  { .grid { grid-template-columns: 1fr; } }
+
+/* ── Sección ── */
+.section {
+  border: 1.5px solid #1c241a;
+}
+
+.sectTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1c241a;
+  margin: 0;
+  padding: 16px 20px;
+  border-bottom: 1.5px solid #1c241a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectCount {
+  margin-left: auto;
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: 1.1rem;
+  color: #8a9089;
+  font-weight: 400;
+}
+
+/* ── Apoderados ── */
+.apoderadoList {
+  display: flex;
+  flex-direction: column;
+}
+
+.apoderado {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(28, 36, 26, .08);
+}
+.apoderado:last-child { border-bottom: none; }
+
+.apoderadoTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.apoderadoName {
+  font-size: .92rem;
+  font-weight: 500;
+  color: #1c241a;
+}
+
+.badge {
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #16a34a;
+  background: rgba(22, 163, 74, .1);
+  padding: 2px 7px;
+}
+
+.apoderadoRole {
+  font-size: .75rem;
+  color: #8a9089;
+  margin-bottom: 8px;
+}
+
+.apoderadoContact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contactItem {
+  font-size: .82rem;
+  color: #56605a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contactNone {
+  font-size: .8rem;
+  color: #b0b8ae;
+  font-style: italic;
+}
+
+/* ── Aviso ── */
+.notice {
+  margin: 0;
+  padding: 10px 20px;
+  font-size: .78rem;
+  color: #6b4e10;
+  background: rgba(192, 138, 46, .06);
+  border-bottom: 1px solid rgba(192, 138, 46, .15);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ── Respuestas ── */
+.responseList {
+  display: flex;
+  flex-direction: column;
+}
+
+.responseItem {
+  padding: 13px 20px;
+  border-bottom: 1px solid rgba(28, 36, 26, .07);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.responseItem:last-child { border-bottom: none; }
+
+.responseName {
+  font-size: .88rem;
+  color: #1c241a;
+  font-weight: 500;
+}
+
+.responseDate {
+  font-size: .75rem;
+  color: #8a9089;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Vacío ── */
+.empty {
+  padding: 28px 20px;
+  font-size: .88rem;
+  color: #8a9089;
+  font-style: italic;
+}
+
+@media (max-width: 420px) { .heroName { font-size: 1.5rem; } }

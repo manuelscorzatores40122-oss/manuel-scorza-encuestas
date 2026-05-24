@@ -1,0 +1,197 @@
+/* ══ NavbarDirector — barra de dos niveles ══ */
+
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  background: #fff;
+  border-bottom: 1.5px solid #1c241a;
+  font-family: var(--font-outfit), 'Outfit', system-ui, sans-serif;
+}
+
+/* ── Fila 1: marca ── */
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (min-width: 768px) {
+  .brandRow { height: 48px; padding: 0 2rem; }
+}
+
+.brandLeft {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+}
+
+.appName {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1c241a;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.roleChip {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.accountRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.areaName {
+  display: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #6b7280;
+  white-space: nowrap;
+}
+@media (min-width: 1024px) { .areaName { display: block; } }
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.15s;
+}
+.hamburger:hover  { background: #f3f4f6; }
+.hamburgerIcon    { width: 1.125rem; height: 1.125rem; }
+
+@media (min-width: 768px) { .hamburger { display: none; } }
+
+/* ── Fila 2: pestañas (escritorio) ── */
+.tabsRow { display: none; }
+
+@media (min-width: 768px) {
+  .tabsRow {
+    display: flex;
+    align-items: stretch;
+    height: 48px;
+    padding: 0 1.5rem;
+    gap: 0.125rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabsRow::-webkit-scrollbar { display: none; }
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.875rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-decoration: none;
+  border-bottom: 2.5px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.tab:hover    { color: #16a34a; }
+.tabActive    { color: #16a34a; font-weight: 700; border-bottom-color: #16a34a; }
+.tabIcon      { width: 1.1rem; height: 1.1rem; }
+
+.tabLogout {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-left: auto;
+  padding: 0 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: var(--font-outfit), 'Outfit', system-ui, sans-serif;
+  color: #9ca3af;
+  background: transparent;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.tabLogout:hover { color: #dc2626; }
+
+/* ── Cajón móvil ── */
+.drawer {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  padding: 0.5rem 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+@media (min-width: 768px) { .drawer { display: none; } }
+
+.drawerItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.drawerItem:hover      { background: #f9fafb; color: #1c241a; }
+.drawerItemActive      { border-left-color: #16a34a; background: #f0fdf4; color: #1c241a; font-weight: 700; }
+.drawerIcon            { width: 1rem; height: 1rem; flex-shrink: 0; }
+.drawerLabel           { flex: 1; }
+
+.drawerLogout {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid #e5e7eb;
+  border-left: 3px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: var(--font-outfit), 'Outfit', system-ui, sans-serif;
+  color: #9ca3af;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.12s, color 0.12s;
+}
+.drawerLogout:hover { background: #fef2f2; color: #dc2626; }
