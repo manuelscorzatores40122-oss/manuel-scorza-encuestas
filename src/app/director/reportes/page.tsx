@@ -1,65 +1,91 @@
 import { prisma } from '@/lib/prisma';
-import { BarChart3 } from 'lucide-react';
+import styles from './reportes.module.css';
 
 export default async function ReportesDirector() {
-  const surveys = await prisma.survey.findMany({
-    include: { _count: { select: { responses: true } } },
-    orderBy: { createdAt: 'desc' },
-  });
+  const [surveys, totalsByLevel] = await Promise.all([
+    prisma.survey.findMany({
+      include: { _count: { select: { responses: true } } },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.response.groupBy({ by: ['riskLevel'], _count: true }),
+  ]);
 
-  const totalsByLevel = await prisma.response.groupBy({
-    by: ['riskLevel'],
-    _count: true,
-  });
+  const sinRiesgo  = totalsByLevel.find(t => t.riskLevel === 'LOW')?._count  || 0;
+  const riesgoMed  = totalsByLevel.find(t => t.riskLevel === 'MID')?._count  || 0;
+  const riesgoAlto = totalsByLevel.find(t => t.riskLevel === 'HIGH')?._count || 0;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold flex items-center gap-2">
-        <BarChart3 className="w-6 h-6 text-brand-600" /> Reportes
-      </h1>
+    <div className={styles.page}>
 
-      <div className="card">
-        <h2 className="font-semibold mb-4">Encuestas y participación</h2>
-        <table className="w-full text-sm">
-          <thead className="text-slate-600">
-            <tr>
-              <th className="text-left py-2">Encuesta</th>
-              <th className="text-center py-2">Estado</th>
-              <th className="text-right py-2">Respuestas</th>
-            </tr>
-          </thead>
-          <tbody>
-            {surveys.map((s) => (
-              <tr key={s.id} className="border-t border-slate-100">
-                <td className="py-2">{s.title}</td>
-                <td className="py-2 text-center">
-                  <span className={`badge ${s.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                    {s.isActive ? 'Activa' : 'Cerrada'}
-                  </span>
-                </td>
-                <td className="py-2 text-right font-medium">{s._count.responses}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <header className={styles.header}>
+        <p className={styles.kick}>Panel · Director</p>
+        <h1 className={styles.pageTitle}>Reportes</h1>
+        <p className={styles.pageSub}>Participación y riesgo agregado por encuesta</p>
+      </header>
 
-      <div className="card">
-        <h2 className="font-semibold mb-4">Resumen global de riesgo</h2>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="p-4 rounded-xl bg-emerald-50">
-            <p className="text-xs text-slate-500">Sin riesgo</p>
-            <p className="text-2xl font-bold text-emerald-700">{totalsByLevel.find((t) => t.riskLevel === 'LOW')?._count || 0}</p>
+      <div className={styles.body}>
+
+        {/* ── Tabla de encuestas ── */}
+        <div className={styles.section}>
+          <div className={styles.sectHead}>
+            <h2 className={styles.sectTitle}>Encuestas y participación</h2>
+            <span className={styles.sectCount}>{surveys.length} encuestas</span>
           </div>
-          <div className="p-4 rounded-xl bg-yellow-50">
-            <p className="text-xs text-slate-500">Riesgo medio</p>
-            <p className="text-2xl font-bold text-yellow-700">{totalsByLevel.find((t) => t.riskLevel === 'MID')?._count || 0}</p>
-          </div>
-          <div className="p-4 rounded-xl bg-red-50">
-            <p className="text-xs text-slate-500">Riesgo alto</p>
-            <p className="text-2xl font-bold text-red-700">{totalsByLevel.find((t) => t.riskLevel === 'HIGH')?._count || 0}</p>
+
+          {surveys.length === 0 ? (
+            <div className={styles.empty}>Sin encuestas registradas aún.</div>
+          ) : (
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th className={styles.th}>Encuesta</th>
+                    <th className={styles.th}>Estado</th>
+                    <th className={`${styles.th} ${styles.thR}`}>Respuestas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {surveys.map(s => (
+                    <tr key={s.id} className={styles.tr}>
+                      <td className={`${styles.td} ${styles.tdTitle}`}>{s.title}</td>
+                      <td className={styles.td}>
+                        {s.isActive ? (
+                          <span className={styles.stateOn}>
+                            <span className={styles.stateDot} style={{ background: '#16a34a' }} />
+                            Activa
+                          </span>
+                        ) : (
+                          <span className={styles.stateOff}>
+                            <span className={styles.stateDot} style={{ background: '#8a9089' }} />
+                            Cerrada
+                          </span>
+                        )}
+                      </td>
+                      <td className={`${styles.td} ${styles.tdNum}`}>{s._count.responses}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Resumen de riesgo global */}
+          <div className={styles.riskGrid}>
+            <div className={styles.riskCard}>
+              <div className={styles.riskLabel}>Sin riesgo</div>
+              <div className={`${styles.riskNum} ${styles.riskLow}`}>{sinRiesgo}</div>
+            </div>
+            <div className={styles.riskCard}>
+              <div className={styles.riskLabel}>Riesgo medio</div>
+              <div className={`${styles.riskNum} ${styles.riskMid}`}>{riesgoMed}</div>
+            </div>
+            <div className={styles.riskCard}>
+              <div className={styles.riskLabel}>Riesgo alto</div>
+              <div className={`${styles.riskNum} ${styles.riskHigh}`}>{riesgoAlto}</div>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -269,10 +269,18 @@ textarea.input {
 
 /* ── Responsive ─────────────────────────── */
 @media (max-width: 640px) {
-  .card     { padding: 20px 18px; }
-  .title    { font-size: 1.8rem; }
-  .footer   { flex-direction: column; align-items: stretch; }
-  .comboRow { flex-direction: column; }
+  .container    { padding: 0 0 48px; }
+  .card         { padding: 20px 18px; }
+  .title        { font-size: 1.8rem; }
+  .footer       { flex-direction: column; align-items: stretch; }
+  .comboRow     { flex-direction: column; }
   .comboSelect,
   .sectionSelect { width: 100%; }
+  .btn-primary  { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 420px) {
+  .title     { font-size: 1.5rem; }
+  .card      { padding: 18px 14px; }
+  .gradeList { gap: 6px; }
 }

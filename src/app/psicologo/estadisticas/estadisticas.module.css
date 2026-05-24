@@ -363,9 +363,19 @@
 
 @media (max-width: 760px) {
   .pageTitle { font-size: 1.8rem; }
-  .kpi  { padding: 18px 16px; }
-  .chart { padding: 24px 20px; }
-  .ind  { padding: 20px 16px; }
-  .pred { padding: 24px 20px; }
-  .predStats { gap: 28px; }
+  .kpi       { padding: 18px 16px; }
+  .chart     { padding: 24px 20px; }
+  .ind       { padding: 20px 16px; }
+  .pred      { padding: 24px 20px; }
+  .predStats { gap: 24px; }
+}
+
+@media (max-width: 480px) {
+  .pageTitle  { font-size: 1.5rem; }
+  .kpis       { grid-template-columns: 1fr; }
+  .kpiNum     { font-size: 2rem; }
+  .kpi        { padding: 16px 14px; }
+  .predStats  { gap: 16px; }
+  .predStatN,
+  .confN      { font-size: 1.6rem; }
 }

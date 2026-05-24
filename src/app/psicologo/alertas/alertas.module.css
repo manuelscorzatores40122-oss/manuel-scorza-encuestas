@@ -269,9 +269,24 @@
     padding-top: 6px;
   }
 
-  .tabs { gap: 18px; overflow-x: auto; }
+  .tabs {
+    gap: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
 }
 
 @media (max-width: 760px) {
   .pageTitle { font-size: 1.8rem; }
+  .aText     { max-width: none; }
+}
+
+@media (max-width: 520px) {
+  .pageTitle { font-size: 1.5rem; }
+  .sev       { width: 36px; height: 36px; }
+  .sev svg   { width: 16px; height: 16px; }
+  .abtn      { font-size: .82rem; padding: 8px 11px; }
+  .alert     { gap: 12px; }
 }

@@ -277,4 +277,10 @@
 @media (max-width: 760px) {
   .header    { flex-direction: column; align-items: flex-start; gap: 18px; }
   .pageTitle { font-size: 1.8rem; }
+  .btnSolid  { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 420px) {
+  .pageTitle { font-size: 1.5rem; }
+  .eTitle    { font-size: 1rem; }
 }

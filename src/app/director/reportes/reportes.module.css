@@ -1,0 +1,201 @@
+/* ══ Reportes Director — editorial ══ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.page {
+  margin: -1.5rem -1.25rem;
+  animation: fadeIn .3s ease both;
+}
+@media (min-width: 640px)  { .page { margin: -1.75rem -1.5rem; } }
+@media (min-width: 1024px) { .page { margin: -2rem -2.5rem; } }
+
+.header {
+  padding: 24px 20px 20px;
+  border-bottom: 1.5px solid #1c241a;
+}
+@media (min-width: 768px) { .header { padding: 36px 48px 24px; } }
+
+.kick {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #16a34a;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.kick::before {
+  content: '';
+  width: 30px;
+  height: 1.5px;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.2rem;
+  letter-spacing: -.02em;
+  line-height: 1;
+  color: #1c241a;
+  margin: 0 0 8px;
+}
+.pageSub { font-size: .9rem; color: #8a9089; margin: 0; }
+
+.body {
+  padding: 28px 20px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+@media (min-width: 768px) { .body { padding: 32px 48px 60px; } }
+
+/* ── Sección ── */
+.section { border: 1.5px solid #1c241a; }
+
+.sectHead {
+  padding: 18px 24px;
+  border-bottom: 1.5px solid #1c241a;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #1c241a;
+  margin: 0;
+}
+
+.sectCount {
+  font-size: .82rem;
+  color: #8a9089;
+  white-space: nowrap;
+}
+
+/* ── Tabla ── */
+.tableWrap { overflow-x: auto; }
+
+.table { width: 100%; border-collapse: collapse; }
+
+.th {
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8a9089;
+  text-align: left;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(28, 36, 26, .12);
+  white-space: nowrap;
+}
+.thR { text-align: right; }
+
+.tr { transition: background .12s; }
+.tr:hover { background: rgba(22, 163, 74, .04); }
+
+.td {
+  padding: 14px 20px;
+  font-size: .9rem;
+  color: #56605a;
+  border-bottom: 1px solid rgba(28, 36, 26, .08);
+}
+.tr:last-child .td { border-bottom: none; }
+
+.tdTitle { color: #1c241a; font-weight: 500; }
+.tdR     { text-align: right; }
+
+.tdNum {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: 1.05rem;
+  color: #1c241a;
+  text-align: right;
+}
+
+/* ── Estado badge ── */
+.stateOn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #16a34a;
+}
+.stateOff {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #8a9089;
+}
+.stateDot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Resumen de riesgo ── */
+.riskGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1.5px solid #1c241a;
+}
+
+.riskCard {
+  padding: 24px 20px;
+  border-right: 1px solid rgba(28, 36, 26, .12);
+  text-align: center;
+}
+.riskCard:last-child { border-right: none; }
+
+.riskLabel {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #56605a;
+  margin-bottom: 12px;
+}
+
+.riskNum {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+.riskLow  { color: #16a34a; }
+.riskMid  { color: #c08a2e; }
+.riskHigh { color: #b3473f; }
+
+/* ── Vacío ── */
+.empty {
+  padding: 52px 20px;
+  text-align: center;
+  font-size: .9rem;
+  color: #8a9089;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .pageTitle { font-size: 1.7rem; }
+  .riskGrid  { grid-template-columns: 1fr; }
+  .riskCard  { border-right: none; border-bottom: 1px solid rgba(28, 36, 26, .12); }
+  .riskCard:last-child { border-bottom: none; }
+  .riskNum   { font-size: 2rem; }
+}
+
+@media (max-width: 420px) {
+  .pageTitle { font-size: 1.5rem; }
+}

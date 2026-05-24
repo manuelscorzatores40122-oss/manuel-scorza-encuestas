@@ -92,7 +92,7 @@ export default function LoginPage() {
 
             <div className={styles.heroActions}>
               <a href="#acceder" className={styles.btnSolid}>
-                Ingresar con mi DNI
+                Ingresar con mi documento
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14M13 6l6 6-6 6"/>
                 </svg>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                       id="username"
                       className={styles.input}
                       type="text"
-                      placeholder="DNI o correo institucional"
+                      placeholder="DNI / CE o correo institucional"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       autoComplete="username"
@@ -133,7 +133,7 @@ export default function LoginPage() {
                       autoFocus
                     />
                   </div>
-                  <p className={styles.hint}>Estudiantes: tu DNI · Personal: correo institucional.</p>
+                  <p className={styles.hint}>Estudiantes: tu DNI o CE · Personal: correo institucional.</p>
                 </div>
 
                 <div className={styles.loginField}>
@@ -240,7 +240,7 @@ export default function LoginPage() {
           {[
             {
               n: '01', title: 'Ingresa con tu DNI',
-              desc: <> Usa tu número de <b>DNI</b> como usuario para acceder. El personal del colegio ingresa con su correo institucional.</>,
+              desc: <> Usa tu número de <b>DNI o CE</b> como usuario para acceder. El personal del colegio ingresa con su correo institucional.</>,
             },
             {
               n: '02', title: 'Completa tus actividades',

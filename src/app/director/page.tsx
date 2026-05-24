@@ -1,11 +1,18 @@
-import { Users, ClipboardList, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp, AlertTriangle, ClipboardCheck, Shield } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { GraficosDirector } from './GraficosDirector';
+import { AcordeonHermanos, type SiblingGroup } from './AcordeonHermanos';
+import styles from './dashboard.module.css';
 
-type GradeRiskRow = {
+type GradeRiskRow    = { grado: string; riskLevel: string; total: bigint };
+type SiblingRow      = { total_familias: bigint; total_hermanos: bigint };
+type SiblingDetailRow = {
+  celular: string;
+  apoderado: string;
+  estudiante: string;
   grado: string;
-  riskLevel: string;
-  total: bigint;
+  seccion: string;
+  nivel: string;
 };
 
 export default async function DirectorDashboard() {
@@ -19,6 +26,8 @@ export default async function DirectorDashboard() {
     secundaria,
     porGradoRows,
     riskDist,
+    siblingRows,
+    siblingDetailRows,
   ] = await Promise.all([
     prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA' } }),
     prisma.response.count(),
@@ -40,9 +49,60 @@ export default async function DirectorDashboard() {
       ORDER BY g.nivel, g."order"
     `,
     prisma.response.groupBy({ by: ['riskLevel'], _count: true }),
+    prisma.$queryRaw<SiblingRow[]>`
+      WITH familias AS (
+        SELECT celular, COUNT(DISTINCT "studentId") AS hijos
+        FROM "Apoderado"
+        WHERE celular IS NOT NULL AND celular <> ''
+        GROUP BY celular
+        HAVING COUNT(DISTINCT "studentId") >= 2
+      )
+      SELECT
+        COUNT(*)                AS total_familias,
+        COALESCE(SUM(hijos), 0) AS total_hermanos
+      FROM familias
+    `,
+    prisma.$queryRaw<SiblingDetailRow[]>`
+      SELECT DISTINCT ON (a.celular, s.id)
+        a.celular,
+        a."apellidosNombres"                                                   AS apoderado,
+        s."apellidoPaterno" || ' ' || s."apellidoMaterno" || ', ' || s.nombres AS estudiante,
+        g.name   AS grado,
+        sec.name AS seccion,
+        g.nivel
+      FROM "Apoderado" a
+      JOIN "Student"  s   ON s.id   = a."studentId"
+      JOIN "Section"  sec ON sec.id = s."sectionId"
+      JOIN "Grade"    g   ON g.id   = sec."gradeId"
+      WHERE a.celular IN (
+        SELECT celular FROM "Apoderado"
+        WHERE celular IS NOT NULL AND celular <> ''
+        GROUP BY celular
+        HAVING COUNT(DISTINCT "studentId") >= 2
+      )
+      ORDER BY a.celular, s.id, a."apellidosNombres"
+    `,
   ]);
 
-  // Bucket por grado anonimizado
+  const totalFamilias = Number(siblingRows[0]?.total_familias ?? 0);
+  const totalHermanos = Number(siblingRows[0]?.total_hermanos ?? 0);
+
+  const siblingGroupMap: Record<string, SiblingGroup> = {};
+  for (const row of siblingDetailRows) {
+    if (!siblingGroupMap[row.celular]) {
+      siblingGroupMap[row.celular] = { celular: row.celular, apoderado: row.apoderado, students: [] };
+    }
+    siblingGroupMap[row.celular].students.push({
+      estudiante: row.estudiante,
+      grado: row.grado,
+      seccion: row.seccion,
+      nivel: row.nivel,
+    });
+  }
+  const siblingGroups = Object.values(siblingGroupMap).sort((a, b) =>
+    a.apoderado.localeCompare(b.apoderado),
+  );
+
   const byGrade: Record<string, { total: number; alto: number; medio: number }> = {};
   for (const row of porGradoRows) {
     const key = row.grado;
@@ -52,66 +112,107 @@ export default async function DirectorDashboard() {
     if (row.riskLevel === 'HIGH') byGrade[key].alto += total;
     if (row.riskLevel === 'MID') byGrade[key].medio += total;
   }
-  const gradeData = Object.entries(byGrade)
-    .sort()
-    .map(([grado, v]) => ({ grado, ...v }));
+  const gradeData = Object.entries(byGrade).sort().map(([grado, v]) => ({ grado, ...v }));
 
   const riskData = [
-    { name: 'Sin riesgo', value: riskDist.find((r) => r.riskLevel === 'LOW')?._count || 0, color: '#16a34a' },
-    { name: 'Riesgo medio', value: riskDist.find((r) => r.riskLevel === 'MID')?._count || 0, color: '#eab308' },
-    { name: 'Riesgo alto', value: riskDist.find((r) => r.riskLevel === 'HIGH')?._count || 0, color: '#dc2626' },
+    { name: 'Sin riesgo',   value: riskDist.find(r => r.riskLevel === 'LOW')?._count  || 0, color: '#16a34a' },
+    { name: 'Riesgo medio', value: riskDist.find(r => r.riskLevel === 'MID')?._count  || 0, color: '#c08a2e' },
+    { name: 'Riesgo alto',  value: riskDist.find(r => r.riskLevel === 'HIGH')?._count || 0, color: '#b3473f' },
   ];
 
+  const pctPri = totalEstudiantes > 0 ? ((primaria / totalEstudiantes) * 100).toFixed(0) : '0';
+  const pctSec = totalEstudiantes > 0 ? ((secundaria / totalEstudiantes) * 100).toFixed(0) : '0';
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <header>
-        <h1 className="text-2xl md:text-3xl font-bold">Panel del Director</h1>
-        <p className="text-slate-600 mt-1">Estadísticas agregadas — sin identificación individual</p>
+    <div className={styles.page}>
+
+      {/* ── Encabezado ── */}
+      <header className={styles.header}>
+        <p className={styles.kick}>Panel · Director</p>
+        <h1 className={styles.pageTitle}>Resumen general</h1>
+        <p className={styles.pageSub}>Estadísticas agregadas — sin identificación individual</p>
       </header>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card label="Estudiantes" value={totalEstudiantes} icon={<Users className="w-5 h-5" />} color="bg-brand-100 text-brand-700" />
-        <Card label="Respuestas" value={totalRespuestas} icon={<TrendingUp className="w-5 h-5" />} color="bg-purple-100 text-purple-700" />
-        <Card label="Riesgo medio" value={riesgoMedio} icon={<AlertTriangle className="w-5 h-5" />} color="bg-yellow-100 text-yellow-700" />
-        <Card label="Riesgo alto" value={riesgoAlto} icon={<AlertTriangle className="w-5 h-5" />} color="bg-red-100 text-red-700" />
-      </div>
+      <div className={styles.body}>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <div className="card">
-          <h2 className="font-semibold mb-3">Población estudiantil</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-xl bg-brand-50 border border-brand-100">
-              <p className="text-xs text-slate-500">Primaria</p>
-              <p className="text-3xl font-bold text-brand-700">{primaria}</p>
-              <p className="text-xs text-slate-500 mt-1">{totalEstudiantes > 0 ? ((primaria/totalEstudiantes)*100).toFixed(0) : 0}%</p>
+        {/* ── KPIs ── */}
+        <div className={styles.kpiGrid}>
+          <div className={styles.kpi}>
+            <div className={`${styles.kpiIcon} ${styles.kpiIconGreen}`}>
+              <Users size={18} />
             </div>
-            <div className="p-4 rounded-xl bg-warm-50 border border-warm-100">
-              <p className="text-xs text-slate-500">Secundaria</p>
-              <p className="text-3xl font-bold text-warm-700">{secundaria}</p>
-              <p className="text-xs text-slate-500 mt-1">{totalEstudiantes > 0 ? ((secundaria/totalEstudiantes)*100).toFixed(0) : 0}%</p>
-            </div>
+            <div className={styles.kpiNum}>{totalEstudiantes}</div>
+            <div className={styles.kpiLbl}>Estudiantes matriculados</div>
           </div>
-          <p className="text-xs text-slate-500 mt-4">Encuestas activas: {encuestasActivas}</p>
+          <div className={styles.kpi}>
+            <div className={`${styles.kpiIcon}`}>
+              <ClipboardCheck size={18} />
+            </div>
+            <div className={styles.kpiNum}>{totalRespuestas}</div>
+            <div className={styles.kpiLbl}>Respuestas registradas</div>
+          </div>
+          <div className={styles.kpi}>
+            <div className={`${styles.kpiIcon} ${styles.kpiIconWarn}`}>
+              <AlertTriangle size={18} />
+            </div>
+            <div className={`${styles.kpiNum} ${styles.kpiNumWarn}`}>{riesgoMedio}</div>
+            <div className={styles.kpiLbl}>Riesgo medio</div>
+          </div>
+          <div className={styles.kpi}>
+            <div className={`${styles.kpiIcon} ${styles.kpiIconAlert}`}>
+              <AlertTriangle size={18} />
+            </div>
+            <div className={`${styles.kpiNum} ${styles.kpiNumAlert}`}>{riesgoAlto}</div>
+            <div className={styles.kpiLbl}>Riesgo alto</div>
+          </div>
         </div>
 
-        <GraficosDirector riskData={riskData} gradeData={gradeData} />
-      </div>
+        {/* ── Hermanos matriculados ── */}
+        <AcordeonHermanos
+          groups={siblingGroups}
+          totalHermanos={totalHermanos}
+          totalFamilias={totalFamilias}
+        />
 
-      <div className="card bg-slate-50 border-slate-200">
-        <p className="text-sm text-slate-700">
-          🔒 Por confidencialidad, no se muestran datos individuales de estudiantes. Para casos específicos, coordina con el psicólogo del colegio.
-        </p>
-      </div>
-    </div>
-  );
-}
+        {/* ── Gráficos ── */}
+        <div className={styles.charts}>
 
-function Card({ label, value, icon, color }: { label: string; value: number; icon: React.ReactNode; color: string }) {
-  return (
-    <div className="card !p-4">
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${color}`}>{icon}</div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
+          {/* Población */}
+          <div className={styles.chartCard}>
+            <h2 className={styles.chartTitle}>Población estudiantil</h2>
+            <p className={styles.chartDesc}>Distribución por nivel educativo</p>
+
+            <div className={styles.popGrid}>
+              <div className={styles.popItem}>
+                <div className={styles.popLabel}>Primaria</div>
+                <div className={`${styles.popNum} ${styles.popNumPri}`}>{primaria}</div>
+                <div className={styles.popPct}>{pctPri}% del total</div>
+              </div>
+              <div className={styles.popItem}>
+                <div className={styles.popLabel}>Secundaria</div>
+                <div className={`${styles.popNum} ${styles.popNumSec}`}>{secundaria}</div>
+                <div className={styles.popPct}>{pctSec}% del total</div>
+              </div>
+            </div>
+
+            <div className={styles.encuestasNote}>
+              <TrendingUp size={14} />
+              {encuestasActivas} encuesta{encuestasActivas !== 1 ? 's' : ''} activa{encuestasActivas !== 1 ? 's' : ''} en este momento
+            </div>
+          </div>
+
+          {/* Gráfico riesgo */}
+          <GraficosDirector riskData={riskData} gradeData={gradeData} />
+        </div>
+
+        {/* ── Privacidad ── */}
+        <div className={styles.privacy}>
+          <span className={styles.privacyIcon}><Shield size={16} /></span>
+          Por confidencialidad, no se muestran datos individuales de estudiantes.
+          Para casos específicos, coordina con el psicólogo del colegio.
+        </div>
+
+      </div>
     </div>
   );
 }

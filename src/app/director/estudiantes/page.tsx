@@ -1,206 +1,147 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { AlertTriangle, Search, Users } from 'lucide-react';
 import type { Prisma } from '@prisma/client';
-
 import { prisma } from '@/lib/prisma';
-import { RiskBadge } from '@/components/EtiquetaRiesgo';
+import { TablaEstudiantes } from './TablaEstudiantes';
+import { FiltrosEstudiantes } from './FiltrosEstudiantes';
+import styles from './estudiantes.module.css';
+
+const PAGE_SIZE = 10;
 
 export default async function DirectorEstudiantes({
   searchParams,
 }: {
-  searchParams: { q?: string; gradoId?: string; nivel?: string; riesgo?: string };
+  searchParams: { q?: string; nivel?: string; gradoId?: string; seccionId?: string; page?: string };
 }) {
-  const where: Prisma.StudentWhereInput = { estadoMatricula: 'DEFINITIVA' };
-  const query = searchParams.q?.trim();
+  const q        = searchParams.q?.trim();
+  const pageNum  = Math.max(1, parseInt(searchParams.page || '1', 10) || 1);
+  const nivelVal = searchParams.nivel === 'PRIMARIA' || searchParams.nivel === 'SECUNDARIA'
+    ? searchParams.nivel : undefined;
 
-  if (query) {
+  /* ── Where ── */
+  const where: Prisma.StudentWhereInput = { estadoMatricula: 'DEFINITIVA' };
+
+  if (q) {
     where.OR = [
-      { dni: { contains: query } },
-      { codigoEstudiante: { contains: query } },
-      { nombres: { contains: query.toUpperCase() } },
-      { apellidoPaterno: { contains: query.toUpperCase() } },
-      { apellidoMaterno: { contains: query.toUpperCase() } },
-      { user: { fullName: { contains: query, mode: 'insensitive' } } },
+      { dni:              { contains: q, mode: 'insensitive' } },
+      { codigoEstudiante: { contains: q, mode: 'insensitive' } },
+      { nombres:          { contains: q, mode: 'insensitive' } },
+      { apellidoPaterno:  { contains: q, mode: 'insensitive' } },
+      { apellidoMaterno:  { contains: q, mode: 'insensitive' } },
     ];
   }
 
-  if (searchParams.gradoId) {
+  if (searchParams.seccionId) {
+    where.sectionId = searchParams.seccionId;
+  } else if (searchParams.gradoId) {
     where.section = { gradeId: searchParams.gradoId };
-  } else if (searchParams.nivel === 'PRIMARIA' || searchParams.nivel === 'SECUNDARIA') {
-    where.section = { grade: { nivel: searchParams.nivel } };
+  } else if (nivelVal) {
+    where.section = { grade: { nivel: nivelVal } };
   }
 
-  if (searchParams.riesgo === 'HIGH' || searchParams.riesgo === 'MID' || searchParams.riesgo === 'LOW') {
-    where.responses = { some: { riskLevel: searchParams.riesgo } };
-  }
-
-  const [students, grades, totals] = await Promise.all([
+  /* ── Fetch ── */
+  const [students, grades, sections, total, filteredTotal] = await Promise.all([
     prisma.student.findMany({
       where,
       include: {
-        user: { select: { isActive: true, lastLogin: true } },
         section: { include: { grade: true } },
-        apoderados: true,
-        responses: {
-          orderBy: { submittedAt: 'desc' },
-          take: 1,
-          select: { riskLevel: true, riskScore: true, submittedAt: true, wantsToTalk: true },
-        },
-        _count: { select: { responses: true } },
+        apoderados: { orderBy: [{ esContactoPrincipal: 'desc' }, { parentesco: 'asc' }] },
       },
       orderBy: [{ apellidoPaterno: 'asc' }, { apellidoMaterno: 'asc' }, { nombres: 'asc' }],
-      take: 300,
+      skip: (pageNum - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
     }),
+    // Todos los grados — el componente cliente filtra por nivel
     prisma.grade.findMany({ orderBy: [{ nivel: 'asc' }, { order: 'asc' }] }),
+    // Todas las secciones — el componente cliente filtra por grado/nivel
+    prisma.section.findMany({
+      include: { grade: true },
+      orderBy: [{ grade: { nivel: 'asc' } }, { grade: { order: 'asc' } }, { name: 'asc' }],
+    }),
     prisma.student.count({ where: { estadoMatricula: 'DEFINITIVA' } }),
+    prisma.student.count({ where }),
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredTotal / PAGE_SIZE));
+
+  function pageUrl(p: number) {
+    const params = new URLSearchParams();
+    if (q)                       params.set('q',         q);
+    if (searchParams.nivel)      params.set('nivel',     searchParams.nivel);
+    if (searchParams.gradoId)    params.set('gradoId',   searchParams.gradoId);
+    if (searchParams.seccionId)  params.set('seccionId', searchParams.seccionId);
+    params.set('page', String(p));
+    return `/director/estudiantes?${params}`;
+  }
+
+  const from = filteredTotal === 0 ? 0 : (pageNum - 1) * PAGE_SIZE + 1;
+  const to   = Math.min(pageNum * PAGE_SIZE, filteredTotal);
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-            <Users className="w-7 h-7 text-brand-600" />
-            Estudiantes
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Consulta integral de matrícula, contacto familiar y seguimiento socioemocional.
-          </p>
-        </div>
-        <div className="card !p-4 min-w-[150px]">
-          <p className="text-xs text-slate-500">Matrícula activa</p>
-          <p className="text-2xl font-bold">{totals}</p>
+    <div className={styles.page}>
+
+      <header className={styles.header}>
+        <p className={styles.kick}>Panel · Director</p>
+        <div className={styles.headerRow}>
+          <div>
+            <h1 className={styles.pageTitle}>Estudiantes</h1>
+            <p className={styles.pageSub}>Información completa de matrícula y contacto familiar</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div className={styles.totalBadge}>{total}</div>
+            <div className={styles.totalLabel}>matriculados</div>
+          </div>
         </div>
       </header>
 
-      <form className="card grid gap-3 md:grid-cols-[1fr_160px_180px_150px_auto] md:items-end">
-        <div>
-          <label className="label text-xs">Buscar estudiante</label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              name="q"
-              defaultValue={searchParams.q || ''}
-              className="input pl-10"
-              placeholder="DNI, código, nombre o apellido"
-            />
+      <div className={styles.body}>
+
+        {/* ── Filtros (cliente, cascada instantánea) ── */}
+        <FiltrosEstudiantes
+          grades={grades}
+          sections={sections}
+          defaultQ={q || ''}
+          defaultNivel={searchParams.nivel || ''}
+          defaultGradoId={searchParams.gradoId || ''}
+          defaultSeccionId={searchParams.seccionId || ''}
+        />
+
+        {/* ── Tabla ── */}
+        <TablaEstudiantes students={students} />
+
+        {/* ── Paginación ── */}
+        <div className={styles.pagination}>
+          <span className={styles.paginationInfo}>
+            {filteredTotal === 0
+              ? 'Sin resultados'
+              : `${from}–${to} de ${filteredTotal} estudiante${filteredTotal !== 1 ? 's' : ''}`}
+          </span>
+
+          <div className={styles.paginationControls}>
+            {pageNum > 1 ? (
+              <Link href={pageUrl(pageNum - 1)} className={styles.pageBtn}>
+                <ChevronLeft size={16} /> Anterior
+              </Link>
+            ) : (
+              <span className={`${styles.pageBtn} ${styles.pageBtnDisabled}`}>
+                <ChevronLeft size={16} /> Anterior
+              </span>
+            )}
+
+            <span className={styles.pageIndicator}>{pageNum} / {totalPages}</span>
+
+            {pageNum < totalPages ? (
+              <Link href={pageUrl(pageNum + 1)} className={styles.pageBtn}>
+                Siguiente <ChevronRight size={16} />
+              </Link>
+            ) : (
+              <span className={`${styles.pageBtn} ${styles.pageBtnDisabled}`}>
+                Siguiente <ChevronRight size={16} />
+              </span>
+            )}
           </div>
         </div>
 
-        <div>
-          <label className="label text-xs">Nivel</label>
-          <select name="nivel" defaultValue={searchParams.nivel || ''} className="input">
-            <option value="">Todos</option>
-            <option value="PRIMARIA">Primaria</option>
-            <option value="SECUNDARIA">Secundaria</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="label text-xs">Grado</label>
-          <select name="gradoId" defaultValue={searchParams.gradoId || ''} className="input">
-            <option value="">Todos</option>
-            {grades.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria'} {g.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="label text-xs">Riesgo</label>
-          <select name="riesgo" defaultValue={searchParams.riesgo || ''} className="input">
-            <option value="">Todos</option>
-            <option value="HIGH">Alto</option>
-            <option value="MID">Medio</option>
-            <option value="LOW">Sin riesgo</option>
-          </select>
-        </div>
-
-        <button className="btn-primary" type="submit">
-          Filtrar
-        </button>
-      </form>
-
-      <div className="card !p-0 overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-slate-600">
-            <tr>
-              <th className="text-left px-4 py-3">Estudiante</th>
-              <th className="text-left px-4 py-3">Grado</th>
-              <th className="text-left px-4 py-3">Contacto principal</th>
-              <th className="text-center px-4 py-3">Respuestas</th>
-              <th className="text-left px-4 py-3">Último riesgo</th>
-              <th className="text-right px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => {
-              const contact =
-                student.apoderados.find((a) => a.esContactoPrincipal) ||
-                student.apoderados.find((a) => a.parentesco === 'APODERADO') ||
-                student.apoderados[0];
-              const latest = student.responses[0];
-
-              return (
-                <tr key={student.id} className="border-t border-slate-100 align-top">
-                  <td className="px-4 py-3">
-                    <p className="font-semibold text-slate-900">
-                      {student.apellidoPaterno} {student.apellidoMaterno}, {student.nombres}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      DNI {student.dni} · {student.edad} años · {student.sexo}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3 text-slate-700">
-                    {student.section.grade.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria'}{' '}
-                    {student.section.grade.name} {student.section.name}
-                  </td>
-                  <td className="px-4 py-3">
-                    {contact ? (
-                      <>
-                        <p className="font-medium text-slate-800">{contact.apellidosNombres}</p>
-                        <p className="text-xs text-slate-500">{contact.celular || 'Sin celular registrado'}</p>
-                      </>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-red-600">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        Sin contacto
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">{student._count.responses}</td>
-                  <td className="px-4 py-3">
-                    {latest ? (
-                      <div className="flex flex-col items-start gap-1">
-                        <RiskBadge level={latest.riskLevel} />
-                        <span className="text-xs text-slate-500">Score {latest.riskScore}</span>
-                        {latest.wantsToTalk && (
-                          <span className="text-xs text-warm-700">Solicitó conversar</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-slate-500">Sin respuestas</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link href={`/director/estudiantes/${student.id}`} className="text-brand-700 hover:underline font-medium">
-                      Ver ficha
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-            {students.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center text-slate-500 py-10">
-                  No hay estudiantes que coincidan con los filtros.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
       </div>
     </div>
   );

@@ -1,0 +1,140 @@
+/* ══ Comparativas Director — editorial ══ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.page {
+  margin: -1.5rem -1.25rem;
+  animation: fadeIn .3s ease both;
+}
+@media (min-width: 640px)  { .page { margin: -1.75rem -1.5rem; } }
+@media (min-width: 1024px) { .page { margin: -2rem -2.5rem; } }
+
+.header {
+  padding: 24px 20px 20px;
+  border-bottom: 1.5px solid #1c241a;
+}
+@media (min-width: 768px) { .header { padding: 36px 48px 24px; } }
+
+.kick {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #16a34a;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.kick::before {
+  content: '';
+  width: 30px;
+  height: 1.5px;
+  background: linear-gradient(to right, #16a34a, #0d9488);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 2.2rem;
+  letter-spacing: -.02em;
+  line-height: 1;
+  color: #1c241a;
+  margin: 0 0 8px;
+}
+.pageSub { font-size: .9rem; color: #8a9089; margin: 0; }
+
+.body {
+  padding: 28px 20px 56px;
+}
+@media (min-width: 768px) { .body { padding: 32px 48px 60px; } }
+
+/* ── Cards de comparativa ── */
+.compareGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1.5px solid #1c241a;
+  margin-bottom: 32px;
+}
+
+.compareCard {
+  padding: 28px 26px;
+  border-right: 1.5px solid #1c241a;
+}
+.compareCard:last-child { border-right: none; }
+
+.compareLabel {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #56605a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dotPri { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; flex-shrink: 0; }
+.dotSec { width: 8px; height: 8px; border-radius: 50%; background: #534ab7; flex-shrink: 0; }
+
+.compareNum {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -.025em;
+  margin-bottom: 20px;
+}
+.numPri { color: #16a34a; }
+.numSec { color: #534ab7; }
+
+.riskRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(28, 36, 26, .1);
+}
+
+.riskItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: .86rem;
+}
+
+.riskDot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.riskName { color: #56605a; display: flex; align-items: center; gap: 7px; }
+.riskVal  { font-family: var(--font-fraunces), 'Fraunces', serif; font-size: 1rem; color: #1c241a; font-weight: 500; }
+
+/* ── Gráfico ── */
+.chartCard {
+  border: 1.5px solid #1c241a;
+  padding: 28px;
+}
+.chartTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #1c241a;
+  margin: 0 0 4px;
+}
+.chartDesc { font-size: .85rem; color: #8a9089; margin-bottom: 22px; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .compareGrid { grid-template-columns: 1fr; }
+  .compareCard { border-right: none; border-bottom: 1.5px solid #1c241a; }
+  .compareCard:last-child { border-bottom: none; }
+  .pageTitle { font-size: 1.7rem; }
+}
+
+@media (max-width: 420px) {
+  .pageTitle  { font-size: 1.5rem; }
+  .compareNum { font-size: 2.4rem; }
+}
