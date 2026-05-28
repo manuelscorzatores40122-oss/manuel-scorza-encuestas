@@ -1,0 +1,394 @@
+/* ══ Nuevo estudiante — Psicólogo — editorial ══ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.page {
+  margin: -1.5rem -1.25rem;
+  animation: fadeIn .3s ease both;
+  padding-bottom: 60px;
+}
+@media (min-width: 640px)  { .page { margin: -1.75rem -1.5rem; } }
+@media (min-width: 1024px) { .page { margin: -2rem -2.5rem; } }
+
+/* ── Volver ── */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #16a34a;
+  text-decoration: none;
+  padding: 16px 20px;
+}
+@media (min-width: 768px) { .back { padding: 20px 48px; } }
+.back:hover { text-decoration: underline; }
+
+/* ── Cabecera ── */
+.header {
+  border-top: 1.5px solid #1c241a;
+  border-bottom: 1.5px solid #1c241a;
+  padding: 24px 20px 22px;
+}
+@media (min-width: 768px) { .header { padding: 28px 48px 24px; } }
+
+.kick {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #16a34a;
+  margin: 0 0 10px;
+}
+
+.pageTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.9rem;
+  letter-spacing: -.02em;
+  color: #1c241a;
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+
+.pageSub { font-size: .9rem; color: #8a9089; margin: 0; }
+
+/* ── Body ── */
+.body {
+  padding: 24px 20px;
+}
+@media (min-width: 768px) { .body { padding: 28px 48px; } }
+
+/* ── Formulario ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Mensaje ── */
+.msgBanner {
+  padding: 12px 16px;
+  font-size: .88rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+.msgOk  { background: rgba(22,163,74,.08);  border: 1px solid rgba(22,163,74,.25);  color: #15803d; }
+.msgErr { background: rgba(220,38,38,.06);  border: 1px solid rgba(220,38,38,.2);   color: #b91c1c; }
+
+/* ── Secciones del formulario ── */
+.section {
+  border: 1.5px solid #1c241a;
+  margin-bottom: 20px;
+}
+
+.sectTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #1c241a;
+  margin: 0;
+  padding: 14px 20px;
+  border-bottom: 1.5px solid #1c241a;
+}
+
+/* ── Grids de campos ── */
+.fieldRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 20px;
+}
+@media (max-width: 768px) { .fieldRow { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .fieldRow { grid-template-columns: 1fr; } }
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px;
+}
+@media (max-width: 540px) { .fieldGrid { grid-template-columns: 1fr; } }
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Ocupa las dos columnas del grid */
+.fieldGroupFull {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  font-size: .63rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8a9089;
+}
+
+.req { color: #dc2626; font-style: normal; }
+
+.fieldInput {
+  height: 38px;
+  padding: 0 12px;
+  border: 1.5px solid rgba(28,36,26,.2);
+  background: #fff;
+  font-size: .88rem;
+  color: #1c241a;
+  outline: none;
+  font-family: inherit;
+  border-radius: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+.fieldInput:focus { border-color: #1c241a; }
+.fieldInput::placeholder { color: #b0b8ae; }
+
+.fieldSelect {
+  height: 38px;
+  padding: 0 10px;
+  border: 1.5px solid rgba(28,36,26,.2);
+  background: #fff;
+  font-size: .88rem;
+  color: #1c241a;
+  outline: none;
+  font-family: inherit;
+  border-radius: 0;
+  cursor: pointer;
+  width: 100%;
+}
+.fieldSelect:focus    { border-color: #1c241a; }
+.fieldSelect:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Hint de campo ── */
+.sectHint {
+  font-size: .82rem;
+  color: #8a9089;
+  padding: 0 20px 4px;
+  margin: 0;
+  border-bottom: 1px dashed rgba(28,36,26,.12);
+  margin-bottom: 0;
+}
+
+.fieldHint {
+  font-size: .7rem;
+  color: #8a9089;
+}
+
+/* ── Input con ícono ── */
+.inputIcon {
+  position: relative;
+}
+.inputIconIcon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8a9089;
+  pointer-events: none;
+}
+.fieldInputIcon {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 32px;
+  border: 1.5px solid rgba(28,36,26,.2);
+  background: #fff;
+  font-size: .88rem;
+  color: #1c241a;
+  outline: none;
+  font-family: inherit;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.fieldInputIcon:focus { border-color: #1c241a; }
+.fieldInputIcon::placeholder { color: #b0b8ae; }
+
+/* ── Acciones ── */
+.formActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.btnPrimary {
+  height: 42px;
+  padding: 0 28px;
+  background: #1c241a;
+  color: #f4f6f0;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background .12s;
+  font-family: inherit;
+}
+.btnPrimary:hover    { background: #2e3d2b; }
+.btnPrimary:disabled { opacity: .5; cursor: not-allowed; }
+
+.btnSecondary {
+  height: 42px;
+  padding: 0 22px;
+  background: none;
+  color: #56605a;
+  font-size: .85rem;
+  font-weight: 600;
+  border: 1.5px solid rgba(28,36,26,.2);
+  cursor: pointer;
+  transition: border-color .12s, color .12s;
+  font-family: inherit;
+}
+.btnSecondary:hover { border-color: #1c241a; color: #1c241a; }
+
+/* ── Tarjeta de credenciales ── */
+.credsCard {
+  border: 1.5px solid #1c241a;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.credsIconRow {
+  margin-bottom: 16px;
+}
+.credsIcon {
+  width: 44px;
+  height: 44px;
+  color: #16a34a;
+  stroke-width: 1.5;
+}
+
+.credsTitle {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #1c241a;
+  margin: 0 0 8px;
+  letter-spacing: -.02em;
+}
+
+.credsName {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #1c241a;
+  margin: 0 0 10px;
+}
+
+.credsSub {
+  font-size: .85rem;
+  color: #56605a;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.credsList {
+  width: 100%;
+  border: 1.5px solid #1c241a;
+  margin-bottom: 16px;
+}
+
+.credsItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  gap: 16px;
+}
+.credsItem + .credsItem {
+  border-top: 1px solid rgba(28,36,26,.12);
+}
+
+.credsItemLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #8a9089;
+  white-space: nowrap;
+}
+
+.credsItemValue {
+  font-family: var(--font-fraunces), 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #1c241a;
+  letter-spacing: .04em;
+}
+
+.credsNote {
+  font-size: .78rem;
+  color: #8a9089;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+/* ── Bloque de notificación ── */
+.credsNotif {
+  width: 100%;
+  border: 1px solid rgba(22,163,74,.25);
+  background: rgba(22,163,74,.05);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+.credsNotifTitle {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #15803d;
+  margin: 0 0 6px;
+}
+.credsNotifSub {
+  font-size: .82rem;
+  color: #1c241a;
+  margin: 0 0 10px;
+}
+.credsNotifChannels {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.credsChannel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .82rem;
+  color: #15803d;
+  font-weight: 500;
+}
+.credsChannelNone {
+  font-size: .78rem;
+  color: #8a9089;
+  font-style: italic;
+}
+
+.credsActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 420px) {
+  .pageTitle  { font-size: 1.5rem; }
+  .credsCard  { padding: 24px 16px; }
+  .credsTitle { font-size: 1.3rem; }
+}

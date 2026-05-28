@@ -196,6 +196,40 @@
   margin: 0;
 }
 
+/* ── Paginador dentro de tabla ───────────── */
+.paginador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.pgBtn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  border-radius: var(--r-sm);
+  transition: background .1s;
+  font-family: inherit;
+}
+.pgBtn:hover:not(:disabled) { background: var(--bg-muted); }
+.pgBtn:disabled { opacity: .35; cursor: default; }
+
+.pgInfo {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 48px;
+  text-align: center;
+}
+
 /* ── Animation ───────────────────────────── */
 @keyframes fadeIn {
   from { opacity:0; transform:translateY(6px); }

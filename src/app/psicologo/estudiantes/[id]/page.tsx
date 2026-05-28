@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Phone, User, Mail, Star } from 'lucide-react';
+import { BtnEliminarEstudiante } from './BtnEliminarEstudiante';
 import { prisma } from '@/lib/prisma';
 import { formatDateTime } from '@/lib/utils';
 import { RiskBadge } from '@/components/EtiquetaRiesgo';
@@ -47,11 +48,17 @@ export default async function HistorialEstudiante({
   return (
     <div className={styles.page}>
 
-      {/* Back */}
-      <Link href="/psicologo/estudiantes" className={styles.backLink}>
-        <ArrowLeft className={styles.backIcon} />
-        Volver a estudiantes
-      </Link>
+      {/* Back + acciones */}
+      <div className={styles.topBar}>
+        <Link href="/psicologo/estudiantes" className={styles.backLink}>
+          <ArrowLeft className={styles.backIcon} />
+          Volver a estudiantes
+        </Link>
+        <BtnEliminarEstudiante
+          studentId={student.id}
+          nombre={`${student.apellidoPaterno} ${student.nombres}`}
+        />
+      </div>
 
       {/* Student info */}
       <div className={styles.card}>

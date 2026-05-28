@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Users } from 'lucide-react';
+import { ArrowRight, Users, UserPlus } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { FiltrosEstudiantes } from './FiltrosEstudiantes';
 import { DatabaseUnavailable } from '@/components/BaseDatosNoDisponible';
@@ -106,8 +106,14 @@ async function renderPage(searchParams: {
           <div className={styles.kick}>Directorio</div>
           <h1 className={styles.pageTitle}>Estudiantes</h1>
         </div>
-        <div className={styles.total}>
-          <b>{total}</b> matriculados · 2026
+        <div className={styles.headerRight}>
+          <div className={styles.total}>
+            <b>{total}</b> matriculados · 2026
+          </div>
+          <Link href="/psicologo/estudiantes/nuevo" className={styles.addBtn}>
+            <UserPlus size={14} strokeWidth={2} />
+            Agregar
+          </Link>
         </div>
       </header>
 

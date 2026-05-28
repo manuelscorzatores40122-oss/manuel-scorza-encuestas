@@ -11,6 +11,15 @@
   animation: fadeIn 0.25s ease both;
 }
 
+/* ── Top bar ────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 /* ── Back link ──────────────────────────── */
 .backLink {
   display: inline-flex;
@@ -245,6 +254,76 @@
   color: var(--text-tertiary);
   font-size: 0.875rem;
 }
+
+/* ── Eliminar estudiante ────────────────── */
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #b91c1c;
+  border: 1.5px solid rgba(185,28,28,.3);
+  background: none;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  font-family: inherit;
+}
+.deleteBtn:hover { background: #b91c1c; color: #fff; }
+
+.deleteConfirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border: 1.5px solid rgba(185,28,28,.3);
+  background: rgba(185,28,28,.04);
+}
+
+.deleteConfirmText {
+  font-size: .82rem;
+  color: #1c241a;
+}
+
+.deleteConfirmBtns {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.deleteCancel {
+  height: 30px;
+  padding: 0 14px;
+  background: none;
+  border: 1.5px solid rgba(28,36,26,.2);
+  font-size: .75rem;
+  font-weight: 600;
+  color: #56605a;
+  cursor: pointer;
+  font-family: inherit;
+}
+.deleteCancel:hover { border-color: #1c241a; color: #1c241a; }
+
+.deleteConfirmBtn {
+  height: 30px;
+  padding: 0 14px;
+  background: #b91c1c;
+  border: none;
+  font-size: .75rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.deleteConfirmBtn:hover    { background: #991b1b; }
+.deleteConfirmBtn:disabled { opacity: .6; cursor: not-allowed; }
 
 /* ── Animation ──────────────────────────── */
 @keyframes fadeIn {

@@ -170,6 +170,23 @@ export async function toggleSurveyAction(id: string) {
   return { ok: true as const };
 }
 
+export async function updateSurveyAction(id: string, title: string, description: string) {
+  await requireRole(['PSYCHOLOGIST', 'ADMIN']);
+
+  if (!title.trim()) return { ok: false as const, error: 'El título es requerido' };
+
+  await prisma.survey.update({
+    where: { id },
+    data: {
+      title:       title.trim(),
+      description: description.trim() || null,
+    },
+  });
+
+  revalidatePath('/psicologo/encuestas');
+  return { ok: true as const };
+}
+
 export async function deleteSurveyAction(id: string) {
   await requireRole(['PSYCHOLOGIST', 'ADMIN']);
 

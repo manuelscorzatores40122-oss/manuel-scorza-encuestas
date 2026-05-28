@@ -58,14 +58,42 @@
   margin: 0;
 }
 
+.headerRight {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .total {
   font-family: var(--font-fraunces), 'Fraunces', serif;
   font-size: 1.05rem;
   color: #56605a;
   white-space: nowrap;
-  flex-shrink: 0;
   padding-bottom: 4px;
 }
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  background: #16a34a;
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  transition: background .12s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.addBtn:hover { background: #15803d; }
 
 .total b { color: #15201a; font-weight: 600; }
 

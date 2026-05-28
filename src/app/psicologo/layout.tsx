@@ -12,16 +12,17 @@ export default async function PsicologoLayout({ children }: { children: React.Re
   const [user, alertCount] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.userId },
-      select: { fullName: true },
+      select: { fullName: true, username: true },
     }),
     prisma.alert.count({ where: { reviewedAt: null } }),
   ]);
 
-  const userName = user?.fullName || 'Psicólogo';
+  const userName  = user?.fullName || 'Psicólogo';
+  const userEmail = user?.username || '';
 
   return (
     <div className={styles.shell}>
-      <NavbarPsicologo userName={userName} alertCount={alertCount} />
+      <NavbarPsicologo userName={userName} userEmail={userEmail} alertCount={alertCount} />
       <main className={styles.main}>
         <div className={styles.pageWrapper}>{children}</div>
       </main>

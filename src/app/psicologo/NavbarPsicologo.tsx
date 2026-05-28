@@ -10,6 +10,7 @@ import {
   BarChart2,
   Bell,
   TrendingUp,
+  UserCog,
   LogOut,
   Menu,
   X,
@@ -26,14 +27,18 @@ const NAV_ITEMS = [
   { href: '/psicologo/respuestas',   label: 'Respuestas',   icon: BarChart2,     badge: false },
   { href: '/psicologo/alertas',      label: 'Alertas',      icon: Bell,          badge: true  },
   { href: '/psicologo/estadisticas', label: 'Estadísticas', icon: TrendingUp,    badge: false },
+  { href: '/psicologo/usuarios',     label: 'Usuarios',     icon: UserCog,       badge: false },
 ];
 
+const MASTER_PSI = 'psicologo@scorzatorres.edu.pe';
+
 interface Props {
-  userName: string;
+  userName:  string;
+  userEmail: string;
   alertCount: number;
 }
 
-export function NavbarPsicologo({ userName, alertCount }: Props) {
+export function NavbarPsicologo({ userName, userEmail, alertCount }: Props) {
   const pathname  = usePathname();
   const router    = useRouter();
   const [open, setOpen] = useState(false);
@@ -47,6 +52,11 @@ export function NavbarPsicologo({ userName, alertCount }: Props) {
     if (href === '/psicologo') return pathname === '/psicologo';
     return pathname.startsWith(href);
   }
+
+  const isMaster = userEmail === MASTER_PSI;
+  const visibleItems = NAV_ITEMS.filter(
+    item => item.href !== '/psicologo/usuarios' || isMaster,
+  );
 
   const initials = userName
     .split(' ')
@@ -97,7 +107,7 @@ export function NavbarPsicologo({ userName, alertCount }: Props) {
 
       {/* ══ FILA 2: pestañas (solo escritorio) ══════════ */}
       <nav className={styles.tabsRow} aria-label="Navegación principal">
-        {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => (
+        {visibleItems.map(({ href, label, icon: Icon, badge }) => (
           <Link
             key={href}
             href={href}
@@ -122,7 +132,7 @@ export function NavbarPsicologo({ userName, alertCount }: Props) {
       {/* ══ CAJÓN MÓVIL ══════════════════════════════════ */}
       {open && (
         <nav className={styles.drawer} aria-label="Menú móvil">
-          {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => (
+          {visibleItems.map(({ href, label, icon: Icon, badge }) => (
             <Link
               key={href}
               href={href}

@@ -1,0 +1,21 @@
+{
+  "name": "psicoescolar-notificaciones",
+  "version": "1.0.0",
+  "description": "Servicio de notificaciones por email — PsicoEscolar I.E. 40122",
+  "scripts": {
+    "start": "tsx index.ts",
+    "dev":   "tsx watch index.ts"
+  },
+  "dependencies": {
+    "dotenv":      "^16.4.5",
+    "node-cron":   "^3.0.3",
+    "nodemailer":  "^6.9.15"
+  },
+  "devDependencies": {
+    "@types/node":       "^20.0.0",
+    "@types/node-cron":  "^3.0.11",
+    "@types/nodemailer": "^6.4.17",
+    "tsx":               "^4.19.2",
+    "typescript":        "^5.0.0"
+  }
+}
