@@ -81,6 +81,9 @@
 /* ── Cuerpo ─────────────────────────────── */
 .body {
   padding: 24px 20px 48px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @media (min-width: 768px) { .body { padding: 32px 48px 60px; } }
@@ -268,7 +271,7 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 18px 4px;
   background: none;
   border: none;
@@ -277,6 +280,9 @@
   font-family: inherit;
   min-width: 0;
 }
+
+@media (min-width: 768px) { .accTrigger { gap: 20px; } }
+
 .accTrigger:hover .accTitle { color: #16a34a; }
 
 /* Badge estado */
@@ -289,7 +295,7 @@
   letter-spacing: .09em;
   text-transform: uppercase;
   flex-shrink: 0;
-  width: 72px;
+  min-width: 74px;
 }
 .accBadgeDot {
   width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
@@ -319,7 +325,10 @@
   color: #8a9089;
   flex-shrink: 0;
   white-space: nowrap;
+  display: none;
 }
+
+@media (min-width: 640px) { .accMeta { display: block; } }
 
 .accChevron {
   color: #8a9089;
@@ -386,8 +395,17 @@
 }
 .accDate { color: #8a9089; }
 
+.accLinks {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .accLink {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: .85rem;
   font-weight: 600;
   color: #16a34a;
@@ -396,6 +414,11 @@
   transition: border-color .15s;
 }
 .accLink:hover { border-bottom-color: #16a34a; }
+
+.accLinkEdit {
+  color: #534ab7;
+}
+.accLinkEdit:hover { border-bottom-color: #534ab7; }
 
 /* Formulario edición inline */
 .editForm {

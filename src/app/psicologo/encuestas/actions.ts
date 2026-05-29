@@ -170,6 +170,67 @@ export async function toggleSurveyAction(id: string) {
   return { ok: true as const };
 }
 
+type QuestionInput = {
+  dbId?:     string;   // undefined = pregunta nueva
+  type:      'SINGLE' | 'MULTI' | 'SCALE' | 'TEXT' | 'YES_NO';
+  text:      string;
+  required:  boolean;
+  riskScore: number;
+  options?:  { label: string; value: string; riskScore: number }[];
+};
+
+export async function updateSurveyQuestionsAction(
+  surveyId: string,
+  questions: QuestionInput[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  await requireRole(['PSYCHOLOGIST', 'ADMIN']);
+
+  if (questions.length === 0)
+    return { ok: false, error: 'La encuesta debe tener al menos una pregunta' };
+
+  for (const [i, q] of questions.entries()) {
+    if (!q.text.trim()) return { ok: false, error: `La pregunta ${i + 1} necesita texto` };
+  }
+
+  const existing = await prisma.question.findMany({
+    where:  { surveyId },
+    select: { id: true },
+  });
+
+  const submittedDbIds = new Set(questions.map(q => q.dbId).filter(Boolean));
+
+  // Eliminar solo preguntas sin respuestas asociadas
+  for (const { id } of existing) {
+    if (!submittedDbIds.has(id)) {
+      const hasAnswers = await prisma.answer.count({ where: { questionId: id } });
+      if (hasAnswers === 0) await prisma.question.delete({ where: { id } });
+    }
+  }
+
+  // Actualizar existentes / crear nuevas
+  for (let i = 0; i < questions.length; i++) {
+    const q     = questions[i];
+    const order = i + 1;
+    const needsOptions = ['SINGLE', 'MULTI', 'YES_NO'].includes(q.type);
+    const options = needsOptions ? (q.options ?? []) : undefined;
+
+    if (q.dbId) {
+      await prisma.question.update({
+        where: { id: q.dbId },
+        data:  { text: q.text.trim(), required: q.required, riskScore: q.riskScore, order, options },
+      });
+    } else {
+      await prisma.question.create({
+        data: { surveyId, type: q.type, text: q.text.trim(), required: q.required, riskScore: q.riskScore, order, options },
+      });
+    }
+  }
+
+  revalidatePath('/psicologo/encuestas');
+  revalidatePath(`/psicologo/encuestas/${surveyId}`);
+  return { ok: true };
+}
+
 export async function updateSurveyAction(id: string, title: string, description: string) {
   await requireRole(['PSYCHOLOGIST', 'ADMIN']);
 

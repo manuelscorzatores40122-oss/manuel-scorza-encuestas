@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ChevronDown, ChevronLeft, ChevronRight,
-  Eye, Pencil, Power, Trash2, Check, X,
+  Eye, Pencil, Power, Trash2, Check, X, ListChecks,
 } from 'lucide-react';
 import { toggleSurveyAction, deleteSurveyAction, updateSurveyAction } from './actions';
 import { formatDate } from '@/lib/utils';
@@ -105,7 +105,9 @@ export function GestorEncuestas({ surveys }: { surveys: Survey[] }) {
                   </span>
                   <span className={styles.accTitle}>{s.title}</span>
                   <span className={styles.accMeta}>
-                    {s._count.questions} preg · {s._count.responses} resp
+                    {s._count.questions} {s._count.questions === 1 ? 'pregunta' : 'preguntas'}
+                    {' · '}
+                    {s._count.responses} {s._count.responses === 1 ? 'respuesta' : 'respuestas'}
                   </span>
                   <ChevronDown
                     size={15}
@@ -124,7 +126,7 @@ export function GestorEncuestas({ surveys }: { surveys: Survey[] }) {
                   <button
                     type="button"
                     className={styles.ibtn}
-                    title="Editar"
+                    title="Editar título y descripción"
                     disabled={pending}
                     onClick={() => openEdit(s)}
                   >
@@ -203,12 +205,20 @@ export function GestorEncuestas({ surveys }: { surveys: Survey[] }) {
                         <span><b>{s._count.responses}</b> respuestas</span>
                         <span className={styles.accDate}>{formatDate(s.createdAt)}</span>
                       </div>
-                      <Link
-                        href={`/psicologo/encuestas/${s.id}`}
-                        className={styles.accLink}
-                      >
-                        Ver resultados →
-                      </Link>
+                      <div className={styles.accLinks}>
+                        <Link
+                          href={`/psicologo/encuestas/${s.id}`}
+                          className={styles.accLink}
+                        >
+                          <Eye size={13} /> Ver resultados
+                        </Link>
+                        <Link
+                          href={`/psicologo/encuestas/${s.id}/editar`}
+                          className={`${styles.accLink} ${styles.accLinkEdit}`}
+                        >
+                          <ListChecks size={13} /> Editar preguntas
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>
