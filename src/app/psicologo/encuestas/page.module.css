@@ -491,6 +491,89 @@
 }
 .editCancel:hover { color: #15201a; border-color: #15201a; }
 
+/* ── Destinatarios en acordeón (vista) ───── */
+.accTarget {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .78rem;
+  color: #56605a;
+  background: rgba(21,32,26,.05);
+  border: 1px solid rgba(21,32,26,.1);
+  padding: 3px 10px;
+  width: fit-content;
+}
+
+/* ── Selector de destinatarios ───────────── */
+.checkToda {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88rem;
+  font-weight: 600;
+  color: #15201a;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.checkToda input { accent-color: #16a34a; width: 15px; height: 15px; cursor: pointer; }
+
+.gradePicker { display: flex; flex-direction: column; gap: 12px; }
+.gradePickerMuted { opacity: .4; pointer-events: none; }
+
+.levelGroup { display: flex; flex-direction: column; gap: 6px; }
+.levelLabel {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #8a9089;
+}
+
+.gradeRow { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; }
+
+.gradeCell { display: flex; flex-direction: column; gap: 4px; }
+
+.gradeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 5px 12px;
+  border: 1.5px solid rgba(21,32,26,.22);
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  font-family: inherit;
+  color: #56605a;
+  transition: border-color .12s, background .12s, color .12s;
+  border-radius: 0;
+}
+.gradeChip:hover:not(:disabled) { border-color: #16a34a; color: #16a34a; }
+.gradeChip:disabled { cursor: default; }
+.gradeChipOn { background: #16a34a !important; border-color: #16a34a !important; color: #fff !important; }
+
+.secRow { display: flex; gap: 4px; padding-left: 4px; flex-wrap: wrap; }
+
+.secChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 9px;
+  border: 1px solid rgba(21,32,26,.18);
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  font-family: inherit;
+  color: #8a9089;
+  transition: border-color .12s, background .12s, color .12s;
+  border-radius: 0;
+}
+.secChip:hover:not(:disabled) { border-color: #534ab7; color: #534ab7; }
+.secChip:disabled { cursor: default; }
+.secChipOn { background: #534ab7 !important; border-color: #534ab7 !important; color: #fff !important; }
+
 /* Paginación */
 .pagination {
   display: flex;

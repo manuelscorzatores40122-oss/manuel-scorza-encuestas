@@ -15,14 +15,14 @@ import { logoutAction } from '@/app/login/actions';
 import styles from './layout.module.css';
 
 const NAV_ITEMS = [
-  { href: '/estudiante',           label: 'Inicio',      icon: Home          },
-  { href: '/estudiante/encuestas', label: 'Encuestas',   icon: ClipboardList },
-  { href: '/estudiante/anuncios',  label: 'Anuncios',    icon: Megaphone     },
-  { href: '/estudiante/historial', label: 'Mi historial',icon: History       },
-  { href: '/estudiante/perfil',    label: 'Mi perfil',   icon: UserRound     },
+  { href: '/estudiante',           label: 'Inicio',       icon: Home,          badge: false },
+  { href: '/estudiante/encuestas', label: 'Encuestas',    icon: ClipboardList, badge: true  },
+  { href: '/estudiante/anuncios',  label: 'Anuncios',     icon: Megaphone,     badge: false },
+  { href: '/estudiante/historial', label: 'Mi historial', icon: History,       badge: false },
+  { href: '/estudiante/perfil',    label: 'Mi perfil',    icon: UserRound,     badge: false },
 ];
 
-export function BarraLateral() {
+export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
   const pathname = usePathname();
   const router   = useRouter();
 
@@ -52,14 +52,19 @@ export function BarraLateral() {
 
       {/* Navegación */}
       <nav className={styles.sidebarNav}>
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+        {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => (
           <Link
             key={href}
             href={href}
             className={`${styles.sidebarItem} ${isActive(href) ? styles.sidebarItemActive : ''}`}
           >
             <Icon className={styles.sidebarItemIcon} />
-            <span>{label}</span>
+            <span className={styles.sidebarItemLabel}>{label}</span>
+            {badge && pendingSurveys > 0 && (
+              <span className={styles.navBadge}>
+                {pendingSurveys > 9 ? '9+' : pendingSurveys}
+              </span>
+            )}
           </Link>
         ))}
       </nav>

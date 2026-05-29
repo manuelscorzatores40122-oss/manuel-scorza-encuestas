@@ -5,13 +5,20 @@ import { prisma } from '@/lib/prisma';
 import { EditorPreguntas } from './EditorPreguntas';
 
 export default async function EditarEncuestaPage({ params }: { params: { id: string } }) {
-  const survey = await prisma.survey.findUnique({
-    where:   { id: params.id },
-    include: {
-      questions: { orderBy: { order: 'asc' } },
-      _count:    { select: { responses: true } },
-    },
-  });
+  const [survey, grades] = await Promise.all([
+    prisma.survey.findUnique({
+      where:   { id: params.id },
+      include: {
+        questions: { orderBy: { order: 'asc' } },
+        _count:    { select: { responses: true } },
+      },
+    }),
+    prisma.grade.findMany({
+      orderBy: [{ nivel: 'asc' }, { order: 'asc' }],
+      include: { sections: { orderBy: { name: 'asc' } } },
+    }),
+  ]);
+
   if (!survey) notFound();
 
   return (
@@ -27,7 +34,7 @@ export default async function EditarEncuestaPage({ params }: { params: { id: str
 
       <header className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-          Editar preguntas
+          Editar encuesta
         </p>
         <h1 className="text-2xl font-bold text-slate-900">{survey.title}</h1>
         {survey.description && (
@@ -38,6 +45,9 @@ export default async function EditarEncuestaPage({ params }: { params: { id: str
       <EditorPreguntas
         surveyId={survey.id}
         responsesCount={survey._count.responses}
+        initialTargetGrades={survey.targetGrades}
+        initialTargetSections={survey.targetSections}
+        grades={grades}
         initialQuestions={survey.questions.map(q => ({
           dbId:      q.id,
           id:        q.id,

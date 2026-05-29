@@ -166,6 +166,7 @@ export async function toggleSurveyAction(id: string) {
   });
 
   revalidatePath('/psicologo/encuestas');
+  revalidatePath('/estudiante', 'layout');
 
   return { ok: true as const };
 }
@@ -231,20 +232,28 @@ export async function updateSurveyQuestionsAction(
   return { ok: true };
 }
 
-export async function updateSurveyAction(id: string, title: string, description: string) {
+export async function updateSurveyAction(
+  id: string,
+  title: string,
+  description: string,
+  targetGrades: string[]   = [],
+  targetSections: string[] = [],
+) {
   await requireRole(['PSYCHOLOGIST', 'ADMIN']);
 
-  if (!title.trim()) return { ok: false as const, error: 'El título es requerido' };
+  const data: Record<string, unknown> = {
+    targetGrades:   targetGrades,
+    targetSections: targetSections,
+  };
+  if (title.trim()) {
+    data.title       = title.trim();
+    data.description = description.trim() || null;
+  }
 
-  await prisma.survey.update({
-    where: { id },
-    data: {
-      title:       title.trim(),
-      description: description.trim() || null,
-    },
-  });
+  await prisma.survey.update({ where: { id }, data });
 
   revalidatePath('/psicologo/encuestas');
+  revalidatePath('/estudiante', 'layout');
   return { ok: true as const };
 }
 

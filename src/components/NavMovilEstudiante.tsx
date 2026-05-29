@@ -16,7 +16,7 @@ import {
 import { logoutAction } from '@/app/login/actions';
 import styles from '@/app/estudiante/layout.module.css';
 
-export function StudentMobileBottomNav() {
+export function StudentMobileBottomNav({ pendingSurveys }: { pendingSurveys: number }) {
   const router = useRouter();
 
   async function logout() {
@@ -32,7 +32,14 @@ export function StudentMobileBottomNav() {
       </Link>
 
       <Link href="/estudiante/encuestas" className={styles.mobileNavButton}>
-        <ClipboardList className={styles.mobileIcon} />
+        <span className={styles.mobileNavIconWrap}>
+          <ClipboardList className={styles.mobileIcon} />
+          {pendingSurveys > 0 && (
+            <span className={styles.mobileBadge}>
+              {pendingSurveys > 9 ? '9+' : pendingSurveys}
+            </span>
+          )}
+        </span>
         <span>Encuestas</span>
       </Link>
 

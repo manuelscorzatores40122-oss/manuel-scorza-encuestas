@@ -1,0 +1,114 @@
+/* ── Selector de destinatarios en EditorPreguntas ── */
+
+.checkToda {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+}
+.checkToda input {
+  accent-color: #16a34a;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.gradePicker {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: opacity .15s;
+}
+.gradePickerMuted {
+  opacity: .35;
+  pointer-events: none;
+}
+
+.levelGroup { display: flex; flex-direction: column; gap: 6px; }
+
+.levelLabel {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.gradeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.gradeCell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gradeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  padding: 5px 12px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+  font-family: inherit;
+  color: #64748b;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.gradeChip:hover:not(:disabled) {
+  border-color: #16a34a;
+  color: #16a34a;
+  background: #f0fdf4;
+}
+.gradeChip:disabled { cursor: default; }
+.gradeChipOn {
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #fff !important;
+}
+
+.secRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding-left: 4px;
+}
+
+.secChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+  font-family: inherit;
+  color: #94a3b8;
+  transition: border-color .12s, background .12s, color .12s;
+}
+.secChip:hover:not(:disabled) {
+  border-color: #534ab7;
+  color: #534ab7;
+  background: #f5f3ff;
+}
+.secChip:disabled { cursor: default; }
+.secChipOn {
+  background: #534ab7 !important;
+  border-color: #534ab7 !important;
+  color: #fff !important;
+}

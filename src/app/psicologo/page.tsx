@@ -114,7 +114,9 @@ async function renderDashboard() {
         <BuscadorEstudiantes />
 
         {/* ── KPIs: requiere atención ────── */}
-        <p className={styles.sectionLabel}>Requiere tu atención</p>
+        <p className={styles.sectionLabel}>Busquedas rapidas</p>
+        <p></p>
+
         <div className={styles.kpiGrid}>
           <KpiCell
             icon={<AlertTriangle className={styles.kpiTopIcon} />}

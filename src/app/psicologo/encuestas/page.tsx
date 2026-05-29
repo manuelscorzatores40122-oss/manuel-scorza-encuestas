@@ -15,24 +15,31 @@ export default async function EncuestasPsicologo() {
 }
 
 async function renderPage() {
-  const raw = await prisma.survey.findMany({
-    orderBy: { createdAt: 'desc' },
-    select: {
-      id:          true,
-      title:       true,
-      description: true,
-      isActive:    true,
-      createdAt:   true,
-      _count: { select: { responses: true, questions: true } },
-    },
-  });
+  const [raw, grades] = await Promise.all([
+    prisma.survey.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id:             true,
+        title:          true,
+        description:    true,
+        isActive:       true,
+        createdAt:      true,
+        targetGrades:   true,
+        targetSections: true,
+        _count: { select: { responses: true, questions: true } },
+      },
+    }),
+    prisma.grade.findMany({
+      orderBy: [{ nivel: 'asc' }, { order: 'asc' }],
+      include: { sections: { orderBy: { name: 'asc' } } },
+    }),
+  ]);
 
   const surveys = raw.map(s => ({ ...s, createdAt: s.createdAt.toISOString() }));
 
   return (
     <div className={styles.page}>
 
-      {/* ── Encabezado ── */}
       <header className={styles.header}>
         <div>
           <div className={styles.kick}>Gestión</div>
@@ -48,7 +55,7 @@ async function renderPage() {
         {surveys.length === 0 ? (
           <EmptyState />
         ) : (
-          <GestorEncuestas surveys={surveys} />
+          <GestorEncuestas surveys={surveys} grades={grades} />
         )}
       </div>
 
