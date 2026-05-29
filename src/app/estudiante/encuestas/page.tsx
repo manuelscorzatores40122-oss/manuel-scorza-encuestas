@@ -16,23 +16,20 @@ export default async function EncuestasEstudiante() {
 
     if (!student) return null;
 
-    const surveys = await prisma.survey.findMany({
-      where: {
-        isActive: true,
-        responses: { none: { studentId: student.id } },
-        OR: [
-          { targetGrades: { has: student.section.gradeId } },
-          { targetGrades: { isEmpty: true } },
-        ],
-        AND: [{
-          OR: [
-            { targetSections: { has: student.sectionId } },
-            { targetSections: { isEmpty: true } },
-          ],
-        }],
-      },
+    const allActive = await prisma.survey.findMany({
+      where:   { isActive: true, responses: { none: { studentId: student.id } } },
       orderBy: { createdAt: 'desc' },
       include: { _count: { select: { questions: true } } },
+    });
+
+    const gradeId   = student.section?.gradeId   ?? '';
+    const sectionId = student.sectionId           ?? '';
+
+    const surveys = allActive.filter(s => {
+      const tg = s.targetGrades   ?? [];
+      const ts = s.targetSections ?? [];
+      return (tg.length === 0 || tg.includes(gradeId))
+          && (ts.length === 0 || ts.includes(sectionId));
     });
 
     return (

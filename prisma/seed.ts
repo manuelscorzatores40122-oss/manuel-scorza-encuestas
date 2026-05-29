@@ -293,7 +293,7 @@ async function main() {
         description: 'Esta encuesta es confidencial. Ayúdanos a conocer tu experiencia en el colegio para poder apoyarte mejor.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -377,7 +377,7 @@ async function main() {
         description: 'Queremos conocer cómo te encuentras en casa para brindarte el apoyo que necesitas. Tus respuestas son privadas.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -460,7 +460,7 @@ async function main() {
         description: 'Esta encuesta nos ayuda a conocer cómo te has sentido emocionalmente. Es completamente confidencial. Responde con sinceridad.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -538,7 +538,7 @@ async function main() {
         description: 'Queremos entender cómo el colegio afecta tu bienestar. No hay respuestas correctas o incorrectas.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -615,7 +615,7 @@ async function main() {
         description: 'Esta encuesta nos ayuda a conocer cómo te valoras a ti mismo/a. Tus respuestas son privadas.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -692,7 +692,7 @@ async function main() {
         description: 'Queremos saber cómo te llevas con tus compañeros y si te sientes parte del colegio.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -768,7 +768,7 @@ async function main() {
         description: 'Esta encuesta nos ayuda a entender cómo el uso del celular y las redes sociales afecta tu bienestar.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -843,7 +843,7 @@ async function main() {
         description: 'Queremos conocer tus metas, sueños y qué tan motivado/a te sientes en el colegio.',
         isActive: false,
         createdById: psicologo.id,
-        targetGrades: allGrades.map(g => g.id),
+        targetGrades: [],
         targetSections: [],
         questions: {
           create: [
@@ -915,7 +915,50 @@ async function main() {
   console.log('✅ Encuesta "Proyecto de Vida y Motivación Escolar" creada (inactiva)');
 
   // ============================================================
-  // 5. REGLAS DE ALERTA POR DEFECTO
+  // 5. ANUNCIOS POR DEFECTO
+  // ============================================================
+  const anunciosDefault = [
+    {
+      title: '¡Bienvenidos al Sistema PsicoEscolar!',
+      content:
+        'Estimados estudiantes, a partir de ahora contamos con PsicoEscolar para el seguimiento de su bienestar emocional. ' +
+        'Aquí podrán responder encuestas, leer comunicados y solicitar apoyo del área de Psicología. ' +
+        'Sus respuestas son completamente confidenciales. ¡Gracias por participar!',
+    },
+    {
+      title: 'Área de Psicología — Estamos aquí para apoyarte',
+      content:
+        'Recuerda que el área de Psicología de la I.E. 40122 Manuel Scorza Torres está disponible ' +
+        'para apoyarte en cualquier situación difícil. Si sientes que necesitas hablar con alguien, ' +
+        'puedes acercarte directamente al departamento de Psicología o indicarlo en tus encuestas de bienestar.',
+    },
+    {
+      title: 'Tus respuestas son privadas y confidenciales',
+      content:
+        'Queremos que sepas que todo lo que respondes en las encuestas de PsicoEscolar es estrictamente confidencial. ' +
+        'Solo el psicólogo del colegio tiene acceso a tus respuestas. ' +
+        'Responde con sinceridad para que podamos brindarte el mejor apoyo posible.',
+    },
+  ];
+
+  for (const anuncio of anunciosDefault) {
+    const existe = await prisma.announcement.findFirst({ where: { title: anuncio.title } });
+    if (!existe) {
+      await prisma.announcement.create({
+        data: {
+          title:       anuncio.title,
+          content:     anuncio.content,
+          targetRoles: ['STUDENT'],
+          isPublished: true,
+          createdById: psicologo.id,
+        },
+      });
+    }
+  }
+  console.log('✅ 3 anuncios por defecto creados (visibles para estudiantes)');
+
+  // ============================================================
+  // 6. REGLAS DE ALERTA POR DEFECTO
   // ============================================================
   const reglas = [
     {

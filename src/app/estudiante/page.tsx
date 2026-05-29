@@ -20,23 +20,25 @@ export default async function EstudianteHome() {
     return <p>No se encontró tu ficha de estudiante.</p>;
   }
 
-  const [surveys, myResponses, announcements] = await Promise.all([
+  const gradeId   = student.section?.gradeId ?? '';
+  const sectionId = student.sectionId        ?? '';
+
+  const [allActiveSurveys, myResponses, announcements] = await Promise.all([
     prisma.survey.findMany({
-      where: {
-        isActive: true,
-        responses: { none: { studentId: student.id } },
-        OR: [
-          { targetGrades: { has: student.section.gradeId } },
-          { targetGrades: { isEmpty: true } },
-        ],
-        AND: [{ OR: [{ targetSections: { has: student.sectionId } }, { targetSections: { isEmpty: true } }] }],
-      },
+      where:   { isActive: true, responses: { none: { studentId: student.id } } },
       orderBy: { createdAt: 'desc' },
-      select: { id: true, title: true, description: true },
+      select:  { id: true, title: true, description: true, targetGrades: true, targetSections: true },
     }),
     prisma.response.count({ where: { studentId: student.id } }),
     listPublishedAnnouncementsFor('STUDENT', 3),
   ]);
+
+  const surveys = allActiveSurveys.filter(s => {
+    const tg = s.targetGrades   ?? [];
+    const ts = s.targetSections ?? [];
+    return (tg.length === 0 || tg.includes(gradeId))
+        && (ts.length === 0 || ts.includes(sectionId));
+  });
 
   const emergencyContact =
     student.apoderados.find((a) => a.esContactoPrincipal) ||

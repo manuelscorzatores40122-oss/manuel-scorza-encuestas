@@ -162,8 +162,8 @@ model Survey {
   fechaFin      DateTime?
   createdById   String
   createdBy     User      @relation("SurveyCreator", fields: [createdById], references: [id])
-  targetGrades  String[]  // ids de Grade
-  targetSections String[] // ids de Section (opcional, vacío = todas)
+  targetGrades   String[] @default([]) // ids de Grade
+  targetSections String[] @default([]) // ids de Section (opcional, vacío = todas)
   questions     Question[]
   responses     Response[]
   createdAt     DateTime  @default(now())

@@ -10,86 +10,80 @@ export type AnnouncementRow = {
   createdBy: { fullName: string };
 };
 
-type RawAnnouncementRow = {
-  id: string;
-  title: string;
-  content: string;
-  targetRoles: string[];
-  isPublished: boolean;
-  createdAt: Date;
-  createdByName: string;
-};
-
+/* ── Lista con autor (paneles admin/director/psicologo) ── */
 export async function listAnnouncements(limit = 50): Promise<AnnouncementRow[]> {
-  const rows = await prisma.$queryRaw<RawAnnouncementRow[]>`
-    SELECT
-      a.id,
-      a.title,
-      a.content,
-      a."targetRoles",
-      a."isPublished",
-      a."createdAt",
-      u."fullName" AS "createdByName"
-    FROM "Announcement" a
-    INNER JOIN "User" u ON u.id = a."createdById"
-    ORDER BY a."createdAt" DESC
-    LIMIT ${limit}
-  `;
-
-  return rows.map((row) => ({
-    id: row.id,
-    title: row.title,
-    content: row.content,
-    targetRoles: row.targetRoles,
-    isPublished: row.isPublished,
-    createdAt: row.createdAt,
-    createdBy: { fullName: row.createdByName },
-  }));
+  const rows = await prisma.announcement.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    select: {
+      id:          true,
+      title:       true,
+      content:     true,
+      targetRoles: true,
+      isPublished: true,
+      createdAt:   true,
+      createdBy:   { select: { fullName: true } },
+    },
+  });
+  return rows;
 }
 
-export async function listPublishedAnnouncementsFor(role: string, limit = 3) {
-  return prisma.$queryRaw<Array<Omit<AnnouncementRow, 'createdBy'> & { createdById: string }>>`
-    SELECT id, title, content, "targetRoles", "isPublished", "createdAt", "createdById"
-    FROM "Announcement"
-    WHERE "isPublished" = true
-      AND (${role} = ANY("targetRoles") OR cardinality("targetRoles") = 0)
-    ORDER BY "createdAt" DESC
-    LIMIT ${limit}
-  `;
+/* ── Lista para el estudiante (solo visibles para su rol) ── */
+export async function listPublishedAnnouncementsFor(role: string, limit = 100) {
+  return prisma.announcement.findMany({
+    where: {
+      isPublished: true,
+      OR: [
+        { targetRoles: { has: role } },
+        { targetRoles: { isEmpty: true } },
+      ],
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    select: {
+      id:          true,
+      title:       true,
+      content:     true,
+      targetRoles: true,
+      isPublished: true,
+      createdAt:   true,
+      createdById: true,
+    },
+  });
 }
 
+/* ── CRUD ── */
 export async function createAnnouncement(input: {
-  id: string;
-  title: string;
-  content: string;
+  id:          string;
+  title:       string;
+  content:     string;
   targetRoles: string[];
   createdById: string;
 }) {
-  await prisma.$executeRaw`
-    INSERT INTO "Announcement" (
-      id, title, content, "targetRoles", "isPublished", "createdById", "createdAt", "updatedAt"
-    )
-    VALUES (
-      ${input.id},
-      ${input.title},
-      ${input.content},
-      ${input.targetRoles}::text[],
-      true,
-      ${input.createdById},
-      NOW(),
-      NOW()
-    )
-  `;
+  await prisma.announcement.create({
+    data: {
+      id:          input.id,
+      title:       input.title,
+      content:     input.content,
+      targetRoles: input.targetRoles,
+      isPublished: true,
+      createdById: input.createdById,
+    },
+  });
 }
 
 export async function toggleAnnouncement(id: string) {
-  await prisma.$executeRaw`
-    UPDATE "Announcement"
-    SET "isPublished" = NOT "isPublished", "updatedAt" = NOW()
-    WHERE id = ${id}
-  `;
+  const current = await prisma.announcement.findUnique({
+    where:  { id },
+    select: { isPublished: true },
+  });
+  if (!current) return;
+  await prisma.announcement.update({
+    where: { id },
+    data:  { isPublished: !current.isPublished },
+  });
 }
 
 export async function deleteAnnouncement(id: string) {
-  await prisma.$executeRaw`DELETE FROM "Announcement" WHERE id = ${id}`;
+  await prisma.announcement.delete({ where: { id } });
 }

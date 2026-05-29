@@ -14,24 +14,23 @@ export default async function StudentLayout({ children }: { children: React.Reac
     select: { id: true, sectionId: true, section: { select: { gradeId: true } } },
   });
 
-  const pendingSurveys = student
-    ? await prisma.survey.count({
-        where: {
-          isActive: true,
-          responses: { none: { studentId: student.id } },
-          OR: [
-            { targetGrades: { has: student.section.gradeId } },
-            { targetGrades: { isEmpty: true } },
-          ],
-          AND: [{
-            OR: [
-              { targetSections: { has: student.sectionId } },
-              { targetSections: { isEmpty: true } },
-            ],
-          }],
-        },
-      })
-    : 0;
+  let pendingSurveys = 0;
+  if (student) {
+    const gradeId   = student.section?.gradeId ?? '';
+    const sectionId = student.sectionId        ?? '';
+
+    const allActive = await prisma.survey.findMany({
+      where:  { isActive: true, responses: { none: { studentId: student.id } } },
+      select: { targetGrades: true, targetSections: true },
+    });
+
+    pendingSurveys = allActive.filter(s => {
+      const tg = s.targetGrades   ?? [];
+      const ts = s.targetSections ?? [];
+      return (tg.length === 0 || tg.includes(gradeId))
+          && (ts.length === 0 || ts.includes(sectionId));
+    }).length;
+  }
 
   return (
     <div className={styles.shell}>
