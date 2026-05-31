@@ -6,14 +6,20 @@ import { Home, ClipboardList, Megaphone, History, UserRound } from 'lucide-react
 import styles from '@/app/estudiante/layout.module.css';
 
 const NAV = [
-  { href: '/estudiante',           label: 'Inicio',    icon: Home,          badge: false },
-  { href: '/estudiante/encuestas', label: 'Encuestas', icon: ClipboardList, badge: true  },
-  { href: '/estudiante/anuncios',  label: 'Anuncios',  icon: Megaphone,     badge: false },
-  { href: '/estudiante/historial', label: 'Historial', icon: History,       badge: false },
-  { href: '/estudiante/perfil',    label: 'Perfil',    icon: UserRound,     badge: false },
+  { href: '/estudiante',           label: 'Inicio',    icon: Home,          badgeKey: 'none'          },
+  { href: '/estudiante/encuestas', label: 'Encuestas', icon: ClipboardList, badgeKey: 'surveys'       },
+  { href: '/estudiante/anuncios',  label: 'Anuncios',  icon: Megaphone,     badgeKey: 'announcements' },
+  { href: '/estudiante/historial', label: 'Historial', icon: History,       badgeKey: 'none'          },
+  { href: '/estudiante/perfil',    label: 'Perfil',    icon: UserRound,     badgeKey: 'none'          },
 ];
 
-export function StudentMobileBottomNav({ pendingSurveys }: { pendingSurveys: number }) {
+export function StudentMobileBottomNav({
+  pendingSurveys,
+  announcementsCount,
+}: {
+  pendingSurveys:    number;
+  announcementsCount: number;
+}) {
   const pathname = usePathname();
 
   function isActive(href: string) {
@@ -21,10 +27,17 @@ export function StudentMobileBottomNav({ pendingSurveys }: { pendingSurveys: num
     return pathname.startsWith(href);
   }
 
+  function badgeCount(key: string) {
+    if (key === 'surveys')       return pendingSurveys;
+    if (key === 'announcements') return announcementsCount;
+    return 0;
+  }
+
   return (
     <nav className={styles.mobileBottomNav}>
-      {NAV.map(({ href, label, icon: Icon, badge }) => {
+      {NAV.map(({ href, label, icon: Icon, badgeKey }) => {
         const active = isActive(href);
+        const count  = badgeCount(badgeKey);
         return (
           <Link
             key={href}
@@ -33,9 +46,9 @@ export function StudentMobileBottomNav({ pendingSurveys }: { pendingSurveys: num
           >
             <span className={styles.mobileNavIconWrap}>
               <Icon className={styles.mobileIcon} />
-              {badge && pendingSurveys > 0 && (
+              {count > 0 && (
                 <span className={styles.mobileBadge}>
-                  {pendingSurveys > 9 ? '9+' : pendingSurveys}
+                  {count > 9 ? '9+' : count}
                 </span>
               )}
             </span>

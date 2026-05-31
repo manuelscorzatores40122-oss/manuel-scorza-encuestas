@@ -25,25 +25,13 @@ function esIOSNoInstalado() {
 async function getSWRegistration(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) return null;
 
-  // Esperar SW activo (máx 4s)
-  const existing = await navigator.serviceWorker.getRegistration('/');
-  if (existing?.active) return existing;
+  // Registrar si no existe aún
+  await navigator.serviceWorker
+    .register('/sw.js', { scope: '/', updateViaCache: 'none' })
+    .catch(() => {});
 
-  const reg = await navigator.serviceWorker.register('/sw.js', {
-    scope: '/',
-    updateViaCache: 'none',
-  });
-
-  if (reg.active) return reg;
-
-  return new Promise((resolve) => {
-    const sw = reg.installing ?? reg.waiting ?? null;
-    if (!sw) { resolve(reg); return; }
-    sw.addEventListener('statechange', () => {
-      if (sw.state === 'activated') resolve(reg);
-    });
-    setTimeout(() => resolve(reg), 4000);
-  });
+  // .ready resuelve SOLO cuando el SW está activado — es la API correcta para esto
+  return navigator.serviceWorker.ready;
 }
 
 type Estado = 'cargando' | 'idle' | 'activo' | 'ios-pwa' | 'no-soportado';
@@ -95,8 +83,11 @@ export function BtnNotificaciones() {
         const reg = await getSWRegistration();
         if (!reg) { setError('El Service Worker no está disponible.'); return; }
 
+        // Limpiar suscripción vieja para evitar conflictos con claves VAPID anteriores
         const existing = await reg.pushManager.getSubscription();
-        const sub = existing ?? await reg.pushManager.subscribe({
+        if (existing) await existing.unsubscribe().catch(() => {});
+
+        const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
         });
@@ -109,9 +100,19 @@ export function BtnNotificaciones() {
 
         if (!res.ok) throw new Error('Error al guardar suscripción');
         setEstado('activo');
-      } catch (err) {
-        setError('No se pudo activar. Inténtalo de nuevo.');
-        console.error('[Push]', err);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[Push] Error al activar:', msg);
+
+        if (msg.includes('permission') || msg.includes('denied')) {
+          setError('Permiso denegado en el navegador. Actívalo en Configuración → Notificaciones.');
+        } else if (msg.includes('registration') || msg.includes('service worker')) {
+          setError('El Service Worker no está listo. Recarga la página e inténtalo de nuevo.');
+        } else if (msg.includes('applicationServerKey') || msg.includes('VAPID') || msg.includes('key')) {
+          setError('Error de configuración del servidor. Contacta al administrador.');
+        } else {
+          setError(`No se pudo activar: ${msg}`);
+        }
       }
     });
   }

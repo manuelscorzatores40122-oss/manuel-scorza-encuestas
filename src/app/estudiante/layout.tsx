@@ -16,15 +16,28 @@ export default async function StudentLayout({ children }: { children: React.Reac
     select: { id: true, sectionId: true, section: { select: { gradeId: true } } },
   });
 
-  let pendingSurveys = 0;
+  let pendingSurveys   = 0;
+  let announcementsCount = 0;
+
   if (student) {
     const gradeId   = student.section?.gradeId ?? '';
     const sectionId = student.sectionId        ?? '';
 
-    const allActive = await prisma.survey.findMany({
-      where:  { isActive: true, responses: { none: { studentId: student.id } } },
-      select: { targetGrades: true, targetSections: true },
-    });
+    const [allActive, totalAnnouncements] = await Promise.all([
+      prisma.survey.findMany({
+        where:  { isActive: true, responses: { none: { studentId: student.id } } },
+        select: { targetGrades: true, targetSections: true },
+      }),
+      prisma.announcement.count({
+        where: {
+          isPublished: true,
+          OR: [
+            { targetRoles: { has: 'STUDENT' } },
+            { targetRoles: { isEmpty: true } },
+          ],
+        },
+      }),
+    ]);
 
     pendingSurveys = allActive.filter(s => {
       const tg = s.targetGrades   ?? [];
@@ -32,17 +45,19 @@ export default async function StudentLayout({ children }: { children: React.Reac
       return (tg.length === 0 || tg.includes(gradeId))
           && (ts.length === 0 || ts.includes(sectionId));
     }).length;
+
+    announcementsCount = totalAnnouncements;
   }
 
   return (
     <div className={styles.shell}>
       <RegistrarSW />
-      <AppBarEstudiante pendingSurveys={pendingSurveys} />
-      <BarraLateral pendingSurveys={pendingSurveys} />
+      <AppBarEstudiante pendingSurveys={pendingSurveys} announcementsCount={announcementsCount} />
+      <BarraLateral     pendingSurveys={pendingSurveys} announcementsCount={announcementsCount} />
       <main className={styles.main}>
         <div className={styles.pageWrapper}>{children}</div>
       </main>
-      <StudentMobileBottomNav pendingSurveys={pendingSurveys} />
+      <StudentMobileBottomNav pendingSurveys={pendingSurveys} announcementsCount={announcementsCount} />
     </div>
   );
 }

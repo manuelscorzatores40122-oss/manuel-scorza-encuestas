@@ -10,19 +10,25 @@ import { logoutAction } from '@/app/login/actions';
 import styles from './layout.module.css';
 
 type NavItem =
-  | { type: 'link'; href: string; label: string; icon: React.ElementType; badge?: boolean }
+  | { type: 'link'; href: string; label: string; icon: React.ElementType; badgeKey?: string }
   | { type: 'divider' };
 
 const NAV_ITEMS: NavItem[] = [
   { type: 'link', href: '/estudiante',           label: 'Inicio',       icon: Home },
-  { type: 'link', href: '/estudiante/encuestas', label: 'Encuestas',    icon: ClipboardList, badge: true },
-  { type: 'link', href: '/estudiante/anuncios',  label: 'Anuncios',     icon: Megaphone },
+  { type: 'link', href: '/estudiante/encuestas', label: 'Encuestas',    icon: ClipboardList, badgeKey: 'surveys' },
+  { type: 'link', href: '/estudiante/anuncios',  label: 'Anuncios',     icon: Megaphone,     badgeKey: 'announcements' },
   { type: 'divider' },
   { type: 'link', href: '/estudiante/historial', label: 'Mi historial', icon: History },
   { type: 'link', href: '/estudiante/perfil',    label: 'Mi perfil',    icon: UserRound },
 ];
 
-export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
+export function BarraLateral({
+  pendingSurveys,
+  announcementsCount,
+}: {
+  pendingSurveys:    number;
+  announcementsCount: number;
+}) {
   const pathname = usePathname();
   const router   = useRouter();
 
@@ -34,6 +40,12 @@ export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
   function isActive(href: string) {
     if (href === '/estudiante') return pathname === '/estudiante';
     return pathname.startsWith(href);
+  }
+
+  function badgeCount(key?: string) {
+    if (key === 'surveys')       return pendingSurveys;
+    if (key === 'announcements') return announcementsCount;
+    return 0;
   }
 
   return (
@@ -56,7 +68,8 @@ export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
           if (item.type === 'divider') {
             return <div key={`divider-${i}`} className={styles.navDivider} />;
           }
-          const Icon = item.icon;
+          const Icon  = item.icon;
+          const count = badgeCount(item.badgeKey);
           return (
             <Link
               key={item.href}
@@ -65,9 +78,9 @@ export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
             >
               <Icon className={styles.sidebarItemIcon} />
               <span className={styles.sidebarItemLabel}>{item.label}</span>
-              {item.badge && pendingSurveys > 0 && (
+              {count > 0 && (
                 <span className={styles.navBadge}>
-                  {pendingSurveys > 9 ? '9+' : pendingSurveys}
+                  {count > 9 ? '9+' : count}
                 </span>
               )}
             </Link>

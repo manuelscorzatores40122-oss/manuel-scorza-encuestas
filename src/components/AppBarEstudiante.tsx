@@ -8,7 +8,13 @@ import { logoutAction } from '@/app/login/actions';
 
 import styles from '@/app/estudiante/layout.module.css';
 
-export function AppBarEstudiante({ pendingSurveys }: { pendingSurveys: number }) {
+export function AppBarEstudiante({
+  pendingSurveys,
+  announcementsCount,
+}: {
+  pendingSurveys:    number;
+  announcementsCount: number;
+}) {
   const router = useRouter();
 
   async function logout() {
@@ -32,12 +38,14 @@ export function AppBarEstudiante({ pendingSurveys }: { pendingSurveys: number })
 
       <div className={styles.topBarActions}>
         <Link
-          href="/estudiante/encuestas"
+          href="/estudiante/anuncios"
           className={styles.topBarBell}
-          aria-label="Encuestas pendientes"
+          aria-label="Anuncios"
         >
           <Bell className={styles.topBarBellIcon} />
-          {pendingSurveys > 0 && <span className={styles.topBarBellDot} aria-hidden />}
+          {(pendingSurveys > 0 || announcementsCount > 0) && (
+            <span className={styles.topBarBellDot} aria-hidden />
+          )}
         </Link>
 
         <button
