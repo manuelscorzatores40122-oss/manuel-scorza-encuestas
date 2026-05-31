@@ -1,0 +1,88 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: #fff;
+  border: 1px solid #d0dff0;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(11,37,69,0.06);
+}
+
+.cardLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.iconWrap {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  background: #e3eef9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon { width: 1rem; height: 1rem; color: #1a5fa8; }
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #0b2545;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: 0.7rem;
+  color: #6b87aa;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.875rem;
+  border-radius: 999px;
+  background: #1a5fa8;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.btn:hover:not(:disabled) { background: #143d73; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #e0f4ee;
+  color: #0a7a5a;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.badgeIcon { width: 0.75rem; height: 0.75rem; }

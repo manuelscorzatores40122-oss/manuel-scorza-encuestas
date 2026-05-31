@@ -1,6 +1,7 @@
 import { Megaphone, Calendar, ChevronDown } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { BtnInstalarApp } from '@/components/BtnInstalarApp';
+import { BtnNotificaciones } from '@/components/BtnNotificaciones';
 import styles from './anuncios.module.css';
 
 export default async function AnunciosEstudiante() {
@@ -49,8 +50,9 @@ export default async function AnunciosEstudiante() {
         </span>
       </div>
 
-      {/* Instalar app */}
+      {/* Instalar app + notificaciones */}
       <BtnInstalarApp />
+      <BtnNotificaciones />
 
       {/* Acordeón */}
       {announcements.length > 0 ? (
