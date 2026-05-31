@@ -147,7 +147,7 @@ export default async function EstudianteHome() {
               <div className={styles.surveysSectionIcon}>
                 <ClipboardList className={styles.surveysSectionIconSvg} />
               </div>
-              <div>
+              <div className={styles.surveysSectionText}>
                 <h2 className={styles.surveysSectionTitle}>Encuestas pendientes</h2>
                 <p className={styles.surveysSectionSub}>{surveys.length} por responder</p>
               </div>

@@ -9,6 +9,7 @@
 .shell {
   display: flex;
   min-height: 100dvh;
+  width: 100%;
   background: #eef3fa;
   font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui, sans-serif);
 }
@@ -33,11 +34,14 @@
 /* wrapper interno con padding */
 .pageWrapper {
   padding: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 480px)  { .pageWrapper { padding: 1rem; } }
-@media (min-width: 640px)  { .pageWrapper { padding: 1.25rem; } }
+@media (min-width: 768px)  { .pageWrapper { padding: 1.5rem; } }
 @media (min-width: 1024px) { .pageWrapper { padding: 2rem 2.5rem; } }
+@media (min-width: 1280px) { .pageWrapper { padding: 2rem 3rem; } }
 
 /* ══════════════════════════════════════════
    SIDEBAR DESKTOP  (oculto en móvil)

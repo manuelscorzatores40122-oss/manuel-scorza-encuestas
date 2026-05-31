@@ -7,10 +7,12 @@
   flex-direction: column;
   gap: 0.875rem;
   width: 100%;
-  max-width: 680px;
+  max-width: 860px;
   margin: 0 auto;
-  animation: fadeIn 0.35s ease both;
 }
+
+@media (min-width: 768px)  { .page { gap: 1.125rem; } }
+@media (min-width: 1024px) { .page { gap: 1.375rem; } }
 
 /* ── BANNER ──────────────────────────── */
 .banner {
@@ -50,6 +52,18 @@
 
 .bannerTitle { font-size: 1.0625rem; font-weight: 700; color: #fff; margin: 0; line-height: 1.2; }
 .bannerSub   { font-size: 0.775rem; color: #a8c8f0; margin: 0.2rem 0 0; }
+
+@media (min-width: 768px) {
+  .banner      { padding: 1.375rem 1.625rem; border-radius: 1.5rem; }
+  .bannerTitle { font-size: 1.25rem; }
+  .bannerSub   { font-size: 0.875rem; }
+  .bannerIconWrap { width: 3.25rem; height: 3.25rem; }
+}
+
+@media (min-width: 1024px) {
+  .banner      { padding: 1.625rem 2rem; }
+  .bannerTitle { font-size: 1.375rem; }
+}
 
 .bannerBadge {
   display: inline-flex; align-items: center; justify-content: center;
@@ -242,6 +256,18 @@
 .emptyIcon  { font-size: 3rem; line-height: 1; }
 .emptyTitle { font-size: 1rem; font-weight: 700; color: #0b2545; margin: 0; }
 .emptyDesc  { font-size: 0.8125rem; color: #6b87aa; margin: 0; max-width: 240px; line-height: 1.6; }
+
+/* ── Desktop: groups más espaciados ─── */
+@media (min-width: 768px) {
+  .group          { border-radius: 1.25rem; }
+  .groupSummary   { padding: 1rem 1.25rem; }
+  .groupSummaryTitle { font-size: 0.9375rem; }
+  .encCardSummary { padding: 0.875rem 1.25rem; }
+  .encCardTitle   { font-size: 0.9375rem; }
+  .encCardBody    { padding: 0.875rem 1.25rem 1rem; }
+  .encCardDesc    { font-size: 0.875rem; }
+  .encCardIcon    { width: 2.25rem; height: 2.25rem; border-radius: 0.625rem; }
+}
 
 /* ── Animaciones ─────────────────────── */
 @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

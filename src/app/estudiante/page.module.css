@@ -18,6 +18,8 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 @media (min-width: 480px) { .page { gap: 0.875rem; } }
@@ -108,6 +110,7 @@
   flex-direction: column;
   gap: 0.3rem;
   min-width: 0;
+  flex: 1;
 }
 
 .heroGreeting {
@@ -171,18 +174,22 @@
   z-index: 1;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 0.875rem;
-  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.15rem;
   flex-shrink: 0;
-  margin-left: 0.75rem;
+  margin-left: 0.625rem;
+}
+
+@media (min-width: 400px) {
+  .heroShieldCard { padding: 0.625rem 0.75rem; margin-left: 0.75rem; border-radius: 0.875rem; }
 }
 
 @media (min-width: 480px) {
-  .heroShieldCard { padding: 0.875rem 1rem; margin-left: 0.875rem; border-radius: 1rem; }
+  .heroShieldCard { padding: 0.75rem 0.875rem; margin-left: 0.875rem; border-radius: 1rem; }
 }
 
 @media (min-width: 768px) {
@@ -190,12 +197,13 @@
 }
 
 .heroShieldImg {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
 }
 
+@media (min-width: 400px)  { .heroShieldImg { width: 50px; height: 50px; } }
 @media (min-width: 480px)  { .heroShieldImg { width: 58px; height: 58px; } }
 @media (min-width: 768px)  { .heroShieldImg { width: 76px; height: 76px; } }
 @media (min-width: 1024px) { .heroShieldImg { width: 92px; height: 92px; } }
@@ -206,6 +214,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
+  display: none;
 }
 
 .heroShieldNum {
@@ -214,9 +223,19 @@
   font-weight: 600;
   text-align: center;
   line-height: 1.3;
+  display: none;
 }
 
-@media (min-width: 480px) { .heroShieldLabel { font-size: 0.6rem; } .heroShieldNum { font-size: 0.65rem; } }
+/* Mostrar etiquetas del escudo solo en pantallas con espacio */
+@media (min-width: 400px) {
+  .heroShieldLabel { display: block; font-size: 0.55rem; }
+  .heroShieldNum   { display: block; font-size: 0.6rem; }
+}
+
+@media (min-width: 480px) {
+  .heroShieldLabel { font-size: 0.6rem; }
+  .heroShieldNum   { font-size: 0.65rem; }
+}
 
 /* ══ CUADRÍCULA DE ACCIONES 2×2 ════════ */
 .actionsGrid {
@@ -319,6 +338,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  overflow: hidden;
+  min-width: 0;
 }
 
 @media (min-width: 768px) { .surveysSection { border-radius: 1.375rem; padding: 1.5rem; } }
@@ -327,13 +348,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.625rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .surveysSectionLeft {
   display: flex;
   align-items: center;
   gap: 0.625rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .surveysSectionIcon {
@@ -349,12 +374,17 @@
 
 .surveysSectionIconSvg { width: 1rem; height: 1rem; color: #1a5fa8; }
 
+.surveysSectionText { min-width: 0; overflow: hidden; }
+
 .surveysSectionTitle {
   font-size: 0.875rem;
   font-weight: 700;
   color: #0b2545;
   margin: 0;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .surveysSectionSub {
@@ -403,6 +433,8 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .surveyAccordionHead::-webkit-details-marker { display: none; }
@@ -549,6 +581,8 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .announcementSummary::-webkit-details-marker { display: none; }
@@ -611,6 +645,8 @@
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
   border-radius: 1.125rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .cardSummary::-webkit-details-marker { display: none; }
@@ -625,9 +661,13 @@ details[open] .cardSummary {
 
 .cardSummaryTitle {
   flex: 1;
+  min-width: 0;
   font-size: 0.875rem;
   font-weight: 700;
   color: #0b2545;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cardChevron {
