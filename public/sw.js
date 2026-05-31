@@ -1,7 +1,5 @@
 /* ── Activación inmediata ──────────────── */
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
@@ -14,6 +12,7 @@ self.addEventListener('push', (event) => {
     body:  'Tienes una nueva notificación.',
     url:   '/estudiante',
     tag:   'psicoescolar',
+    count: 1,
   };
 
   if (event.data) {
@@ -25,15 +24,24 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(payload.title, {
-      body:              payload.body,
-      tag:               payload.tag,
-      icon:              '/iconomobil.png',
-      badge:             '/iconomobil.png',
-      vibrate:           [200, 100, 200],
-      requireInteraction: false,
-      data:              { url: payload.url || '/estudiante' },
-    })
+    (async () => {
+      // Mostrar notificación con sonido del sistema
+      await self.registration.showNotification(payload.title, {
+        body:               payload.body,
+        tag:                payload.tag,
+        icon:               '/iconomobil.png',
+        badge:              '/iconomobil.png',
+        vibrate:            [200, 100, 200],
+        silent:             false,          // usa el sonido del sistema
+        requireInteraction: false,
+        data:               { url: payload.url || '/estudiante', count: payload.count },
+      });
+
+      // Badge en el ícono de la app (Android Chrome / Edge)
+      if ('setAppBadge' in navigator) {
+        await navigator.setAppBadge(payload.count ?? 1);
+      }
+    })()
   );
 });
 
@@ -41,8 +49,13 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const url = event.notification.data?.url || '/estudiante';
-  const fullUrl = self.location.origin + url;
+  const url      = event.notification.data?.url || '/estudiante';
+  const fullUrl  = self.location.origin + url;
+
+  // Limpiar badge al abrir la app
+  if ('clearAppBadge' in navigator) {
+    navigator.clearAppBadge();
+  }
 
   event.waitUntil(
     self.clients
@@ -57,4 +70,14 @@ self.addEventListener('notificationclick', (event) => {
         return self.clients.openWindow(fullUrl);
       })
   );
+});
+
+/* ── Limpiar badge cuando se abre la app ── */
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'CLEAR_BADGE' && 'clearAppBadge' in navigator) {
+    navigator.clearAppBadge();
+  }
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

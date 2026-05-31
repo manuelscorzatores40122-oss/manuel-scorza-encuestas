@@ -3,9 +3,10 @@ import { prisma } from './prisma';
 
 type PushPayload = {
   title: string;
-  body: string;
-  url?: string;
-  tag?: string;
+  body:  string;
+  url?:  string;
+  tag?:  string;
+  count?: number;
 };
 
 type WebPushSubscription = {
@@ -103,15 +104,28 @@ export async function sendPushToRoles(roles: Role[], payload: PushPayload) {
 }
 
 export async function sendAnnouncementPush(input: {
-  title: string;
-  content: string;
+  title:       string;
+  content:     string;
   targetRoles: Role[];
 }) {
   return sendPushToRoles(input.targetRoles, {
     title: `📢 ${input.title}`,
-    body: input.content,
-    url: '/estudiante/anuncios',
-    tag: 'announcement',
+    body:  input.content,
+    url:   '/estudiante/anuncios',
+    tag:   'anuncio',
+    count: 1,
+  });
+}
+
+export async function sendSurveyPush(input: {
+  title: string;
+}) {
+  return sendPushToRoles(['STUDENT'], {
+    title: '📋 Nueva encuesta disponible',
+    body:  input.title,
+    url:   '/estudiante/encuestas',
+    tag:   'encuesta',
+    count: 1,
   });
 }
 
@@ -121,8 +135,9 @@ export async function sendRiskAlertPush(input: {
 }) {
   return sendPushToRoles(['PSYCHOLOGIST'], {
     title: '🚨 Alerta PsicoEscolar',
-    body: `Se detectó una respuesta con riesgo ${input.riskLevel} (score ${input.riskScore}).`,
-    url: '/psicologo/alertas',
-    tag: 'risk-alert',
+    body:  `Riesgo ${input.riskLevel} detectado (score ${input.riskScore})`,
+    url:   '/psicologo/alertas',
+    tag:   'alerta',
+    count: 1,
   });
 }

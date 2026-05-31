@@ -48,10 +48,20 @@ export const metadata: Metadata = {
     title: 'PsicoEscolar',
   },
   formatDetection: { telephone: false },
-  icons: { apple: '/iconomobil.png', icon: '/iconomobil.png' },
+  icons: {
+    icon: [
+      { url: '/iconomobil.png', type: 'image/png', sizes: '192x192' },
+      { url: '/iconomobil.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: [
+      { url: '/iconomobil.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/iconomobil.png',
+  },
   other: {
     'mobile-web-app-capable': 'yes',
     'msapplication-TileColor': '#0b2545',
+    'msapplication-TileImage': '/iconomobil.png',
     'msapplication-tap-highlight': 'no',
   },
 };

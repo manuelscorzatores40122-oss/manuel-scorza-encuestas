@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { sendPushToRoles } from '@/lib/push';
+import { sendSurveyPush } from '@/lib/push';
 
 const optionSchema = z.object({
   label: z.string().trim().min(1, 'Cada opción necesita una etiqueta'),
@@ -143,12 +143,7 @@ export async function createSurveyAction(input: CreateSurveyInput): Promise<Surv
 
   revalidatePath('/psicologo/encuestas');
 
-  await sendPushToRoles(['STUDENT'], {
-    title: '📋 Nueva encuesta disponible',
-    body: title,
-    url: '/estudiante/encuestas',
-    tag: 'nueva-encuesta',
-  });
+  await sendSurveyPush({ title });
 
   return {
     ok: true,
@@ -176,12 +171,7 @@ export async function toggleSurveyAction(id: string) {
   revalidatePath('/estudiante', 'layout');
 
   if (updated.isActive) {
-    await sendPushToRoles(['STUDENT'], {
-      title: '📋 Nueva encuesta disponible',
-      body: updated.title,
-      url: '/estudiante/encuestas',
-      tag: 'nueva-encuesta',
-    });
+    await sendSurveyPush({ title: updated.title });
   }
 
   return { ok: true as const };
