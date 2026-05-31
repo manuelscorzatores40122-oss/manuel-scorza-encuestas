@@ -108,9 +108,13 @@ export async function sendAnnouncementPush(input: {
   content:     string;
   targetRoles: Role[];
 }) {
+  const body = input.content.length > 150
+    ? input.content.slice(0, 147) + '…'
+    : input.content;
+
   return sendPushToRoles(input.targetRoles, {
     title: `📢 ${input.title}`,
-    body:  input.content,
+    body,
     url:   '/estudiante/anuncios',
     tag:   'anuncio',
     count: 1,

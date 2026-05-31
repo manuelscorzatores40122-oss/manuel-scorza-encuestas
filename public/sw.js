@@ -29,6 +29,7 @@ self.addEventListener('push', (event) => {
       await self.registration.showNotification(payload.title, {
         body:               payload.body,
         tag:                payload.tag,
+        renotify:           true,           // vibra/suena aunque el tag ya exista
         icon:               '/iconomobil.png',
         badge:              '/iconomobil.png',
         vibrate:            [200, 100, 200],
@@ -38,8 +39,8 @@ self.addEventListener('push', (event) => {
       });
 
       // Badge en el ícono de la app (Android Chrome / Edge)
-      if ('setAppBadge' in navigator) {
-        await navigator.setAppBadge(payload.count ?? 1);
+      if ('setAppBadge' in self.navigator) {
+        await self.navigator.setAppBadge(payload.count ?? 1);
       }
     })()
   );
@@ -53,8 +54,8 @@ self.addEventListener('notificationclick', (event) => {
   const fullUrl  = self.location.origin + url;
 
   // Limpiar badge al abrir la app
-  if ('clearAppBadge' in navigator) {
-    navigator.clearAppBadge();
+  if ('clearAppBadge' in self.navigator) {
+    self.navigator.clearAppBadge();
   }
 
   event.waitUntil(
@@ -74,8 +75,8 @@ self.addEventListener('notificationclick', (event) => {
 
 /* ── Limpiar badge cuando se abre la app ── */
 self.addEventListener('message', (event) => {
-  if (event.data?.type === 'CLEAR_BADGE' && 'clearAppBadge' in navigator) {
-    navigator.clearAppBadge();
+  if (event.data?.type === 'CLEAR_BADGE' && 'clearAppBadge' in self.navigator) {
+    self.navigator.clearAppBadge();
   }
   if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
