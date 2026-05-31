@@ -5,6 +5,7 @@ import { StudentMobileBottomNav } from '@/components/NavMovilEstudiante';
 import { AppBarEstudiante } from '@/components/AppBarEstudiante';
 import { BarraLateral } from './BarraLateral';
 import { RegistrarSW } from '@/components/RegistrarSW';
+import { AnunciosPoller } from '@/components/AnunciosPoller';
 import styles from './layout.module.css';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
@@ -52,6 +53,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   return (
     <div className={styles.shell}>
       <RegistrarSW />
+      <AnunciosPoller initialCount={announcementsCount} />
       <AppBarEstudiante pendingSurveys={pendingSurveys} announcementsCount={announcementsCount} />
       <BarraLateral     pendingSurveys={pendingSurveys} announcementsCount={announcementsCount} />
       <main className={styles.main}>
