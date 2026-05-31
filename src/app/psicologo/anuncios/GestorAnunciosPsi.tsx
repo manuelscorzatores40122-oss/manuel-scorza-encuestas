@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Send, Eye, EyeOff, Trash2, Check } from 'lucide-react';
+import { Send, Eye, EyeOff, Trash2, Check, Bell } from 'lucide-react';
 import {
   createAnnouncementAction,
   deleteAnnouncementAction,
@@ -34,6 +34,20 @@ export function GestorAnunciosPsi({ announcements }: { announcements: Post[] }) 
     timerRef.current = setTimeout(() => setToast(t => ({ ...t, show: false })), 2200);
   }
 
+  function testPush() {
+    startTransition(async () => {
+      const res = await fetch('/api/push/test', { method: 'POST' });
+      const data = await res.json();
+      if (!data.ok) {
+        showToast('Push error: ' + data.error);
+      } else if (data.skipped) {
+        showToast('Push omitido: VAPID keys no configuradas');
+      } else {
+        showToast(`Push enviado a ${data.sent} dispositivo${data.sent !== 1 ? 's' : ''} (${data.failed} fallido${data.failed !== 1 ? 's' : ''})`);
+      }
+    });
+  }
+
   function publish() {
     if (!title.trim() || !content.trim()) return;
     const t = title, c = content;
@@ -46,8 +60,16 @@ export function GestorAnunciosPsi({ announcements }: { announcements: Post[] }) 
     if (checked) fd.append('targetRoles', 'STUDENT');
     startTransition(async () => {
       const result = await createAnnouncementAction(fd);
-      if (result.ok) router.refresh();
-      else showToast('Error: ' + result.error);
+      if (result.ok) {
+        const p = result.push;
+        if (p.skipped)       showToast('Anuncio publicado (push no configurado en servidor)');
+        else if (p.sent > 0) showToast(`Anuncio publicado · Push enviado a ${p.sent} dispositivo${p.sent > 1 ? 's' : ''}`);
+        else if (p.failed > 0) showToast('Anuncio publicado · Push falló — revisa configuración');
+        else                 showToast('Anuncio publicado (sin suscriptores aún)');
+        router.refresh();
+      } else {
+        showToast('Error: ' + result.error);
+      }
     });
   }
 
@@ -136,6 +158,16 @@ export function GestorAnunciosPsi({ announcements }: { announcements: Post[] }) 
           >
             <Send width={17} height={17} />
             {pending ? 'Publicando…' : 'Publicar anuncio'}
+          </button>
+
+          <button
+            type="button"
+            className={styles.testPush}
+            disabled={pending}
+            onClick={testPush}
+          >
+            <Bell width={14} height={14} />
+            Probar push
           </button>
         </div>
 

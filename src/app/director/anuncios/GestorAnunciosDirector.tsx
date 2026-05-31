@@ -47,8 +47,16 @@ export function GestorAnunciosDirector({ announcements }: { announcements: Post[
     if (checked) fd.append('targetRoles', 'STUDENT');
     startTransition(async () => {
       const result = await createAnnouncementAction(fd);
-      if (result.ok) router.refresh();
-      else showToast('Error: ' + result.error);
+      if (result.ok) {
+        const p = result.push;
+        if (p.skipped)       showToast('Anuncio publicado (push no configurado en servidor)');
+        else if (p.sent > 0) showToast(`Anuncio publicado · Push enviado a ${p.sent} dispositivo${p.sent > 1 ? 's' : ''}`);
+        else if (p.failed > 0) showToast('Anuncio publicado · Push falló — revisa configuración');
+        else                 showToast('Anuncio publicado (sin suscriptores aún)');
+        router.refresh();
+      } else {
+        showToast('Error: ' + result.error);
+      }
     });
   }
 

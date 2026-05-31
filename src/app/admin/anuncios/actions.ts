@@ -38,18 +38,14 @@ export async function createAnnouncementAction(formData: FormData) {
     },
   });
 
-  await sendAnnouncementPush({
-    title,
-    content,
-    targetRoles: roles,
-  });
+  const pushResult = await sendAnnouncementPush({ title, content, targetRoles: roles });
 
   revalidatePath('/admin/anuncios');
   revalidatePath('/psicologo');
   revalidatePath('/psicologo/anuncios');
   revalidatePath('/estudiante');
   revalidatePath('/estudiante/anuncios');
-  return { ok: true as const };
+  return { ok: true as const, push: pushResult };
 }
 
 export async function toggleAnnouncementAction(id: string) {
