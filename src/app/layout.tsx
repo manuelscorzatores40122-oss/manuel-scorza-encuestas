@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     title: 'PsicoEscolar',
   },
   formatDetection: { telephone: false },
-  icons: { apple: '/logo.png', icon: '/logo.png' },
+  icons: { apple: '/iconomobil.png', icon: '/iconomobil.png' },
   other: {
     'mobile-web-app-capable': 'yes',
     'msapplication-TileColor': '#0b2545',

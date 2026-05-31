@@ -28,8 +28,8 @@ self.addEventListener('push', (event) => {
     self.registration.showNotification(payload.title, {
       body:              payload.body,
       tag:               payload.tag,
-      icon:              '/logo.png',
-      badge:             '/logo.png',
+      icon:              '/iconomobil.png',
+      badge:             '/iconomobil.png',
       vibrate:           [200, 100, 200],
       requireInteraction: false,
       data:              { url: payload.url || '/estudiante' },
