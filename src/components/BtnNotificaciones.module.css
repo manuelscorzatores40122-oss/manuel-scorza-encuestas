@@ -71,6 +71,8 @@
 
 .btn:hover:not(:disabled) { background: #143d73; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btnError { background: #c0392b; }
+.btnError:hover:not(:disabled) { background: #a02020; }
 
 .badge {
   display: inline-flex;

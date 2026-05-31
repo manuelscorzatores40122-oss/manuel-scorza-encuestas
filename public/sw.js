@@ -1,9 +1,19 @@
+/* ── Activación inmediata ──────────────── */
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+/* ── Recibir push ──────────────────────── */
 self.addEventListener('push', (event) => {
   let payload = {
     title: 'PsicoEscolar',
-    body: 'Tienes una nueva notificación.',
-    url: '/',
-    tag: 'psicoescolar',
+    body:  'Tienes una nueva notificación.',
+    url:   '/estudiante',
+    tag:   'psicoescolar',
   };
 
   if (event.data) {
@@ -16,32 +26,35 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(
     self.registration.showNotification(payload.title, {
-      body:    payload.body,
-      tag:     payload.tag,
-      icon:    '/logo.png',
-      badge:   '/logo.png',
-      vibrate: [200, 100, 200],
-      data:    { url: payload.url || '/' },
+      body:              payload.body,
+      tag:               payload.tag,
+      icon:              '/logo.png',
+      badge:             '/logo.png',
+      vibrate:           [200, 100, 200],
+      requireInteraction: false,
+      data:              { url: payload.url || '/estudiante' },
     })
   );
 });
 
+/* ── Clic en notificación ──────────────── */
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const url = event.notification.data?.url || '/';
+  const url = event.notification.data?.url || '/estudiante';
+  const fullUrl = self.location.origin + url;
 
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
         for (const client of clientList) {
-          if (new URL(client.url).pathname.startsWith(url) && 'focus' in client) {
+          if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+            client.navigate(fullUrl);
             return client.focus();
           }
         }
-        if (self.clients.openWindow) return self.clients.openWindow(url);
-        return undefined;
+        return self.clients.openWindow(fullUrl);
       })
   );
 });

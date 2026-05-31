@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { Bell, BellOff, Check } from 'lucide-react';
+import { Bell, BellOff, Check, Smartphone } from 'lucide-react';
 import styles from './BtnNotificaciones.module.css';
 
 const VAPID_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -15,57 +15,126 @@ function urlBase64ToUint8Array(base64: string) {
   return arr;
 }
 
-async function getRegistration() {
-  if (!('serviceWorker' in navigator)) return null;
-  const existing = await navigator.serviceWorker.getRegistration('/');
-  if (existing) return existing;
-  return navigator.serviceWorker.register('/sw.js', { scope: '/' });
+function esIOSNoInstalado() {
+  const ua = navigator.userAgent;
+  const esIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+  const instalado = (navigator as any).standalone === true;
+  return esIOS && !instalado;
 }
 
-type Estado = 'idle' | 'activo' | 'no-soportado';
+async function getSWRegistration(): Promise<ServiceWorkerRegistration | null> {
+  if (!('serviceWorker' in navigator)) return null;
+
+  // Esperar SW activo (máx 4s)
+  const existing = await navigator.serviceWorker.getRegistration('/');
+  if (existing?.active) return existing;
+
+  const reg = await navigator.serviceWorker.register('/sw.js', {
+    scope: '/',
+    updateViaCache: 'none',
+  });
+
+  if (reg.active) return reg;
+
+  return new Promise((resolve) => {
+    const sw = reg.installing ?? reg.waiting ?? null;
+    if (!sw) { resolve(reg); return; }
+    sw.addEventListener('statechange', () => {
+      if (sw.state === 'activated') resolve(reg);
+    });
+    setTimeout(() => resolve(reg), 4000);
+  });
+}
+
+type Estado = 'cargando' | 'idle' | 'activo' | 'ios-pwa' | 'no-soportado';
 
 export function BtnNotificaciones() {
-  const [estado, setEstado] = useState<Estado>('idle');
+  const [estado, setEstado] = useState<Estado>('cargando');
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!VAPID_KEY || !('Notification' in window) || !('PushManager' in window)) {
-      setEstado('no-soportado');
+    if (
+      !VAPID_KEY ||
+      !('Notification'    in window) ||
+      !('PushManager'     in window) ||
+      !('serviceWorker'   in navigator)
+    ) {
+      if (esIOSNoInstalado()) setEstado('ios-pwa');
+      else setEstado('no-soportado');
+      return;
+    }
+
+    if (esIOSNoInstalado()) {
+      setEstado('ios-pwa');
       return;
     }
 
     (async () => {
-      const reg = await getRegistration();
-      const sub = await reg?.pushManager.getSubscription();
-      if (sub) setEstado('activo');
+      try {
+        const reg = await getSWRegistration();
+        const sub = await reg?.pushManager.getSubscription();
+        setEstado(sub ? 'activo' : 'idle');
+      } catch {
+        setEstado('idle');
+      }
     })();
   }, []);
 
   function activar() {
+    setError(null);
     startTransition(async () => {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted' || !VAPID_KEY) return;
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          setError('Activa los permisos de notificación en tu navegador.');
+          return;
+        }
+        if (!VAPID_KEY) return;
 
-      const reg = await getRegistration();
-      if (!reg) return;
+        const reg = await getSWRegistration();
+        if (!reg) { setError('El Service Worker no está disponible.'); return; }
 
-      const existing = await reg.pushManager.getSubscription();
-      const sub = existing ?? await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
-      });
+        const existing = await reg.pushManager.getSubscription();
+        const sub = existing ?? await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
+        });
 
-      await fetch('/api/push/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sub),
-      });
+        const res = await fetch('/api/push/subscribe', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(sub),
+        });
 
-      setEstado('activo');
+        if (!res.ok) throw new Error('Error al guardar suscripción');
+        setEstado('activo');
+      } catch (err) {
+        setError('No se pudo activar. Inténtalo de nuevo.');
+        console.error('[Push]', err);
+      }
     });
   }
 
-  if (estado === 'no-soportado') return null;
+  if (estado === 'cargando' || estado === 'no-soportado') return null;
+
+  if (estado === 'ios-pwa') {
+    return (
+      <div className={styles.card}>
+        <div className={styles.cardLeft}>
+          <div className={styles.iconWrap}>
+            <Smartphone className={styles.icon} />
+          </div>
+          <div className={styles.text}>
+            <span className={styles.label}>Instala la app primero</span>
+            <span className={styles.sub}>
+              En iPhone: Safari → Compartir → Añadir a inicio para recibir notificaciones
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.card}>
@@ -82,7 +151,7 @@ export function BtnNotificaciones() {
           <span className={styles.sub}>
             {estado === 'activo'
               ? 'Te avisaremos de encuestas y anuncios'
-              : 'Entérate de encuestas y anuncios nuevos'}
+              : error ?? 'Entérate de encuestas y anuncios nuevos'}
           </span>
         </div>
       </div>
@@ -96,9 +165,9 @@ export function BtnNotificaciones() {
         <button
           onClick={activar}
           disabled={pending}
-          className={styles.btn}
+          className={`${styles.btn} ${error ? styles.btnError : ''}`}
         >
-          {pending ? 'Activando...' : 'Activar'}
+          {pending ? 'Activando...' : error ? 'Reintentar' : 'Activar'}
         </button>
       )}
     </div>
