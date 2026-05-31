@@ -8,10 +8,7 @@ self.addEventListener('push', (event) => {
 
   if (event.data) {
     try {
-      payload = {
-        ...payload,
-        ...event.data.json(),
-      };
+      payload = { ...payload, ...event.data.json() };
     } catch {
       payload.body = event.data.text();
     }
@@ -19,11 +16,12 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(
     self.registration.showNotification(payload.title, {
-      body: payload.body,
-      tag: payload.tag,
-      data: {
-        url: payload.url || '/',
-      },
+      body:    payload.body,
+      tag:     payload.tag,
+      icon:    '/logo.png',
+      badge:   '/logo.png',
+      vibrate: [200, 100, 200],
+      data:    { url: payload.url || '/' },
     })
   );
 });
@@ -35,23 +33,14 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     self.clients
-      .matchAll({
-        type: 'window',
-        includeUncontrolled: true,
-      })
+      .matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
         for (const client of clientList) {
-          const clientUrl = new URL(client.url);
-
-          if (clientUrl.pathname === url && 'focus' in client) {
+          if (new URL(client.url).pathname.startsWith(url) && 'focus' in client) {
             return client.focus();
           }
         }
-
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(url);
-        }
-
+        if (self.clients.openWindow) return self.clients.openWindow(url);
         return undefined;
       })
   );
