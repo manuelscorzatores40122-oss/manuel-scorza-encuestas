@@ -3,23 +3,23 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Home,
-  ClipboardList,
-  Megaphone,
-  History,
-  UserRound,
-  LogOut,
-  GraduationCap,
+  Home, ClipboardList, Megaphone,
+  History, UserRound, LogOut, Brain,
 } from 'lucide-react';
 import { logoutAction } from '@/app/login/actions';
 import styles from './layout.module.css';
 
-const NAV_ITEMS = [
-  { href: '/estudiante',           label: 'Inicio',       icon: Home,          badge: false },
-  { href: '/estudiante/encuestas', label: 'Encuestas',    icon: ClipboardList, badge: true  },
-  { href: '/estudiante/anuncios',  label: 'Anuncios',     icon: Megaphone,     badge: false },
-  { href: '/estudiante/historial', label: 'Mi historial', icon: History,       badge: false },
-  { href: '/estudiante/perfil',    label: 'Mi perfil',    icon: UserRound,     badge: false },
+type NavItem =
+  | { type: 'link'; href: string; label: string; icon: React.ElementType; badge?: boolean }
+  | { type: 'divider' };
+
+const NAV_ITEMS: NavItem[] = [
+  { type: 'link', href: '/estudiante',           label: 'Inicio',       icon: Home },
+  { type: 'link', href: '/estudiante/encuestas', label: 'Encuestas',    icon: ClipboardList, badge: true },
+  { type: 'link', href: '/estudiante/anuncios',  label: 'Anuncios',     icon: Megaphone },
+  { type: 'divider' },
+  { type: 'link', href: '/estudiante/historial', label: 'Mi historial', icon: History },
+  { type: 'link', href: '/estudiante/perfil',    label: 'Mi perfil',    icon: UserRound },
 ];
 
 export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
@@ -42,7 +42,7 @@ export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
       {/* Cabecera */}
       <div className={styles.sidebarHeader}>
         <div className={styles.sidebarLogo}>
-          <GraduationCap className={styles.sidebarLogoIcon} />
+          <Brain className={styles.sidebarLogoIcon} />
         </div>
         <div>
           <p className={styles.sidebarAppName}>PsicoEscolar</p>
@@ -52,21 +52,27 @@ export function BarraLateral({ pendingSurveys }: { pendingSurveys: number }) {
 
       {/* Navegación */}
       <nav className={styles.sidebarNav}>
-        {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => (
-          <Link
-            key={href}
-            href={href}
-            className={`${styles.sidebarItem} ${isActive(href) ? styles.sidebarItemActive : ''}`}
-          >
-            <Icon className={styles.sidebarItemIcon} />
-            <span className={styles.sidebarItemLabel}>{label}</span>
-            {badge && pendingSurveys > 0 && (
-              <span className={styles.navBadge}>
-                {pendingSurveys > 9 ? '9+' : pendingSurveys}
-              </span>
-            )}
-          </Link>
-        ))}
+        {NAV_ITEMS.map((item, i) => {
+          if (item.type === 'divider') {
+            return <div key={`divider-${i}`} className={styles.navDivider} />;
+          }
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.sidebarItem} ${isActive(item.href) ? styles.sidebarItemActive : ''}`}
+            >
+              <Icon className={styles.sidebarItemIcon} />
+              <span className={styles.sidebarItemLabel}>{item.label}</span>
+              {item.badge && pendingSurveys > 0 && (
+                <span className={styles.navBadge}>
+                  {pendingSurveys > 9 ? '9+' : pendingSurveys}
+                </span>
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Cerrar sesión */}

@@ -1,0 +1,45 @@
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(120deg, #1a5fa8 0%, #143d73 100%);
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(11,37,69,0.18);
+  transition: opacity 0.15s;
+}
+
+.btn:hover { opacity: 0.92; }
+
+.iconWrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon { width: 1.25rem; height: 1.25rem; color: #fff; }
+
+.text { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; }
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.sub {
+  font-size: 0.72rem;
+  color: #a8c8f0;
+}

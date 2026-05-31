@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { Save, User, CheckCircle2, XCircle } from 'lucide-react';
+import { useState, useTransition, useRef } from 'react';
+import { Save, User, CheckCircle2, XCircle, ChevronDown } from 'lucide-react';
 import { updateStudentProfileAction } from './actions';
 import styles from './perfil.module.css';
 
@@ -24,6 +24,10 @@ export function FormularioPerfil({ contacts }: { contacts: Record<string, Contac
   const [pending, startTransition] = useTransition();
   const [msg, setMsg]         = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [open, setOpen] = useState<Record<string, boolean>>({
+    padre: false, madre: false, apoderado: false,
+  });
+  const activeSection = useRef<string>('');
 
   function submit(formData: FormData) {
     setMsg(null);
@@ -32,12 +36,17 @@ export function FormularioPerfil({ contacts }: { contacts: Record<string, Contac
       const result = await updateStudentProfileAction(formData);
       if (result.ok) {
         setSuccess(true);
-        setMsg('Perfil actualizado correctamente.');
+        setMsg('Guardado correctamente.');
+        setOpen(prev => ({ ...prev, [activeSection.current]: false }));
       } else {
         setSuccess(false);
         setMsg(result.error || 'Error al guardar.');
       }
     });
+  }
+
+  function toggle(key: string, isOpen: boolean) {
+    setOpen(prev => ({ ...prev, [key]: isOpen }));
   }
 
   return (
@@ -46,16 +55,22 @@ export function FormularioPerfil({ contacts }: { contacts: Record<string, Contac
       {SECTIONS.map(({ key, label, color }) => {
         const c = contacts[key];
         return (
-          <section key={key} className={styles.section}>
+          <details
+            key={key}
+            className={styles.section}
+            open={open[key]}
+            onToggle={(e) => toggle(key, (e.currentTarget as HTMLDetailsElement).open)}
+          >
 
-            <div className={`${styles.sectionHead} ${styles[`sectionHead_${color}`]}`}>
+            <summary className={`${styles.sectionHead} ${styles[`sectionHead_${color}`]}`}>
               <div className={`${styles.sectionIconWrap} ${styles[`sectionIconWrap_${color}`]}`}>
                 <User className={styles.sectionIcon} />
               </div>
               <h2 className={`${styles.sectionTitle} ${styles[`sectionTitle_${color}`]}`}>
                 {label}
               </h2>
-            </div>
+              <ChevronDown className={styles.sectionChevron} />
+            </summary>
 
             <div className={styles.sectionBody}>
               <div className={styles.fieldGrid}>
@@ -111,24 +126,34 @@ export function FormularioPerfil({ contacts }: { contacts: Record<string, Contac
                 </div>
 
               </div>
+
+              <div className={styles.sectionFooter}>
+                {msg && open[key] && (
+                  <div className={success
+                    ? `${styles.alert} ${styles.alertSuccess}`
+                    : `${styles.alert} ${styles.alertError}`
+                  }>
+                    {success
+                      ? <CheckCircle2 className={styles.alertIcon} />
+                      : <XCircle      className={styles.alertIcon} />}
+                    {msg}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  className={styles.saveBtn}
+                  disabled={pending}
+                  onClick={() => { activeSection.current = key; }}
+                >
+                  <Save className={styles.saveBtnIcon} />
+                  {pending ? 'Guardando...' : 'Guardar cambios'}
+                </button>
+              </div>
+
             </div>
-          </section>
+          </details>
         );
       })}
-
-      {msg && (
-        <div className={success ? `${styles.alert} ${styles.alertSuccess}` : `${styles.alert} ${styles.alertError}`}>
-          {success
-            ? <CheckCircle2 className={styles.alertIcon} />
-            : <XCircle      className={styles.alertIcon} />}
-          {msg}
-        </div>
-      )}
-
-      <button type="submit" className={styles.saveBtn} disabled={pending}>
-        <Save className={styles.saveBtnIcon} />
-        {pending ? 'Guardando...' : 'Guardar cambios'}
-      </button>
 
     </form>
   );

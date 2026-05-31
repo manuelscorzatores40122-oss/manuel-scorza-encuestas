@@ -1,80 +1,48 @@
-// src/components/StudentMobileBottomNav.tsx
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import {
-  Home,
-  ClipboardList,
-  History,
-  UserRound,
-  Megaphone,
-  Menu,
-  LogOut,
-} from 'lucide-react';
-
-import { logoutAction } from '@/app/login/actions';
+import { usePathname } from 'next/navigation';
+import { Home, ClipboardList, Megaphone, History, UserRound } from 'lucide-react';
 import styles from '@/app/estudiante/layout.module.css';
 
-export function StudentMobileBottomNav({ pendingSurveys }: { pendingSurveys: number }) {
-  const router = useRouter();
+const NAV = [
+  { href: '/estudiante',           label: 'Inicio',    icon: Home,          badge: false },
+  { href: '/estudiante/encuestas', label: 'Encuestas', icon: ClipboardList, badge: true  },
+  { href: '/estudiante/anuncios',  label: 'Anuncios',  icon: Megaphone,     badge: false },
+  { href: '/estudiante/historial', label: 'Historial', icon: History,       badge: false },
+  { href: '/estudiante/perfil',    label: 'Perfil',    icon: UserRound,     badge: false },
+];
 
-  async function logout() {
-    await logoutAction();
-    router.replace('/login');
+export function StudentMobileBottomNav({ pendingSurveys }: { pendingSurveys: number }) {
+  const pathname = usePathname();
+
+  function isActive(href: string) {
+    if (href === '/estudiante') return pathname === '/estudiante';
+    return pathname.startsWith(href);
   }
 
   return (
     <nav className={styles.mobileBottomNav}>
-      <Link href="/estudiante" className={styles.mobileNavButton}>
-        <Home className={styles.mobileIcon} />
-        <span>Inicio</span>
-      </Link>
-
-      <Link href="/estudiante/encuestas" className={styles.mobileNavButton}>
-        <span className={styles.mobileNavIconWrap}>
-          <ClipboardList className={styles.mobileIcon} />
-          {pendingSurveys > 0 && (
-            <span className={styles.mobileBadge}>
-              {pendingSurveys > 9 ? '9+' : pendingSurveys}
-            </span>
-          )}
-        </span>
-        <span>Encuestas</span>
-      </Link>
-
-      <Link href="/estudiante/anuncios" className={styles.mobileNavButton}>
-        <Megaphone className={styles.mobileIcon} />
-        <span>Anuncios</span>
-      </Link>
-
-      <details className={styles.mobileMenu}>
-        <summary className={styles.mobileNavButton}>
-          <Menu className={styles.mobileIcon} />
-          <span>Más</span>
-        </summary>
-
-        <div className={styles.mobileMenuContent}>
-          <Link href="/estudiante/historial" className={styles.mobileMenuItem}>
-            <History className={styles.icon} />
-            Mi historial
-          </Link>
-
-          <Link href="/estudiante/perfil" className={styles.mobileMenuItem}>
-            <UserRound className={styles.icon} />
-            Mi perfil
-          </Link>
-
-          <button
-            type="button"
-            onClick={logout}
-            className={styles.mobileMenuItem}
+      {NAV.map(({ href, label, icon: Icon, badge }) => {
+        const active = isActive(href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.mobileNavButton} ${active ? styles.mobileNavButtonActive : ''}`}
           >
-            <LogOut className={styles.icon} />
-            Cerrar sesión
-          </button>
-        </div>
-      </details>
+            <span className={styles.mobileNavIconWrap}>
+              <Icon className={styles.mobileIcon} />
+              {badge && pendingSurveys > 0 && (
+                <span className={styles.mobileBadge}>
+                  {pendingSurveys > 9 ? '9+' : pendingSurveys}
+                </span>
+              )}
+            </span>
+            <span>{label}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 }

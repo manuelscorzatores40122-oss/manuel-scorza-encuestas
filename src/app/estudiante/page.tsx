@@ -1,5 +1,9 @@
 import Link from 'next/link';
-import { ClipboardList, Heart, Megaphone, Phone, UserRound, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import {
+  ClipboardList, Heart, Megaphone, Phone, UserRound,
+  ChevronRight, ChevronDown, GraduationCap, Layers, AlertCircle, PenLine,
+} from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { listPublishedAnnouncementsFor } from '@/lib/announcements';
@@ -50,6 +54,7 @@ export default async function EstudianteHome() {
 
   const firstName = student.nombres.split(' ')[0];
   const nivel = student.section.grade.nivel === 'PRIMARIA' ? 'Primaria' : 'Secundaria';
+  const gradeName = `${student.section.grade.name} ${student.section.name}`;
 
   return (
     <div className={styles.page}>
@@ -57,67 +62,79 @@ export default async function EstudianteHome() {
       {/* ══ HERO BANNER ══ */}
       <div className={styles.hero}>
         <div className={styles.heroBg} />
+
         <div className={styles.heroContent}>
           <p className={styles.heroGreeting}>¡Bienvenido/a de vuelta!</p>
           <h1 className={styles.heroName}>{firstName}</h1>
-          <span className={styles.heroBadge}>
-            {nivel} · {student.section.grade.name} {student.section.name}
-          </span>
+          <div className={styles.heroPills}>
+            <span className={styles.heroPill}>
+              <GraduationCap className={styles.heroPillIcon} />
+              {nivel}
+            </span>
+            <span className={styles.heroPill}>
+              <Layers className={styles.heroPillIcon} />
+              {gradeName}
+            </span>
+          </div>
         </div>
-        <div className={styles.heroIllustration}>🎓</div>
+
+        <div className={styles.heroShieldCard}>
+          <Image
+            src="/sss.png"
+            alt="I.E. 40122 Manuel Scorza Torres"
+            width={92}
+            height={92}
+            className={styles.heroShieldImg}
+            priority
+          />
+          <span className={styles.heroShieldLabel}>I.E.</span>
+          <span className={styles.heroShieldNum}>40122 Manuel Scorza</span>
+        </div>
       </div>
 
-      {/* ══ BOTONES DE ACCIÓN ══ */}
-      <div className={styles.actionsCol}>
+      {/* ══ CUADRÍCULA DE ACCIONES (2 × 2) ══ */}
+      <div className={styles.actionsGrid}>
 
-        <Link href="/estudiante/encuestas" className={`${styles.actionBtn} ${styles.actionOrange}`}>
-          <div className={styles.actionLeft}>
-            <div className={styles.actionIconWrap}>
-              <ClipboardList className={styles.actionIcon} />
-            </div>
-            <div className={styles.actionText}>
-              <span className={styles.actionTitle}>Ver encuestas activas</span>
-              <span className={styles.actionSub}>
-                {surveys.length > 0
-                  ? `${surveys.length} pendiente${surveys.length > 1 ? 's' : ''}`
-                  : 'Sin pendientes'}
-              </span>
-            </div>
+        <Link href="/estudiante/encuestas" className={`${styles.actionCard} ${styles.cardOrange}`}>
+          <div className={styles.cardIconBox}>
+            <ClipboardList className={styles.cardIconSvg} />
           </div>
-          {surveys.length > 0 && (
-            <span className={styles.actionBadge}>{surveys.length}</span>
+          <span className={styles.cardTitle}>Encuestas</span>
+          {surveys.length > 0 ? (
+            <span className={styles.cardBadge}>
+              {surveys.length} pendiente{surveys.length > 1 ? 's' : ''}
+            </span>
+          ) : (
+            <span className={styles.cardSub}>Sin pendientes</span>
           )}
-          <ChevronRight className={styles.actionArrow} />
         </Link>
 
-        <Link href="/estudiante/anuncios" className={`${styles.actionBtn} ${styles.actionBlue}`}>
-          <div className={styles.actionLeft}>
-            <div className={styles.actionIconWrap}>
-              <Megaphone className={styles.actionIcon} />
-            </div>
-            <div className={styles.actionText}>
-              <span className={styles.actionTitle}>Ver anuncios</span>
-              <span className={styles.actionSub}>Comunicados de la institución</span>
-            </div>
+        <Link href="/estudiante/anuncios" className={`${styles.actionCard} ${styles.cardBlue}`}>
+          <div className={styles.cardIconBox}>
+            <Megaphone className={styles.cardIconSvg} />
           </div>
-          <ChevronRight className={styles.actionArrow} />
+          <span className={styles.cardTitle}>Anuncios</span>
+          <span className={styles.cardSub}>Comunicados</span>
         </Link>
 
-        <Link href="/estudiante/historial" className={`${styles.actionBtn} ${styles.actionGreen}`}>
-          <div className={styles.actionLeft}>
-            <div className={styles.actionIconWrap}>
-              <Heart className={styles.actionIcon} />
-            </div>
-            <div className={styles.actionText}>
-              <span className={styles.actionTitle}>Mi historial</span>
-              <span className={styles.actionSub}>
-                {myResponses > 0
-                  ? `${myResponses} respuesta${myResponses > 1 ? 's' : ''} enviada${myResponses > 1 ? 's' : ''}`
-                  : 'Sin respuestas aún'}
-              </span>
-            </div>
+        <Link href="/estudiante/historial" className={`${styles.actionCard} ${styles.cardGreen}`}>
+          <div className={styles.cardIconBox}>
+            <Heart className={styles.cardIconSvg} />
           </div>
-          <ChevronRight className={styles.actionArrow} />
+          <span className={styles.cardTitle}>Mi historial</span>
+          <span className={styles.cardSub}>
+            {myResponses > 0
+              ? `${myResponses} respuesta${myResponses > 1 ? 's' : ''}`
+              : 'Sin respuestas'}
+          </span>
+        </Link>
+
+        <Link href="/estudiante/perfil" className={`${styles.actionCard} ${styles.cardPurple}`}>
+          <div className={styles.cardIconBox}>
+            <UserRound className={styles.cardIconSvg} />
+          </div>
+          <span className={styles.cardTitle}>Mi perfil</span>
+          <span className={styles.cardSub}>Ver datos</span>
         </Link>
 
       </div>
@@ -142,17 +159,22 @@ export default async function EstudianteHome() {
 
           <div className={styles.surveyList}>
             {surveys.slice(0, 3).map((s, i) => (
-              <Link key={s.id} href={`/estudiante/encuestas/${s.id}`} className={styles.surveyCard}>
-                <div className={styles.surveyCardNum}>{i + 1}</div>
-                <div className={styles.surveyCardBody}>
-                  <p className={styles.surveyCardTitle}>{s.title}</p>
+              <details key={s.id} className={styles.surveyAccordion}>
+                <summary className={styles.surveyAccordionHead}>
+                  <div className={styles.surveyCardNum}>{i + 1}</div>
+                  <span className={styles.surveyCardTitle}>{s.title}</span>
+                  <ChevronDown className={styles.surveyChevron} />
+                </summary>
+                <div className={styles.surveyAccordionBody}>
                   {s.description && (
                     <p className={styles.surveyCardDesc}>{s.description}</p>
                   )}
-                  <span className={styles.surveyCardCta}>Responder ahora →</span>
+                  <Link href={`/estudiante/encuestas/${s.id}`} className={styles.surveyCtaBtn}>
+                    Responder ahora
+                    <ChevronRight className={styles.surveyCtaBtnIcon} />
+                  </Link>
                 </div>
-                <ChevronRight className={styles.surveyCardArrow} />
-              </Link>
+              </details>
             ))}
           </div>
 
@@ -166,34 +188,39 @@ export default async function EstudianteHome() {
 
       {/* ══ ANUNCIOS ══ */}
       {announcements.length > 0 && (
-        <section className={styles.announcementsSection}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>
-              <Megaphone className={styles.sectionIcon} />
-              Anuncios
-            </h2>
-            <Link href="/estudiante/anuncios" className={styles.seeAllLink}>Ver todos →</Link>
-          </div>
+        <details className={styles.announcementsSection}>
+          <summary className={styles.cardSummary}>
+            <Megaphone className={styles.sectionIcon} />
+            <span className={styles.cardSummaryTitle}>Anuncios</span>
+            <Link href="/estudiante/anuncios" className={styles.seeAllLink}>
+              Ver todos →
+            </Link>
+            <ChevronDown className={styles.cardChevron} />
+          </summary>
           <div className={styles.announcementList}>
             {announcements.map((a) => (
-              <article key={a.id} className={styles.announcementCard}>
-                <p className={styles.announcementTitle}>{a.title}</p>
+              <details key={a.id} className={styles.announcementCard}>
+                <summary className={styles.announcementSummary}>
+                  <span className={styles.announcementTitle}>{a.title}</span>
+                  <ChevronDown className={styles.announcementChevron} />
+                </summary>
                 <p className={styles.announcementBody}>{a.content}</p>
-              </article>
+              </details>
             ))}
           </div>
-        </section>
+        </details>
       )}
 
-      {/* ══ CONTACTO + PERFIL ══ */}
-      <div className={styles.bottomGrid}>
+      {/* ══ FILA INFERIOR: CONTACTO + PERFIL ══ */}
+      <div className={styles.contactRow}>
 
         {/* Contacto de emergencia */}
-        <div className={styles.contactCard}>
-          <h2 className={styles.sectionTitle}>
+        <details className={styles.contactCard}>
+          <summary className={styles.cardSummary}>
             <Phone className={styles.sectionIcon} />
-            Contacto de emergencia
-          </h2>
+            <span className={styles.cardSummaryTitle}>Contacto de emergencia</span>
+            <ChevronDown className={styles.cardChevron} />
+          </summary>
 
           {emergencyContact ? (
             <div className={styles.contactBody}>
@@ -210,23 +237,46 @@ export default async function EstudianteHome() {
               </div>
             </div>
           ) : (
-            <p className={styles.emptyContact}>
-              Aún no tienes contacto registrado.
-            </p>
+            <div className={styles.cardBody}>
+              <div className={styles.emptyContact}>
+                <AlertCircle className={styles.emptyContactIcon} />
+                Aún no tienes contacto registrado
+              </div>
+              <Link href="/estudiante/perfil" className={styles.addLink}>
+                <ChevronRight size={13} /> Agregar contacto de emergencia
+              </Link>
+            </div>
           )}
-        </div>
+        </details>
 
-        {/* Ir al perfil */}
-        <Link href="/estudiante/perfil" className={styles.profileCard}>
-          <div className={styles.profileIconBox}>
-            <UserRound className={styles.profileIcon} />
+        {/* Perfil resumen */}
+        <details className={styles.profileSummaryCard}>
+          <summary className={styles.cardSummary}>
+            <UserRound className={styles.sectionIcon} />
+            <span className={styles.cardSummaryTitle}>Mi perfil</span>
+            <ChevronDown className={styles.cardChevron} />
+          </summary>
+
+          <div className={styles.cardBody}>
+            <div className={styles.profileRows}>
+              <div className={styles.profileRow}>
+                <span className={styles.prLabel}>Nombre</span>
+                <span className={styles.prValue}>{firstName}</span>
+              </div>
+              <div className={styles.profileRow}>
+                <span className={styles.prLabel}>Nivel</span>
+                <span className={styles.prValue}>{nivel} · {gradeName}</span>
+              </div>
+              <div className={styles.profileRow}>
+                <span className={styles.prLabel}>Institución</span>
+                <span className={styles.prValue}>I.E. 40122 Manuel Scorza</span>
+              </div>
+            </div>
+            <Link href="/estudiante/perfil" className={styles.profileEditLink}>
+              <PenLine size={12} /> Editar perfil
+            </Link>
           </div>
-          <p className={styles.profileTitle}>Mi perfil</p>
-          <p className={styles.profileDesc}>
-            Actualiza datos de tu apoderado y número de emergencia.
-          </p>
-          <span className={styles.profileCta}>Editar datos →</span>
-        </Link>
+        </details>
 
       </div>
     </div>

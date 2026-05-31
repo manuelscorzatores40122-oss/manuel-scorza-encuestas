@@ -48,17 +48,11 @@ export default async function HistorialEstudiante({
   return (
     <div className={styles.page}>
 
-      {/* Back + acciones */}
-      <div className={styles.topBar}>
-        <Link href="/psicologo/estudiantes" className={styles.backLink}>
-          <ArrowLeft className={styles.backIcon} />
-          Volver a estudiantes
-        </Link>
-        <BtnEliminarEstudiante
-          studentId={student.id}
-          nombre={`${student.apellidoPaterno} ${student.nombres}`}
-        />
-      </div>
+      {/* Back */}
+      <Link href="/psicologo/estudiantes" className={styles.backLink}>
+        <ArrowLeft className={styles.backIcon} />
+        Volver a estudiantes
+      </Link>
 
       {/* Student info */}
       <div className={styles.card}>
@@ -185,6 +179,14 @@ export default async function HistorialEstudiante({
             </p>
           )}
         </div>
+      </div>
+
+      {/* Zona peligrosa — discreta, al fondo */}
+      <div className={styles.dangerZone}>
+        <BtnEliminarEstudiante
+          studentId={student.id}
+          nombre={`${student.apellidoPaterno} ${student.nombres}`}
+        />
       </div>
 
     </div>

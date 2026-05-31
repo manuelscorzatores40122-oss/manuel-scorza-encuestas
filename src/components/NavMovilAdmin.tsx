@@ -1,25 +1,37 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutGrid,
-  Users,
-  Megaphone,
-  ShieldAlert,
-  MoreHorizontal,
-  Upload,
-  FileText,
-  LogOut,
+  LayoutGrid, Users, Megaphone, ShieldAlert,
+  MoreHorizontal, X, Upload, FileText, LogOut,
 } from 'lucide-react';
 import { logoutAction } from '@/app/login/actions';
 import styles from './NavMovilAdmin.module.css';
 
 export function AdminMobileBottomNav() {
-  const pathname = usePathname();
-  const router   = useRouter();
+  const pathname          = usePathname();
+  const router            = useRouter();
+  const [open, setOpen]   = useState(false);
+  const menuRef           = useRef<HTMLDivElement>(null);
+
+  /* Cerrar al tocar fuera */
+  useEffect(() => {
+    if (!open) return;
+    function outside(e: MouseEvent | TouchEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown',  outside);
+    document.addEventListener('touchstart', outside);
+    return () => {
+      document.removeEventListener('mousedown',  outside);
+      document.removeEventListener('touchstart', outside);
+    };
+  }, [open]);
 
   async function logout() {
+    setOpen(false);
     await logoutAction();
     router.replace('/login');
   }
@@ -56,27 +68,34 @@ export function AdminMobileBottomNav() {
         <span>Reglas</span>
       </Link>
 
-      <details className={styles.more}>
-        <summary className={styles.btn}>
-          <span className={styles.iconWrap}><MoreHorizontal className={styles.icon} /></span>
+      {/* Más — menú controlado */}
+      <div ref={menuRef} className={styles.moreWrap}>
+        <button
+          type="button"
+          className={`${styles.btn} ${open ? styles.btnActive : ''}`}
+          onClick={() => setOpen(v => !v)}
+          aria-expanded={open}
+        >
+          <span className={styles.iconWrap}>
+            {open ? <X className={styles.icon} /> : <MoreHorizontal className={styles.icon} />}
+          </span>
           <span>Más</span>
-        </summary>
+        </button>
 
-        <div className={styles.morePanel}>
-          <Link href="/admin/importar" className={styles.moreItem}>
-            <Upload className={styles.moreIcon} />
-            Importar
-          </Link>
-          <Link href="/admin/auditoria" className={styles.moreItem}>
-            <FileText className={styles.moreIcon} />
-            Auditoría
-          </Link>
-          <button type="button" onClick={logout} className={styles.moreItemLogout}>
-            <LogOut className={styles.moreIcon} />
-            Cerrar sesión
-          </button>
-        </div>
-      </details>
+        {open && (
+          <div className={styles.morePanel}>
+            <Link href="/admin/importar"  className={styles.moreItem} onClick={() => setOpen(false)}>
+              <Upload className={styles.moreIcon} />Importar
+            </Link>
+            <Link href="/admin/auditoria" className={styles.moreItem} onClick={() => setOpen(false)}>
+              <FileText className={styles.moreIcon} />Auditoría
+            </Link>
+            <button type="button" onClick={logout} className={styles.moreItemLogout}>
+              <LogOut className={styles.moreIcon} />Cerrar sesión
+            </button>
+          </div>
+        )}
+      </div>
 
     </nav>
   );

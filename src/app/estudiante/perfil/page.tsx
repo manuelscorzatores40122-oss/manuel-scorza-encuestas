@@ -1,5 +1,8 @@
+import { redirect } from 'next/navigation';
+import { LogOut } from 'lucide-react';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { logoutAction } from '@/app/login/actions';
 import { FormularioPerfil } from './FormularioPerfil';
 import styles from './perfil.module.css';
 
@@ -26,6 +29,12 @@ export default async function PerfilEstudiantePage() {
   const fullName = `${student.apellidoPaterno} ${student.apellidoMaterno}, ${student.nombres}`;
   const grade = `${student.section.grade.name} ${student.section.name}`;
 
+  async function handleLogout() {
+    'use server';
+    await logoutAction();
+    redirect('/login');
+  }
+
   return (
     <div className={styles.page}>
 
@@ -36,6 +45,12 @@ export default async function PerfilEstudiantePage() {
           <h1 className={styles.bannerTitle}>Mi perfil</h1>
           <p className={styles.bannerName}>{fullName} · {grade}</p>
         </div>
+        <form action={handleLogout} className={styles.logoutForm}>
+          <button type="submit" className={styles.logoutBtn}>
+            <LogOut size={14} />
+            Salir
+          </button>
+        </form>
       </div>
 
       <FormularioPerfil contacts={contacts} />

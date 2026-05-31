@@ -164,3 +164,4 @@
   flex-shrink: 0;
   stroke-width: 1.75;
 }
+.moreWrap { position: relative; display: flex; flex-direction: column; align-items: center; }

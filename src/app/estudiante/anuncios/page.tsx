@@ -1,16 +1,34 @@
-import { Megaphone, Calendar } from 'lucide-react';
-import { listPublishedAnnouncementsFor } from '@/lib/announcements';
+import { Megaphone, Calendar, ChevronDown } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
+import { BtnInstalarApp } from '@/components/BtnInstalarApp';
 import styles from './anuncios.module.css';
 
 export default async function AnunciosEstudiante() {
-  const announcements = await listPublishedAnnouncementsFor('STUDENT', 100);
+  const announcements = await prisma.announcement.findMany({
+    where: {
+      isPublished: true,
+      OR: [
+        { targetRoles: { has: 'STUDENT' } },
+        { targetRoles: { isEmpty: true } },
+      ],
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+    select: {
+      id:        true,
+      title:     true,
+      content:   true,
+      createdAt: true,
+      createdBy: { select: { fullName: true } },
+    },
+  });
 
   return (
     <div className={styles.page}>
 
-      {/* Banner superior */}
+      {/* Banner */}
       <div className={styles.banner}>
-        <div className={styles.bannerIcon}>
+        <div className={styles.bannerIconWrap}>
           <Megaphone className={styles.bannerIconSvg} />
         </div>
         <div className={styles.bannerText}>
@@ -21,45 +39,72 @@ export default async function AnunciosEstudiante() {
               : 'Sin comunicados por ahora'}
           </p>
         </div>
-        {announcements.length > 0 && (
-          <span className={styles.bannerBadge}>{announcements.length}</span>
-        )}
       </div>
 
-      {/* Lista de anuncios */}
+      {/* Sección */}
+      <div className={styles.sectionRow}>
+        <span className={styles.sectionTitle}>Comunicados recientes</span>
+        <span className={styles.sectionCount}>
+          {announcements.length} {announcements.length === 1 ? 'anuncio' : 'anuncios'}
+        </span>
+      </div>
+
+      {/* Instalar app */}
+      <BtnInstalarApp />
+
+      {/* Acordeón */}
       {announcements.length > 0 ? (
         <div className={styles.list}>
-          {announcements.map((a) => (
-            <article key={a.id} className={styles.card}>
+          {announcements.map((a) => {
+            const initial = a.createdBy.fullName.charAt(0).toUpperCase();
+            const fecha = new Date(a.createdAt).toLocaleDateString('es-PE', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            });
 
-              <div className={styles.cardHead}>
-                <div className={styles.cardTitleRow}>
-                  <div className={styles.cardIconWrap}>
-                    <Megaphone className={styles.cardIcon} />
+            return (
+              <details
+                key={a.id}
+                className={styles.item}
+              >
+                {/* Cabecera / trigger */}
+                <summary className={styles.itemSummary}>
+                  <div className={styles.summaryLeft}>
+                    <div className={styles.summaryIcon}>
+                      <Megaphone className={styles.summaryIconSvg} />
+                    </div>
+                    <div className={styles.summaryText}>
+                      <span className={styles.summaryTitle}>{a.title}</span>
+                      <span className={styles.summaryMeta} suppressHydrationWarning>
+                        <Calendar className={styles.summaryMetaIcon} />
+                        {fecha}
+                      </span>
+                    </div>
                   </div>
-                  <h2 className={styles.cardTitle}>{a.title}</h2>
+                  <ChevronDown className={styles.summaryChevron} />
+                </summary>
+
+                {/* Contenido expandible */}
+                <div className={styles.itemBody}>
+                  <p className={styles.itemContent}>{a.content}</p>
+                  <div className={styles.itemFooter}>
+                    <div className={styles.itemAuthor}>
+                      <div className={styles.authorAvatar}>{initial}</div>
+                      <span className={styles.authorName}>{a.createdBy.fullName}</span>
+                    </div>
+                  </div>
                 </div>
-                <span className={styles.cardDate} suppressHydrationWarning>
-                  <Calendar className={styles.cardDateIcon} />
-                  {new Date(a.createdAt).toLocaleDateString('es-PE', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                </span>
-              </div>
 
-              <div className={styles.cardBody}>
-                <div className={styles.cardDivider} />
-                <p className={styles.cardContent}>{a.content}</p>
-              </div>
-
-            </article>
-          ))}
+              </details>
+            );
+          })}
         </div>
       ) : (
         <div className={styles.empty}>
-          <span className={styles.emptyIcon}>📢</span>
+          <div className={styles.emptyIconWrap}>
+            <Megaphone className={styles.emptyIconSvg} />
+          </div>
           <p className={styles.emptyTitle}>Sin anuncios por ahora</p>
           <p className={styles.emptyDesc}>
             Cuando el colegio publique comunicados, aparecerán aquí.

@@ -6,6 +6,7 @@ import {
   User, Lock, LogIn, Shield,
   ClipboardCheck, Activity, Users, Clock3, BookOpen, ShieldCheck,
 } from 'lucide-react';
+import Image from 'next/image';
 import { loginAction } from './actions';
 import styles from './login.module.css';
 
@@ -51,8 +52,11 @@ export default function LoginPage() {
         <div className={`${styles.wrap} ${styles.nav}`}>
 
           <a href="#" className={styles.brand}>
-            <span className={styles.brandName}>Bienestar Escolar</span>
-            <span className={styles.brandSub}>I.E. 40122 Manuel Scorza Torres</span>
+            <Image src="/sss.png" alt="" width={44} height={44} className={styles.brandShield} priority />
+            <div className={styles.brandText}>
+              <span className={styles.brandName}>Bienestar Escolar</span>
+              <span className={styles.brandSub}>I.E. 40122 Manuel Scorza Torres</span>
+            </div>
           </a>
 
           <nav className={styles.navLinks}>
@@ -78,6 +82,10 @@ export default function LoginPage() {
 
           {/* Izquierda — copy */}
           <div className={styles.heroLeft}>
+            {/* Escudo como marca de agua */}
+            <div className={styles.heroShield} aria-hidden>
+              <Image src="/sss.png" alt="" width={300} height={300} className={styles.heroShieldImg} />
+            </div>
             <div className={styles.heroEyebrow}>Bienestar emocional estudiantil</div>
 
             <h1 className={styles.heroTitle}>
@@ -104,6 +112,29 @@ export default function LoginPage() {
               <Shield className={styles.heroNoteIcon} />
               Tus datos están protegidos y solo el área de psicología puede verlos.
             </div>
+
+            {/* Fotos de la institución */}
+            <div className={styles.heroPhotos}>
+              <div className={styles.heroPhoto}>
+                <Image
+                  src="/primaria.jpg"
+                  alt="Estudiantes de primaria — I.E. 40122"
+                  fill
+                  style={{ objectFit: 'cover', objectPosition: 'center top' }}
+                />
+                <span className={styles.heroPhotoLabel}>Nivel Primaria</span>
+              </div>
+              <div className={styles.heroPhoto}>
+                <Image
+                  src="/secundaria.jpg"
+                  alt="Estudiantes de secundaria — I.E. 40122"
+                  fill
+                  style={{ objectFit: 'cover', objectPosition: 'center top' }}
+                />
+                <span className={styles.heroPhotoLabel}>Nivel Secundaria</span>
+              </div>
+            </div>
+
           </div>
 
           {/* Derecha — formulario */}
@@ -187,6 +218,65 @@ export default function LoginPage() {
         </div>
 
       </div>
+
+      {/* ══ GALERÍA INSTITUCIONAL ═══════════════════════ */}
+      <div className={styles.galeriaStrip}>
+        <div className={styles.galeriaItem}>
+          <Image
+            src="/patio.jpg"
+            alt="Actividades institucionales — I.E. 40122 Manuel Scorza Torres"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+          />
+          <div className={styles.galeriaOverlay}>
+            <span className={styles.galeriaLabel}>Comunidad escolar</span>
+          </div>
+        </div>
+        <div className={styles.galeriaItem}>
+          <Image
+            src="/bandera.jpg"
+            alt="Acto cívico — I.E. 40122 Manuel Scorza Torres"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center top' }}
+          />
+          <div className={styles.galeriaOverlay}>
+            <span className={styles.galeriaLabel}>Identidad y patria</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ══ MANUEL SCORZA TORRES ════════════════════════ */}
+      <section className={styles.homenajeSection}>
+        <div className={styles.wrap}>
+          <div className={styles.homenajeGrid}>
+
+            <div className={styles.homenajePhoto}>
+              <Image
+                src="/manuel-scorza.jpg"
+                alt="Manuel Scorza Torres"
+                fill
+                style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              />
+            </div>
+
+            <div>
+              <div className={styles.homenajeLabel}>Nuestra Institución</div>
+              <h2 className={styles.homenajeTitle}>Manuel Scorza Torres</h2>
+              <p className={styles.homenajeBio}>
+                Poeta, novelista y activista peruano (Lima, 1928 – Madrid, 1983).
+                Reconocido por su ciclo de novelas indigenistas <em>La guerra silenciosa</em>,
+                fue un incansable defensor de los pueblos originarios del Perú.
+                Nuestra institución lleva su nombre como homenaje permanente a su
+                legado literario y humano.
+              </p>
+              <blockquote className={styles.homenajeQuote}>
+                "Los pobres no tienen historia, sólo tienen historias."
+              </blockquote>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
       {/* ══ FEATURES ════════════════════════════════════ */}
       <section className={styles.block} id="programa">

@@ -11,15 +11,6 @@
   animation: fadeIn 0.25s ease both;
 }
 
-/* ── Top bar ────────────────────────────── */
-.topBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
 /* ── Back link ──────────────────────────── */
 .backLink {
   display: inline-flex;
@@ -255,25 +246,29 @@
   font-size: 0.875rem;
 }
 
-/* ── Eliminar estudiante ────────────────── */
+/* ── Zona peligrosa (fondo de página) ───── */
+.dangerZone {
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Eliminar estudiante — botón discreto── */
 .deleteBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 14px;
-  font-size: .78rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: #b91c1c;
-  border: 1.5px solid rgba(185,28,28,.3);
+  gap: 5px;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
   background: none;
+  border: none;
   cursor: pointer;
-  transition: background .12s, color .12s;
   font-family: inherit;
+  padding: 4px 0;
+  transition: color .15s;
 }
-.deleteBtn:hover { background: #b91c1c; color: #fff; }
+.deleteBtn:hover { color: #b91c1c; }
 
 .deleteConfirm {
   display: flex;
